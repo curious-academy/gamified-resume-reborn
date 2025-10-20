@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "prestart": "npm run build:lib",
     "start": "ng serve main-app",
     "build": "ng build main-app",
     "build:lib": "ng build shared-ui",

@@ -3,27 +3,8 @@
     <h1>{{ title() }}</h1>
     <p>Angular 21 Monorepo - Gamified Resume Reborn</p>
   </header>
-  
-  <main>
-    <section class="demo-section">
-      <h2>Shared Library Demo</h2>
-      <p>This button component comes from the shared-ui library:</p>
-      <div class="button-group">
-        <lib-button [label]="'Start Game'" />
-        <lib-button [label]="'View Profile'" />
-        <lib-button [label]="'Settings'" />
-      </div>
-    </section>
 
-    <section class="info-section">
-      <h2>Monorepo Structure</h2>
-      <ul>
-        <li><strong>main-app</strong>: This application</li>
-        <li><strong>shared-ui</strong>: Shared UI components library</li>
-      </ul>
-      <p>Both projects live together in the same workspace and can easily share code!</p>
-    </section>
-  </main>
-  
+  <div id="game-container"></div>
+
   <router-outlet />
 </div>

@@ -1,13 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Button } from 'shared-ui';
+import { GameComponent } from './features/game/game.component';
 
+/**
+ * Composant racine de l'application
+ * Sert de conteneur principal pour l'application
+ */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Button],
+  imports: [RouterOutlet, GameComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('main-app');
+  protected readonly title = signal('Gamified Resume Reborn');
 }

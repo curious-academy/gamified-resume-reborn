@@ -75,3 +75,65 @@ main {
 .demo-section {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
+
+.game-wrapper {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 20px 0;
+
+  #game-container {
+    border: 3px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .game-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 15px 0;
+
+      li {
+        padding: 5px 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.8;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 15px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .game-wrapper {
+    flex-direction: column;
+    align-items: center;
+
+    .game-info {
+      width: 100%;
+      max-width: 400px;
+    }
+  }
+}

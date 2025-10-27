@@ -1,29 +1,24 @@
 <div class="container">
   <header>
     <h1>{{ title() }}</h1>
-    <p>Angular 21 Monorepo - Gamified Resume Reborn</p>
+    <p>Jeu 2D Style Final Fantasy 6 - Déplacez-vous avec les flèches directionnelles</p>
   </header>
-  
-  <main>
-    <section class="demo-section">
-      <h2>Shared Library Demo</h2>
-      <p>This button component comes from the shared-ui library:</p>
-      <div class="button-group">
-        <lib-button [label]="'Start Game'" />
-        <lib-button [label]="'View Profile'" />
-        <lib-button [label]="'Settings'" />
-      </div>
-    </section>
 
-    <section class="info-section">
-      <h2>Monorepo Structure</h2>
+  <div class="game-wrapper">
+    <app-game></app-game>
+    <div class="game-info">
+      <h3>🎮 Contrôles</h3>
       <ul>
-        <li><strong>main-app</strong>: This application</li>
-        <li><strong>shared-ui</strong>: Shared UI components library</li>
+        <li>⬆️ Haut (Bleu)</li>
+        <li>⬇️ Bas (Vert)</li>
+        <li>⬅️ Gauche (Rouge)</li>
+        <li>➡️ Droite (Jaune)</li>
+        <li>⚡ Shift + Flèches = Courir</li>
       </ul>
-      <p>Both projects live together in the same workspace and can easily share code!</p>
-    </section>
-  </main>
-  
+      <p><strong>Objectif :</strong> Explorez la carte et évitez les murs gris !</p>
+      <p><strong>Astuce :</strong> Maintenez Shift pour courir plus vite avec des effets visuels !</p>
+    </div>
+  </div>
+
   <router-outlet />
 </div>

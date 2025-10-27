@@ -9,7 +9,21 @@ Ce projet est une application **gamifiée** utilisant:
 
 ---
 
-## 📋 Workflow de développement des features
+## 📋 Workflows de développement
+
+### ⚠️ Règle importante : Détection automatique du type de tâche
+
+Avant de commencer tout travail, **TOUJOURS** déterminer le type de tâche :
+
+1. **Nouvelle feature** : Ajout de fonctionnalités nouvelles (ex: "Ajout du système d'inventaire")
+   → Suivre le **Workflow Feature** (6 étapes)
+
+2. **Tâche technique** : Refactoring, corrections, améliorations, optimisations (ex: "Refactoring du code", "Amélioration des performances", "Correction de bugs")
+   → Suivre le **Workflow Technique** (6 étapes)
+
+---
+
+## 📋 Workflow Feature (Nouvelles fonctionnalités)
 
 ### Processus obligatoire pour chaque nouvelle feature
 
@@ -83,6 +97,98 @@ Exemple: "Ajout du système d'inventaire" → "feature/add-inventory-system"
 ```
 ⏸️ Message obligatoire:
 "✅ Feature setup complet !
+📝 Issue #[numéro] créée: [URL]
+🌿 Branche créée: [nom-de-la-branche]
+
+⏳ Attendant votre confirmation pour commencer l'implémentation.
+💬 Tapez 'go' ou 'continue' pour démarrer le développement."
+
+⛔ NE PAS continuer sans confirmation explicite de l'utilisateur
+```
+
+---
+
+## 📋 Workflow Technique (Refactoring, Corrections, Améliorations)
+
+### Processus obligatoire pour chaque tâche technique
+
+Suis **rigoureusement** ces étapes dans l'ordre:
+
+#### 1️⃣ Collecte du titre de la tâche
+```
+❓ Question à poser: "Quel est le titre de la tâche technique que vous souhaitez réaliser ?"
+📝 Format attendu: Titre court et descriptif (ex: "Refactoring du composant App", "Correction du bug de collision")
+✅ Validation: Le titre doit être clair et en français
+```
+
+#### 2️⃣ Collecte du contenu détaillé
+```
+❓ Question à poser: "Décrivez le contenu et les objectifs de cette tâche technique"
+📝 Format attendu: Description détaillée incluant:
+   - Problème actuel ou contexte
+   - Objectif de l'amélioration/correction
+   - Approche technique envisagée
+   - Impacts attendus
+✅ Validation: La description doit être suffisamment détaillée pour implémenter
+```
+
+#### 3️⃣ Collecte des critères de validation
+```
+❓ Question à poser: "Quels sont les critères de validation pour cette tâche technique ?"
+📝 Format attendu: Liste de critères vérifiables
+   Exemple pour un refactoring:
+   - Le code compile sans erreur
+   - Les tests existants passent toujours
+   - L'architecture respecte les principes SOLID
+   - La documentation est à jour
+✅ Validation: Au moins 3 critères de validation clairs
+```
+
+#### 4️⃣ Création de l'issue GitHub
+```
+🔧 Action: Créer automatiquement une issue sur le repository avec:
+   - Titre: [même titre qu'à l'étape 1]
+   - Body: 
+     ## Contexte
+     [contenu de l'étape 2]
+     
+     ## Critères de validation
+     [critères de l'étape 3]
+     
+     ## Labels suggérés
+     - enhancement (pour amélioration)
+     - refactoring (pour refactoring)
+     - bug (pour correction)
+     - [frontend/backend selon le cas]
+     
+📍 Repository: curious-academy/gamified-resume-reborn
+✅ Confirmation: Afficher le numéro et l'URL de l'issue créée
+```
+
+#### 5️⃣ Création de la branche locale
+```
+🔧 Action: Créer une branche locale avec le format:
+   - Nom: [type]/[titre-en-kebab-case]
+   - Type: tech/ pour refactoring, fix/ pour corrections, improve/ pour améliorations
+   - Base: branch courante (généralement main ou install-phaser)
+   
+📝 Transformation du titre:
+   - Convertir en anglais
+   - Convertir en kebab-case (minuscules, mots séparés par -)
+   - Préfixer avec le type approprié
+   
+Exemples: 
+   - "Refactoring du composant App" → "tech/refactor-app-component"
+   - "Correction du bug de collision" → "fix/collision-bug"
+   - "Amélioration des performances" → "improve/performance-optimization"
+
+✅ Confirmation: Afficher le nom de la branche créée
+```
+
+#### 6️⃣ Pause et attente de confirmation
+```
+⏸️ Message obligatoire:
+"✅ Tâche technique setup complet !
 📝 Issue #[numéro] créée: [URL]
 🌿 Branche créée: [nom-de-la-branche]
 
@@ -692,14 +798,19 @@ export class PhaserService {
 
 ## ⚠️ Rappels importants
 
-1. **TOUJOURS suivre le workflow en 6 étapes** pour les nouvelles features
-2. **JAMAIS** continuer après l'étape 6 sans confirmation explicite
-3. **TOUJOURS** créer l'issue GitHub avant la branche
-4. **TOUJOURS** utiliser le kebab-case en anglais pour les noms de branches
-5. **TOUJOURS** préfixer les branches avec `feature/`
-6. **TOUJOURS** utiliser les signals Angular 21 au lieu des Subjects RxJS quand possible
-7. **TOUJOURS** utiliser des records C# pour les DTOs immutables
-8. **TOUJOURS** typer strictement (TypeScript et C#)
+1. **TOUJOURS détecter le type de tâche** (feature vs technique) avant de commencer
+2. **TOUJOURS suivre le workflow en 6 étapes** approprié (Feature ou Technique)
+3. **JAMAIS** continuer après l'étape 6 sans confirmation explicite
+4. **TOUJOURS** créer l'issue GitHub avant la branche
+5. **TOUJOURS** utiliser le kebab-case en anglais pour les noms de branches
+6. **TOUJOURS** utiliser le bon préfixe de branche :
+   - `feature/` pour les nouvelles fonctionnalités
+   - `tech/` pour les refactorings
+   - `fix/` pour les corrections de bugs
+   - `improve/` pour les améliorations
+7. **TOUJOURS** utiliser les signals Angular 21 au lieu des Subjects RxJS quand possible
+8. **TOUJOURS** utiliser des records C# pour les DTOs immutables
+9. **TOUJOURS** typer strictement (TypeScript et C#)
 
 ---
 

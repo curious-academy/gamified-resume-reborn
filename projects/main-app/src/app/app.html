@@ -1,10 +1,24 @@
 <div class="container">
   <header>
     <h1>{{ title() }}</h1>
-    <p>Angular 21 Monorepo - Gamified Resume Reborn</p>
+    <p>Jeu 2D Style Final Fantasy 6 - Déplacez-vous avec les flèches directionnelles</p>
   </header>
 
-  <div id="game-container"></div>
+  <div class="game-wrapper">
+    <div id="game-container"></div>
+    <div class="game-info">
+      <h3>🎮 Contrôles</h3>
+      <ul>
+        <li>⬆️ Haut (Bleu)</li>
+        <li>⬇️ Bas (Vert)</li>
+        <li>⬅️ Gauche (Rouge)</li>
+        <li>➡️ Droite (Jaune)</li>
+        <li>⚡ Shift + Flèches = Courir</li>
+      </ul>
+      <p><strong>Objectif :</strong> Explorez la carte et évitez les murs gris !</p>
+      <p><strong>Astuce :</strong> Maintenez Shift pour courir plus vite avec des effets visuels !</p>
+    </div>
+  </div>
 
   <router-outlet />
 </div>

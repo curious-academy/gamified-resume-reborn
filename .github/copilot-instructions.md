@@ -1,411 +1,242 @@
 # Copilot Instructions - Gamified Resume Reborn
 
-## 🎯 Vue d'ensemble du projet
+## � Language Guidelines
 
-Ce projet est une application **gamifiée** utilisant:
-- **Frontend**: Angular 21 (architecture monorepo)
-- **Backend**: .NET 10 avec Minimal API
-- **Game Engine**: Phaser 3 pour le moteur de jeu 2D
+### Code & Comments
+- ✅ **ALL code MUST be written in ENGLISH** (variables, functions, classes, files, etc.)
+- ✅ **ALL code comments MUST be in ENGLISH** (JSDoc, inline comments, documentation)
+- ✅ **ALL commit messages MUST be in ENGLISH**
+- ✅ **ALL branch names MUST be in ENGLISH**
+
+### Agent Responses
+- ✅ **ALL agent responses to the user MUST be in FRENCH**
+- ✅ When asking questions to the user, use FRENCH
+- ✅ When providing explanations or summaries, use FRENCH
+- ✅ When reporting progress or status, use FRENCH
+
+### Examples
+```typescript
+// ✅ CORRECT - Code and comments in English
+/**
+ * Initializes the game with the provided configuration
+ * @param config Phaser game configuration
+ */
+function initGame(config: GameConfig): void {
+  // Create new game instance
+  const game = new Phaser.Game(config);
+}
+
+// ❌ INCORRECT - Comments in French
+/**
+ * Initialise le jeu avec la configuration fournie
+ * @param config Configuration du jeu Phaser
+ */
+function initGame(config: GameConfig): void {
+  // Créer une nouvelle instance du jeu
+  const game = new Phaser.Game(config);
+}
+```
 
 ---
 
-## 📋 Workflows de développement
+## 🎯 Project Overview
 
-### ⚠️ Règle importante : Détection automatique du type de tâche
-
-Avant de commencer tout travail, **TOUJOURS** déterminer le type de tâche :
-
-1. **Nouvelle feature** : Ajout de fonctionnalités nouvelles (ex: "Ajout du système d'inventaire")
-   → Suivre le **Workflow Feature** (6 étapes)
-
-2. **Tâche technique** : Refactoring, corrections, améliorations, optimisations (ex: "Refactoring du code", "Amélioration des performances", "Correction de bugs")
-   → Suivre le **Workflow Technique** (6 étapes)
+This project is a **gamified** application using:
+- **Frontend**: Angular 21 (monorepo architecture)
+- **Backend**: .NET 10 with Minimal API
+- **Game Engine**: Phaser 3 for 2D game engine
 
 ---
 
-## 📋 Workflow Feature (Nouvelles fonctionnalités)
+## 📋 Development Workflows
 
-### Processus obligatoire pour chaque nouvelle feature
+### ⚠️ Important Rule: Automatic Task Type Detection
 
-Suis **rigoureusement** ces étapes dans l'ordre:
+Before starting any work, **ALWAYS** determine the task type:
 
-#### 1️⃣ Collecte du titre de la feature
-```
-❓ Question à poser: "Quel est le titre de la feature que vous souhaitez développer ?"
-📝 Format attendu: Titre court et descriptif (ex: "Ajout du système d'inventaire")
-✅ Validation: Le titre doit être clair et en français
-```
+1. **New Feature**: Adding new functionality (e.g., "Add inventory system")
+   → Follow the **Feature Workflow** (6 steps)
 
-#### 2️⃣ Collecte du contenu détaillé
-```
-❓ Question à poser: "Décrivez le contenu et les fonctionnalités de cette feature"
-📝 Format attendu: Description détaillée incluant:
-   - Objectif de la feature
-   - Fonctionnalités principales
-   - Comportements attendus
-   - Contraintes techniques
-✅ Validation: La description doit être suffisamment détaillée pour implémenter
-```
+2. **Technical Task**: Refactoring, fixes, improvements, optimizations (e.g., "Refactor code", "Performance improvement", "Bug fix")
+   → Follow the **Technical Workflow** (6 steps)
 
-#### 3️⃣ Collecte des tests d'acceptation
+---
+
+## 📋 Feature Workflow (New Functionality)
+
+### Mandatory process for each new feature
+
+Follow these steps **rigorously** in order:
+
+#### 1️⃣ Collect Feature Title
 ```
-❓ Question à poser: "Quels sont les critères d'acceptation et tests pour cette feature ?"
-📝 Format attendu: Liste de critères testables (Given/When/Then)
-   Exemple:
-   - GIVEN: L'utilisateur est sur l'écran de jeu
-   - WHEN: Il appuie sur la touche 'I'
-   - THEN: L'inventaire s'ouvre avec les items collectés
-✅ Validation: Au moins 3 critères d'acceptation clairs
+❓ Question to ask: "What is the title of the feature you want to develop?"
+📝 Expected format: Short and descriptive title (e.g., "Add inventory system")
+✅ Validation: Title must be clear and in French (for user communication)
 ```
 
-#### 4️⃣ Création de l'issue GitHub
+#### 2️⃣ Collect Detailed Content
 ```
-🔧 Action: Créer automatiquement une issue sur le repository avec:
-   - Titre: [même titre qu'à l'étape 1]
+❓ Question to ask: "Describe the content and functionality of this feature"
+📝 Expected format: Detailed description including:
+   - Feature objective
+   - Main functionalities
+   - Expected behaviors
+   - Technical constraints
+✅ Validation: Description must be detailed enough for implementation
+```
+
+#### 3️⃣ Collect Acceptance Tests
+```
+❓ Question to ask: "What are the acceptance criteria and tests for this feature?"
+📝 Expected format: List of testable criteria (Given/When/Then)
+   Example:
+   - GIVEN: User is on the game screen
+   - WHEN: User presses 'I' key
+   - THEN: Inventory opens with collected items
+✅ Validation: At least 3 clear acceptance criteria
+```
+
+#### 4️⃣ Create GitHub Issue
+```
+🔧 Action: Automatically create an issue on the repository with:
+   - Title: [same title as step 1, translated to English]
    - Body: 
      ## Description
-     [contenu de l'étape 2]
+     [content from step 2, in English]
      
-     ## Critères d'acceptation
-     [tests de l'étape 3]
+     ## Acceptance Criteria
+     [tests from step 3, in English]
      
-     ## Labels suggérés
+     ## Suggested Labels
      - feature
-     - [frontend/backend selon le cas]
+     - [frontend/backend depending on case]
      
 📍 Repository: curious-academy/gamified-resume-reborn
-✅ Confirmation: Afficher le numéro et l'URL de l'issue créée
+✅ Confirmation: Display issue number and URL
 ```
 
-#### 5️⃣ Création de la branche locale
+#### 5️⃣ Create Local Branch
 ```
-🔧 Action: Créer une branche locale avec le format:
-   - Nom: feature/[titre-en-kebab-case]
-   - Base: branch courante (généralement main ou install-phaser)
+🔧 Action: Create a local branch with format:
+   - Name: feature/[title-in-kebab-case]
+   - Base: current branch (usually main or install-phaser)
    
-📝 Transformation du titre:
-   - Convertir en anglais
-   - Convertir en kebab-case (minuscules, mots séparés par -)
-   - Préfixer avec "feature/"
+📝 Title transformation:
+   - Convert to English if not already
+   - Convert to kebab-case (lowercase, words separated by -)
+   - Prefix with "feature/"
    
-Exemple: "Ajout du système d'inventaire" → "feature/add-inventory-system"
+Example: "Add inventory system" → "feature/add-inventory-system"
 
-✅ Confirmation: Afficher le nom de la branche créée
+✅ Confirmation: Display created branch name
 ```
 
-#### 6️⃣ Pause et attente de confirmation
+#### 6️⃣ Pause and Wait for Confirmation
 ```
-⏸️ Message obligatoire:
+⏸️ Mandatory message (in French):
 "✅ Feature setup complet !
-📝 Issue #[numéro] créée: [URL]
-🌿 Branche créée: [nom-de-la-branche]
+📝 Issue #[number] créée: [URL]
+🌿 Branche créée: [branch-name]
 
 ⏳ Attendant votre confirmation pour commencer l'implémentation.
 💬 Tapez 'go' ou 'continue' pour démarrer le développement."
 
-⛔ NE PAS continuer sans confirmation explicite de l'utilisateur
+⛔ DO NOT continue without explicit user confirmation
 ```
 
 ---
 
-## 📋 Workflow Technique (Refactoring, Corrections, Améliorations)
+## 📋 Technical Workflow (Refactoring, Fixes, Improvements)
 
-### Processus obligatoire pour chaque tâche technique
+### Mandatory process for each technical task
 
-Suis **rigoureusement** ces étapes dans l'ordre:
+Follow these steps **rigorously** in order:
 
-#### 1️⃣ Collecte du titre de la tâche
+#### 1️⃣ Collect Task Title
 ```
-❓ Question à poser: "Quel est le titre de la tâche technique que vous souhaitez réaliser ?"
-📝 Format attendu: Titre court et descriptif (ex: "Refactoring du composant App", "Correction du bug de collision")
-✅ Validation: Le titre doit être clair et en français
-```
-
-#### 2️⃣ Collecte du contenu détaillé
-```
-❓ Question à poser: "Décrivez le contenu et les objectifs de cette tâche technique"
-📝 Format attendu: Description détaillée incluant:
-   - Problème actuel ou contexte
-   - Objectif de l'amélioration/correction
-   - Approche technique envisagée
-   - Impacts attendus
-✅ Validation: La description doit être suffisamment détaillée pour implémenter
+❓ Question to ask: "What is the title of the technical task you want to accomplish?"
+📝 Expected format: Short and descriptive title (e.g., "Refactor App component", "Fix collision bug")
+✅ Validation: Title must be clear and in French (for user communication)
 ```
 
-#### 3️⃣ Collecte des critères de validation
+#### 2️⃣ Collect Detailed Content
 ```
-❓ Question à poser: "Quels sont les critères de validation pour cette tâche technique ?"
-📝 Format attendu: Liste de critères vérifiables
-   Exemple pour un refactoring:
-   - Le code compile sans erreur
-   - Les tests existants passent toujours
-   - L'architecture respecte les principes SOLID
-   - La documentation est à jour
-✅ Validation: Au moins 3 critères de validation clairs
+❓ Question to ask: "Describe the content and objectives of this technical task"
+📝 Expected format: Detailed description including:
+   - Current problem or context
+   - Improvement/fix objective
+   - Proposed technical approach
+   - Expected impacts
+✅ Validation: Description must be detailed enough for implementation
 ```
 
-#### 4️⃣ Création de l'issue GitHub
+#### 3️⃣ Collect Validation Criteria
 ```
-🔧 Action: Créer automatiquement une issue sur le repository avec:
-   - Titre: [même titre qu'à l'étape 1]
+❓ Question to ask: "What are the validation criteria for this technical task?"
+📝 Expected format: List of verifiable criteria
+   Example for refactoring:
+   - Code compiles without errors
+   - Existing tests still pass
+   - Architecture respects SOLID principles
+   - Documentation is up to date
+✅ Validation: At least 3 clear validation criteria
+```
+
+#### 4️⃣ Create GitHub Issue
+```
+🔧 Action: Automatically create an issue on the repository with:
+   - Title: [same title as step 1, translated to English]
    - Body: 
-     ## Contexte
-     [contenu de l'étape 2]
+     ## Context
+     [content from step 2, in English]
      
-     ## Critères de validation
-     [critères de l'étape 3]
+     ## Validation Criteria
+     [criteria from step 3, in English]
      
-     ## Labels suggérés
-     - enhancement (pour amélioration)
-     - refactoring (pour refactoring)
-     - bug (pour correction)
-     - [frontend/backend selon le cas]
+     ## Suggested Labels
+     - enhancement (for improvement)
+     - refactoring (for refactoring)
+     - bug (for fix)
+     - [frontend/backend depending on case]
      
 📍 Repository: curious-academy/gamified-resume-reborn
-✅ Confirmation: Afficher le numéro et l'URL de l'issue créée
+✅ Confirmation: Display issue number and URL
 ```
 
-#### 5️⃣ Création de la branche locale
+#### 5️⃣ Create Local Branch
 ```
-🔧 Action: Créer une branche locale avec le format:
-   - Nom: [type]/[titre-en-kebab-case]
-   - Type: tech/ pour refactoring, fix/ pour corrections, improve/ pour améliorations
-   - Base: branch courante (généralement main ou install-phaser)
+🔧 Action: Create a local branch with format:
+   - Name: [type]/[title-in-kebab-case]
+   - Type: tech/ for refactoring, fix/ for fixes, improve/ for improvements
+   - Base: current branch (usually main or install-phaser)
    
-📝 Transformation du titre:
-   - Convertir en anglais
-   - Convertir en kebab-case (minuscules, mots séparés par -)
-   - Préfixer avec le type approprié
+📝 Title transformation:
+   - Convert to English if not already
+   - Convert to kebab-case (lowercase, words separated by -)
+   - Prefix with appropriate type
    
-Exemples: 
-   - "Refactoring du composant App" → "tech/refactor-app-component"
-   - "Correction du bug de collision" → "fix/collision-bug"
-   - "Amélioration des performances" → "improve/performance-optimization"
+Examples: 
+   - "Refactor App component" → "tech/refactor-app-component"
+   - "Fix collision bug" → "fix/collision-bug"
+   - "Performance improvement" → "improve/performance-optimization"
 
-✅ Confirmation: Afficher le nom de la branche créée
+✅ Confirmation: Display created branch name
 ```
 
-#### 6️⃣ Pause et attente de confirmation
+#### 6️⃣ Pause and Wait for Confirmation
 ```
-⏸️ Message obligatoire:
+⏸️ Mandatory message (in French):
 "✅ Tâche technique setup complet !
-📝 Issue #[numéro] créée: [URL]
-🌿 Branche créée: [nom-de-la-branche]
+📝 Issue #[number] créée: [URL]
+🌿 Branche créée: [branch-name]
 
 ⏳ Attendant votre confirmation pour commencer l'implémentation.
 💬 Tapez 'go' ou 'continue' pour démarrer le développement."
 
-⛔ NE PAS continuer sans confirmation explicite de l'utilisateur
+⛔ DO NOT continue without explicit user confirmation
 ```
 
----
-
-## 🅰️ Bonnes pratiques Angular 21
-
-### Architecture et Structure
-
-#### Monorepo
-```typescript
-// Structure du workspace Angular
-workspace/
-├── projects/
-│   ├── main-app/           // Application principale
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   │   ├── features/      // Features modules
-│   │   │   │   ├── core/          // Services singleton
-│   │   │   │   ├── shared/        // Components partagés
-│   │   │   │   └── models/        // Types et interfaces
-│   └── shared-ui/          // Librairie de composants réutilisables
-└── angular.json
-```
-
-#### Composants Standalone (Angular 21)
-- Un composant standalone doit déclarer explicitement ses imports
-- Chercher à minimiser les imports pour optimiser le bundle
-```typescript
-// ✅ BON - Composant standalone avec imports explicites
-import { Component, signal } from '@angular/core';
-
-@Component({
-  selector: 'app-feature',
-  templateUrl: './feature.component.html',
-  styleUrl: './feature.component.scss' // 'styleUrl' au singulier pour Angular 21
-})
-export class FeatureComponent {
-  // Utiliser signals pour la réactivité
-  protected readonly count = signal(0);
-  
-  increment(): void {
-    this.count.update(value => value + 1);
-  }
-}
-```
-
-### Signals (nouveau système de réactivité)
-- éviter au maximum d'utiliser effect : préférer computed et signals dérivés, et linked signals
-
-```typescript
-// ✅ BON - Utilisation moderne des signals
-import { Component, signal, computed, effect } from '@angular/core';
-
-export class GameComponent {
-  // Signal basique
-  protected readonly score = signal(0);
-  
-  // Computed signal (dérivé)
-  protected readonly scoreDisplay = computed(() => {
-    return `Score: ${this.score()}`;
-  });
-  
-  // Mise à jour du signal
-  addPoints(points: number): void {
-    this.score.update(current => current + points);
-  }
-}
-```
-
-### Services et Injection de dépendances
-
-```typescript
-// ✅ BON - Service avec inject() moderne
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-@Injectable({
-  providedIn: 'root' // Singleton au niveau app
-})
-export class GameService {
-  // Utiliser inject() au lieu du constructor
-  private readonly http = inject(HttpClient);
-  
-  loadGame(id: string): Promise<void> {
-    return this.http.get<GameData>(`/api/games/${id}`)
-  }
-}
-```
-
-### Routing
-
-```typescript
-// ✅ BON - Routes avec lazy loading
-import { Routes } from '@angular/router';
-
-export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: '/game',
-    pathMatch: 'full'
-  },
-  {
-    path: 'game',
-    loadComponent: () => import('./features/game/game.component')
-      .then(m => m.GameComponent)
-  },
-  {
-    path: 'inventory',
-    loadComponent: () => import('./features/inventory/inventory.component')
-      .then(m => m.InventoryComponent),
-    canActivate: [authGuard] // Guard fonctionnel
-  }
-];
-```
-
-### Formulaires
-
-```typescript
-// ✅ BON - Reactive Forms avec typage fort
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-
-interface ProfileForm {
-  username: string;
-  email: string;
-  level: number;
-}
-
-@Component({
-  selector: 'app-profile',
-  imports: [ReactiveFormsModule],
-  template: `
-    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <input formControlName="username" />
-      <input formControlName="email" type="email" />
-      <input formControlName="level" type="number" />
-      <button type="submit" [disabled]="form.invalid">Save</button>
-    </form>
-  `
-})
-export class ProfileComponent {
-  private readonly fb = inject(FormBuilder);
-  
-  readonly form: FormGroup<ProfileForm> = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
-    email: ['', [Validators.required, Validators.email]],
-    level: [1, [Validators.required, Validators.min(1)]]
-  });
-  
-  onSubmit(): void {
-    if (this.form.valid) {
-      const formData = this.form.value;
-      // Process form data
-    }
-  }
-}
-```
-
-### Tests
-
-```typescript
-// ✅ BON - Tests avec TestBed moderne
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GameComponent } from './game.component';
-
-describe('GameComponent', () => {
-  let component: GameComponent;
-  let fixture: ComponentFixture<GameComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [GameComponent] // Composant standalone
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(GameComponent);
-    component = fixture.componentInstance;
-  });
-
-  it('should increment score', () => {
-    component.addPoints(10);
-    expect(component.score()).toBe(10);
-  });
-});
-```
-
-### Style et Conventions
-
-```typescript
-// ✅ Conventions de nommage
-// - Fichiers: kebab-case (game-inventory.component.ts)
-// - Classes: PascalCase (GameInventoryComponent)
-// - Interfaces: PascalCase avec préfixe I optionnel (IGameState ou GameState)
-// - Constants: UPPER_SNAKE_CASE (MAX_INVENTORY_SIZE)
-// - Variables/fonctions: camelCase (addToInventory)
-
-// ✅ Modificateurs d'accès
-export class MyComponent {
-  protected readonly publicData = signal([]); // Accessible dans le template
-  private internalState = 0; // Interne au composant
-}
-
-// ✅ Typage strict
-// Toujours typer les paramètres et retours
-addItem(item: Item): void {
-  // ...
-}
-
-// ❌ ÉVITER any
-// ✅ Utiliser unknown ou types spécifiques
-```
 
 ---
 
@@ -770,48 +601,43 @@ export class PhaserService {
 
 ---
 
-## 🔒 Sécurité
+## 🔒 Security
 
-### Angular
-- Utiliser `DomSanitizer` pour le contenu dynamique
-- Activer le mode production pour le build
-- Valider toutes les entrées utilisateur
-- Utiliser `HttpInterceptor` pour les tokens d'auth
 
 ### .NET
-- Activer HTTPS en production
-- Implémenter l'authentification JWT
-- Valider les inputs avec Data Annotations
-- Utiliser des parameterized queries
-- Configurer CORS strictement
+- Enable HTTPS in production
+- Implement JWT authentication
+- Validate inputs with Data Annotations
+- Use parameterized queries
+- Configure CORS strictly
 
 ---
 
 ## 📝 Documentation
 
-- Commenter le code complexe
-- Utiliser JSDoc/XML Doc comments
-- Maintenir un README.md à jour
-- Documenter les endpoints API avec Swagger/OpenAPI
+- Comment complex code
+- Use JSDoc/XML Doc comments
+- Maintain an up-to-date README.md
+- Document API endpoints with Swagger/OpenAPI
 
 ---
 
-## ⚠️ Rappels importants
+## ⚠️ Important Reminders
 
-1. **TOUJOURS détecter le type de tâche** (feature vs technique) avant de commencer
-2. **TOUJOURS suivre le workflow en 6 étapes** approprié (Feature ou Technique)
-3. **JAMAIS** continuer après l'étape 6 sans confirmation explicite
-4. **TOUJOURS** créer l'issue GitHub avant la branche
-5. **TOUJOURS** utiliser le kebab-case en anglais pour les noms de branches
-6. **TOUJOURS** utiliser le bon préfixe de branche :
-   - `feature/` pour les nouvelles fonctionnalités
-   - `tech/` pour les refactorings
-   - `fix/` pour les corrections de bugs
-   - `improve/` pour les améliorations
-7. **TOUJOURS** utiliser les signals Angular 21 au lieu des Subjects RxJS quand possible
-8. **TOUJOURS** utiliser des records C# pour les DTOs immutables
-9. **TOUJOURS** typer strictement (TypeScript et C#)
+1. **ALWAYS detect the task type** (feature vs technical) before starting
+2. **ALWAYS follow the appropriate 6-step workflow** (Feature or Technical)
+3. **NEVER** continue after step 6 without explicit confirmation
+4. **ALWAYS** create the GitHub issue before the branch
+5. **ALWAYS** use kebab-case in English for branch names
+6. **ALWAYS** use the correct branch prefix:
+   - `feature/` for new features
+   - `tech/` for refactorings
+   - `fix/` for bug fixes
+   - `improve/` for improvements
+7. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
+8. **ALWAYS** use C# records for immutable DTOs
+9. **ALWAYS** use strict typing (TypeScript and C#)
 
 ---
 
-*Ces instructions doivent être suivies pour assurer la cohérence et la qualité du code dans le projet Gamified Resume Reborn.*
+*These instructions must be followed to ensure consistency and code quality in the Gamified Resume Reborn project.*

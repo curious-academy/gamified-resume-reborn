@@ -10,6 +10,7 @@ import Phaser from 'phaser';
 export class PhaserService {
   private game?: Phaser.Game;
   readonly isGameInitialized = signal<boolean>(false);
+  readonly isTerminalOpen = signal<boolean>(false);
 
   /**
    * Initialise le jeu Phaser avec la configuration fournie
@@ -33,6 +34,7 @@ export class PhaserService {
       this.game.destroy(true);
       this.game = undefined;
       this.isGameInitialized.set(false);
+      this.isTerminalOpen.set(false);
     }
   }
 
@@ -51,5 +53,19 @@ export class PhaserService {
    */
   getGame(): Phaser.Game | undefined {
     return this.game;
+  }
+
+  /**
+   * Opens the terminal interface
+   */
+  openTerminal(): void {
+    this.isTerminalOpen.set(true);
+  }
+
+  /**
+   * Closes the terminal interface
+   */
+  closeTerminal(): void {
+    this.isTerminalOpen.set(false);
   }
 }

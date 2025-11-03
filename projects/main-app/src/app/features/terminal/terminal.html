@@ -1,0 +1,16 @@
+<div class="terminal-overlay" (click)="onClose()">
+  <div class="terminal-container" (click)="$event.stopPropagation()">
+    <div class="terminal-header">
+      <h2>terminal</h2>
+      <button class="close-button" (click)="onClose()">✕</button>
+    </div>
+    <div class="terminal-content">
+      <p>Welcome to the terminal interface!</p>
+      <p>This is where you can interact with the system.</p>
+      <div class="terminal-prompt">
+        <span class="prompt">$</span>
+        <span class="cursor">_</span>
+      </div>
+    </div>
+  </div>
+</div>

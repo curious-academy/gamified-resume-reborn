@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/player.entity';
+import { Terminal } from '../entities/terminal.entity';
+import { InteractionPopup } from '../ui/interaction-popup';
 
 /**
  * Configuration de la carte
@@ -16,6 +18,11 @@ interface MapConfig {
 export class GameScene extends Phaser.Scene {
   private player?: Player;
   private walls?: Phaser.Physics.Arcade.StaticGroup;
+  private terminal?: Terminal;
+  private interactionPopup?: InteractionPopup;
+  private interactKey?: Phaser.Input.Keyboard.Key;
+  private escapeKey?: Phaser.Input.Keyboard.Key;
+  private isPlayerNearTerminal: boolean = false;
   private readonly mapConfig: Required<MapConfig>;
 
   constructor(mapConfig: MapConfig = {}) {
@@ -66,8 +73,11 @@ export class GameScene extends Phaser.Scene {
   create(): void {
     this.createMap();
     this.createPlayer();
+    this.createTerminal();
     this.setupCollisions();
     this.setupCamera();
+    this.setupInteractionUI();
+    this.setupInputHandlers();
   }
 
   /**
@@ -142,6 +152,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
+   * Crée le terminal
+   */
+  private createTerminal(): void {
+    const { tileSize } = this.mapConfig;
+    // Place terminal at position (12, 6)
+    this.terminal = new Terminal(this, 12 * tileSize, 6 * tileSize, {
+      size: tileSize,
+      interactionRadius: 100 // Increased for easier interaction
+    });
+  }
+
+  /**
    * Configure les collisions
    */
   private setupCollisions(): void {
@@ -161,8 +183,116 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setLerp(0.1, 0.1);
   }
 
+  /**
+   * Setup interaction UI
+   */
+  private setupInteractionUI(): void {
+    this.interactionPopup = new InteractionPopup(this, {
+      message: 'Do you want to open the terminal?',
+      acceptKey: 'E',
+      declineKey: 'ESC'
+    });
+  }
+
+  /**
+   * Setup input handlers for interaction
+   */
+  private setupInputHandlers(): void {
+    if (!this.input.keyboard) return;
+
+    this.interactKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+    this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+  }
+
+  /**
+   * Checks player proximity to terminal
+   */
+  private checkTerminalProximity(): void {
+    if (!this.player || !this.terminal) return;
+
+    const playerX = this.player.x;
+    const playerY = this.player.y;
+    const terminalCenterX = this.terminal.x + this.terminal.width / 2;
+    const terminalCenterY = this.terminal.y + this.terminal.height / 2;
+    const distance = Phaser.Math.Distance.Between(terminalCenterX, terminalCenterY, playerX, playerY);
+    const isInRange = distance <= 100; // interaction radius
+
+    // Debug logging
+    if (distance < 120) {
+      console.log('Distance to terminal:', distance, 'In range:', isInRange);
+    }
+
+    if (isInRange && !this.isPlayerNearTerminal) {
+      console.log('Player entered terminal range!');
+      this.isPlayerNearTerminal = true;
+      this.terminal.showGlow();
+      
+      // Show popup at terminal position
+      this.interactionPopup?.show(terminalCenterX, terminalCenterY);
+    } else if (!isInRange && this.isPlayerNearTerminal) {
+      console.log('Player left terminal range!');
+      this.isPlayerNearTerminal = false;
+      this.terminal.hideGlow();
+      this.interactionPopup?.hide();
+    } else if (isInRange && this.isPlayerNearTerminal) {
+      // Update popup position if still in range (camera may have moved)
+      this.updatePopupPosition(terminalCenterX, terminalCenterY);
+    }
+  }
+
+  /**
+   * Updates popup position based on world coordinates
+   */
+  private updatePopupPosition(worldX: number, worldY: number): void {
+    if (!this.interactionPopup?.isVisible()) return;
+    
+    const camera = this.cameras.main;
+    const screenX = (worldX - camera.scrollX) * camera.zoom;
+    const screenY = (worldY - camera.scrollY) * camera.zoom - 60;
+    
+    // Update position without animation
+    const container = (this.interactionPopup as any).container;
+    if (container) {
+      container.setPosition(screenX, screenY);
+    }
+  }
+
+  /**
+   * Handles terminal interaction
+   */
+  private handleTerminalInteraction(): void {
+    if (!this.isPlayerNearTerminal) return;
+
+    // Emit event to open terminal (will be caught by Angular)
+    this.events.emit('openTerminal');
+    
+    // Hide popup
+    this.interactionPopup?.hide();
+  }
+
+  /**
+   * Handles cancel interaction
+   */
+  private handleCancelInteraction(): void {
+    if (this.interactionPopup?.isVisible()) {
+      this.interactionPopup.hide();
+    }
+  }
+
   override update(): void {
     this.player?.update();
+
+    // Check proximity to terminal continuously
+    this.checkTerminalProximity();
+
+    // Check for interaction input
+    if (this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+      this.handleTerminalInteraction();
+    }
+
+    if (this.escapeKey && Phaser.Input.Keyboard.JustDown(this.escapeKey)) {
+      this.handleCancelInteraction();
+    }
   }
 
   /**
@@ -170,5 +300,12 @@ export class GameScene extends Phaser.Scene {
    */
   getPlayer(): Player | undefined {
     return this.player;
+  }
+
+  /**
+   * Gets the terminal
+   */
+  getTerminal(): Terminal | undefined {
+    return this.terminal;
   }
 }

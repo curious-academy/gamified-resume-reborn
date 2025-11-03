@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/player.entity';
 import { Terminal } from '../entities/terminal.entity';
-import { inject } from '@angular/core';
 import { TerminalService } from '../../../core/services/terminal.service';
 
 /**
@@ -14,6 +13,13 @@ interface MapConfig {
 }
 
 /**
+ * Configuration de la scène incluant les services Angular
+ */
+export interface GameSceneConfig extends MapConfig {
+  terminalService?: TerminalService;
+}
+
+/**
  * Scène principale du jeu
  */
 export class GameScene extends Phaser.Scene {
@@ -21,16 +27,18 @@ export class GameScene extends Phaser.Scene {
   private terminal?: Terminal;
   private walls?: Phaser.Physics.Arcade.StaticGroup;
   private readonly mapConfig: Required<MapConfig>;
-  private terminalService?: TerminalService;
+  private readonly terminalService?: TerminalService;
 
-  constructor(mapConfig: MapConfig = {}) {
+  constructor(config: GameSceneConfig = {}) {
     super({ key: 'GameScene' });
 
     this.mapConfig = {
-      width: mapConfig.width ?? 25,
-      height: mapConfig.height ?? 20,
-      tileSize: mapConfig.tileSize ?? 32
+      width: config.width ?? 25,
+      height: config.height ?? 20,
+      tileSize: config.tileSize ?? 32
     };
+
+    this.terminalService = config.terminalService;
   }
 
   preload(): void {
@@ -69,9 +77,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Inject the TerminalService
-    this.terminalService = inject(TerminalService);
-
     this.createMap();
     this.createPlayer();
     this.createTerminal();

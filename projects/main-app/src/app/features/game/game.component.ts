@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import Phaser from 'phaser';
 import { PhaserService } from '../../core/services/phaser.service';
+import { TerminalService } from '../../core/services/terminal.service';
 import { GameScene } from './scenes/game.scene';
 
 /**
@@ -44,6 +45,7 @@ import { GameScene } from './scenes/game.scene';
 })
 export class GameComponent implements OnInit, OnDestroy {
   private readonly phaserService = inject(PhaserService);
+  private readonly terminalService = inject(TerminalService);
   protected readonly isLoading = signal(true);
 
   ngOnInit(): void {
@@ -70,7 +72,7 @@ export class GameComponent implements OnInit, OnDestroy {
           debug: false
         }
       },
-      scene: GameScene,
+      scene: new GameScene({ terminalService: this.terminalService }),
       pixelArt: true,
       antialias: false,
       callbacks: {

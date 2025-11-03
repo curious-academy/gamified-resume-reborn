@@ -23,6 +23,15 @@ export class KeyboardService {
    * Gère les touches pressées
    */
   private handleKeyPress(event: KeyboardEvent): void {
+    // Touche Entrée - Ouvrir le terminal si la popup est affichée
+    if (event.key === 'Enter') {
+      if (this.terminalService.showTerminalPrompt()) {
+        this.terminalService.openTerminal();
+        event.preventDefault();
+        return;
+      }
+    }
+
     // Touche Échap
     if (event.key === 'Escape') {
       // Priorité 1: Fermer le terminal s'il est ouvert

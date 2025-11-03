@@ -129,7 +129,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
       // Effet plus intense pour la course
       this.setAlpha(0.7 + Math.sin(Date.now() * 0.02) * 0.3);
       this.setScale(1.5 + Math.sin(Date.now() * 0.02) * 0.1);
-      
+
       if (this.movementParticles) {
         this.movementParticles.setPosition(this.x, this.y);
         this.movementParticles.start();
@@ -166,7 +166,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
       body.setVelocityX(-currentSpeed);
       newDirection = 'left';
       this.isMoving = true;
-    } 
+    }
     // D = Droite (même pour AZERTY et QWERTY)
     else if (this.keys['D']?.isDown) {
       body.setVelocityX(currentSpeed);
@@ -180,7 +180,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
       body.setVelocityY(-currentSpeed);
       newDirection = 'up';
       this.isMoving = true;
-    } 
+    }
     // S = Bas (même pour AZERTY et QWERTY)
     else if (this.keys['S']?.isDown) {
       body.setVelocityY(currentSpeed);
@@ -192,7 +192,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
     if (this.isMoving) {
       this.updateDirection(newDirection);
     }
-    
+
     this.applyMovementEffects(isRunning);
   }
 

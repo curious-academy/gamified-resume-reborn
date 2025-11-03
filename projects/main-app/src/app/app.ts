@@ -34,9 +34,9 @@ export class App {
   }
 
   /**
-   * Ferme la popup de confirmation
+   * Ferme la popup de confirmation (refus de l'utilisateur)
    */
   closePrompt(): void {
-    this.terminalService.hidePrompt();
+    this.terminalService.dismissPrompt();
   }
 }

@@ -9,6 +9,7 @@ import { Injectable, signal } from '@angular/core';
 export class TerminalService {
   readonly isTerminalOpen = signal<boolean>(false);
   readonly showTerminalPrompt = signal<boolean>(false);
+  private promptDismissed = false;
 
   /**
    * Affiche la popup de confirmation pour ouvrir le terminal
@@ -25,11 +26,20 @@ export class TerminalService {
   }
 
   /**
+   * Ferme la popup et marque qu'elle a été refusée par l'utilisateur
+   */
+  dismissPrompt(): void {
+    this.hidePrompt();
+    this.promptDismissed = true;
+  }
+
+  /**
    * Ouvre le terminal
    */
   openTerminal(): void {
     this.isTerminalOpen.set(true);
     this.hidePrompt();
+    this.promptDismissed = false;
   }
 
   /**
@@ -44,10 +54,12 @@ export class TerminalService {
    * @param isNearby true si le joueur est à proximité
    */
   handlePlayerProximity(isNearby: boolean): void {
-    if (isNearby && !this.isTerminalOpen() && !this.showTerminalPrompt()) {
+    if (isNearby && !this.isTerminalOpen() && !this.showTerminalPrompt() && !this.promptDismissed) {
       this.showPrompt();
-    } else if (!isNearby && this.showTerminalPrompt()) {
+    } else if (!isNearby) {
+      // Reset le flag quand le joueur s'éloigne
       this.hidePrompt();
+      this.promptDismissed = false;
     }
   }
 }

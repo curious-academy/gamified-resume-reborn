@@ -14,7 +14,6 @@ interface PlayerConfig {
  * Classe représentant le joueur dans le jeu
  */
 export class Player extends Phaser.GameObjects.Rectangle {
-  private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private keys?: { [key: string]: Phaser.Input.Keyboard.Key };
   private readonly speed: number;
   private readonly runSpeed: number;
@@ -64,8 +63,15 @@ export class Player extends Phaser.GameObjects.Rectangle {
    * Configure les contrôles clavier
    */
   private setupControls(): void {
-    this.cursors = this.scene.input.keyboard?.createCursorKeys();
-    this.keys = this.scene.input.keyboard?.addKeys('SHIFT') as { [key: string]: Phaser.Input.Keyboard.Key };
+    this.keys = this.scene.input.keyboard?.addKeys({
+      Z: 'Z',
+      Q: 'Q',
+      S: 'S',
+      D: 'D',
+      W: 'W',
+      A: 'A',
+      SHIFT: 'SHIFT'
+    }) as { [key: string]: Phaser.Input.Keyboard.Key };
   }
 
   /**
@@ -123,7 +129,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
       // Effet plus intense pour la course
       this.setAlpha(0.7 + Math.sin(Date.now() * 0.02) * 0.3);
       this.setScale(1.5 + Math.sin(Date.now() * 0.02) * 0.1);
-      
+
       if (this.movementParticles) {
         this.movementParticles.setPosition(this.x, this.y);
         this.movementParticles.start();
@@ -140,12 +146,12 @@ export class Player extends Phaser.GameObjects.Rectangle {
    * Met à jour l'état du joueur à chaque frame
    */
   override update(): void {
-    if (!this.cursors || !this.body) return;
+    if (!this.keys || !this.body) return;
 
     const body = this.body as Phaser.Physics.Arcade.Body;
 
     // Déterminer la vitesse (course si Shift est pressé)
-    const isRunning = this.keys?.['SHIFT']?.isDown ?? false;
+    const isRunning = this.keys['SHIFT']?.isDown ?? false;
     const currentSpeed = isRunning ? this.runSpeed : this.speed;
 
     // Réinitialiser la vélocité
@@ -155,22 +161,28 @@ export class Player extends Phaser.GameObjects.Rectangle {
     let newDirection = this.direction;
 
     // Gestion des mouvements horizontaux
-    if (this.cursors.left?.isDown) {
+    // Q (AZERTY) ou A (QWERTY) = Gauche
+    if (this.keys['Q']?.isDown || this.keys['A']?.isDown) {
       body.setVelocityX(-currentSpeed);
       newDirection = 'left';
       this.isMoving = true;
-    } else if (this.cursors.right?.isDown) {
+    }
+    // D = Droite (même pour AZERTY et QWERTY)
+    else if (this.keys['D']?.isDown) {
       body.setVelocityX(currentSpeed);
       newDirection = 'right';
       this.isMoving = true;
     }
 
     // Gestion des mouvements verticaux
-    if (this.cursors.up?.isDown) {
+    // Z (AZERTY) ou W (QWERTY) = Haut
+    if (this.keys['Z']?.isDown || this.keys['W']?.isDown) {
       body.setVelocityY(-currentSpeed);
       newDirection = 'up';
       this.isMoving = true;
-    } else if (this.cursors.down?.isDown) {
+    }
+    // S = Bas (même pour AZERTY et QWERTY)
+    else if (this.keys['S']?.isDown) {
       body.setVelocityY(currentSpeed);
       newDirection = 'down';
       this.isMoving = true;
@@ -180,7 +192,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
     if (this.isMoving) {
       this.updateDirection(newDirection);
     }
-    
+
     this.applyMovementEffects(isRunning);
   }
 

@@ -1,17 +1,22 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
 import Phaser from 'phaser';
 import { PhaserService } from '../../core/services/phaser.service';
 import { GameScene } from './scenes/game.scene';
+import { Terminal } from '../terminal/terminal';
 
 /**
  * Composant gérant l'affichage et l'initialisation du jeu Phaser
  */
 @Component({
   selector: 'app-game',
+  imports: [Terminal],
   template: `
     <div id="game-container" class="game-container"></div>
     @if (isLoading()) {
       <div class="loading">Chargement du jeu...</div>
+    }
+    @if (phaserService.isTerminalOpen()) {
+      <app-terminal (closeTerminal)="onCloseTerminal()" />
     }
   `,
   styles: [`
@@ -43,7 +48,7 @@ import { GameScene } from './scenes/game.scene';
   `]
 })
 export class GameComponent implements OnInit, OnDestroy {
-  private readonly phaserService = inject(PhaserService);
+  protected readonly phaserService = inject(PhaserService);
   protected readonly isLoading = signal(true);
 
   ngOnInit(): void {
@@ -76,11 +81,32 @@ export class GameComponent implements OnInit, OnDestroy {
       callbacks: {
         postBoot: () => {
           this.isLoading.set(false);
+          this.setupSceneEventListeners();
         }
       }
     };
 
     this.phaserService.initGame(config);
+  }
+
+  /**
+   * Setup event listeners for the game scene
+   */
+  private setupSceneEventListeners(): void {
+    const gameScene = this.phaserService.getScene<GameScene>('GameScene');
+    if (gameScene) {
+      // Listen for openTerminal event from Phaser scene
+      gameScene.events.on('openTerminal', () => {
+        this.phaserService.openTerminal();
+      });
+    }
+  }
+
+  /**
+   * Handles closing the terminal
+   */
+  onCloseTerminal(): void {
+    this.phaserService.closeTerminal();
   }
 
   /**

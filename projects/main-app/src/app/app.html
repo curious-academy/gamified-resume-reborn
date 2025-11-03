@@ -17,8 +17,22 @@
       </ul>
       <p><strong>Objectif :</strong> Explorez la carte et évitez les murs gris !</p>
       <p><strong>Astuce :</strong> Maintenez Shift pour courir plus vite avec des effets visuels !</p>
+      <p><strong>Nouveau :</strong> Approchez-vous du carré violet pour accéder au terminal ! 💻</p>
     </div>
   </div>
+
+  <!-- Terminal Prompt -->
+  @if (terminalService.showTerminalPrompt()) {
+    <app-terminal-prompt
+      (openTerminal)="openTerminal()"
+      (closePrompt)="closePrompt()">
+    </app-terminal-prompt>
+  }
+
+  <!-- Terminal Component -->
+  @if (terminalService.isTerminalOpen()) {
+    <app-terminal (closeTerminal)="closeTerminal()"></app-terminal>
+  }
 
   <router-outlet />
 </div>

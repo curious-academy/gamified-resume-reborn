@@ -1,5 +1,8 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/player.entity';
+import { Terminal } from '../entities/terminal.entity';
+import { inject } from '@angular/core';
+import { TerminalService } from '../../../core/services/terminal.service';
 
 /**
  * Configuration de la carte
@@ -15,8 +18,10 @@ interface MapConfig {
  */
 export class GameScene extends Phaser.Scene {
   private player?: Player;
+  private terminal?: Terminal;
   private walls?: Phaser.Physics.Arcade.StaticGroup;
   private readonly mapConfig: Required<MapConfig>;
+  private terminalService?: TerminalService;
 
   constructor(mapConfig: MapConfig = {}) {
     super({ key: 'GameScene' });
@@ -64,8 +69,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Inject the TerminalService
+    this.terminalService = inject(TerminalService);
+
     this.createMap();
     this.createPlayer();
+    this.createTerminal();
     this.setupCollisions();
     this.setupCamera();
   }
@@ -142,6 +151,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
+   * Crée le terminal d'accès
+   */
+  private createTerminal(): void {
+    const { tileSize } = this.mapConfig;
+    // Positionner le terminal à une position visible dans la carte
+    this.terminal = new Terminal(this, 12 * tileSize, 10 * tileSize, {
+      size: tileSize,
+      proximityRadius: tileSize * 2.5
+    });
+  }
+
+  /**
    * Configure les collisions
    */
   private setupCollisions(): void {
@@ -163,6 +184,17 @@ export class GameScene extends Phaser.Scene {
 
   override update(): void {
     this.player?.update();
+    this.updateTerminalInteraction();
+  }
+
+  /**
+   * Met à jour l'interaction avec le terminal
+   */
+  private updateTerminalInteraction(): void {
+    if (!this.player || !this.terminal || !this.terminalService) return;
+
+    const isNearby = this.terminal.checkProximity(this.player.x, this.player.y);
+    this.terminalService.handlePlayerProximity(isNearby);
   }
 
   /**

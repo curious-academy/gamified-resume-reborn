@@ -55,10 +55,10 @@ This project is a **gamified** application using:
 Before starting any work, **ALWAYS** determine the task type:
 
 1. **New Feature**: Adding new functionality (e.g., "Add inventory system")
-   → Follow the **Feature Workflow** (6 steps)
+   → Follow the **Feature Workflow** (7 steps)
 
 2. **Technical Task**: Refactoring, fixes, improvements, optimizations (e.g., "Refactor code", "Performance improvement", "Bug fix")
-   → Follow the **Technical Workflow** (6 steps)
+   → Follow the **Technical Workflow** (7 steps)
 
 ---
 
@@ -132,12 +132,36 @@ Example: "Add inventory system" → "feature/add-inventory-system"
 ✅ Confirmation: Display created branch name
 ```
 
-#### 6️⃣ Pause and Wait for Confirmation
+#### 6️⃣ Create Pull Request and Link to Issue
+```
+🔧 Action: Automatically create a Pull Request with:
+   - Title: Same as the issue title
+   - Body: 
+     ## Description
+     [Brief description of the feature]
+     
+     ## Related Issue
+     Closes #[issue-number]
+     
+     ## Type of Change
+     - [x] New feature
+     
+   - Base: main (or current default branch)
+   - Head: [branch-name from step 5]
+   - Draft: true (mark as draft initially)
+   - Link to issue: Use "Closes #[issue-number]" in PR body
+
+📍 Repository: curious-academy/gamified-resume-reborn
+✅ Confirmation: Display PR number and URL
+```
+
+#### 7️⃣ Pause and Wait for Confirmation
 ```
 ⏸️ Mandatory message (in French):
 "✅ Feature setup complet !
 📝 Issue #[number] créée: [URL]
 🌿 Branche créée: [branch-name]
+🔗 Pull Request #[number] créée: [URL]
 
 ⏳ Attendant votre confirmation pour commencer l'implémentation.
 💬 Tapez 'go' ou 'continue' pour démarrer le développement."
@@ -224,12 +248,36 @@ Examples:
 ✅ Confirmation: Display created branch name
 ```
 
-#### 6️⃣ Pause and Wait for Confirmation
+#### 6️⃣ Create Pull Request and Link to Issue
+```
+🔧 Action: Automatically create a Pull Request with:
+   - Title: Same as the issue title
+   - Body: 
+     ## Context
+     [Brief description of the technical task]
+     
+     ## Related Issue
+     Closes #[issue-number]
+     
+     ## Type of Change
+     - [x] Technical improvement/refactoring/bug fix
+     
+   - Base: main (or current default branch)
+   - Head: [branch-name from step 5]
+   - Draft: true (mark as draft initially)
+   - Link to issue: Use "Closes #[issue-number]" in PR body
+
+📍 Repository: curious-academy/gamified-resume-reborn
+✅ Confirmation: Display PR number and URL
+```
+
+#### 7️⃣ Pause and Wait for Confirmation
 ```
 ⏸️ Mandatory message (in French):
 "✅ Tâche technique setup complet !
 📝 Issue #[number] créée: [URL]
 🌿 Branche créée: [branch-name]
+🔗 Pull Request #[number] créée: [URL]
 
 ⏳ Attendant votre confirmation pour commencer l'implémentation.
 💬 Tapez 'go' ou 'continue' pour démarrer le développement."
@@ -625,18 +673,19 @@ export class PhaserService {
 ## ⚠️ Important Reminders
 
 1. **ALWAYS detect the task type** (feature vs technical) before starting
-2. **ALWAYS follow the appropriate 6-step workflow** (Feature or Technical)
-3. **NEVER** continue after step 6 without explicit confirmation
+2. **ALWAYS follow the appropriate 7-step workflow** (Feature or Technical)
+3. **NEVER** continue after step 7 without explicit user confirmation
 4. **ALWAYS** create the GitHub issue before the branch
-5. **ALWAYS** use kebab-case in English for branch names
-6. **ALWAYS** use the correct branch prefix:
+5. **ALWAYS** create the Pull Request and link it to the issue
+6. **ALWAYS** use kebab-case in English for branch names
+7. **ALWAYS** use the correct branch prefix:
    - `feature/` for new features
    - `tech/` for refactorings
    - `fix/` for bug fixes
    - `improve/` for improvements
-7. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
-8. **ALWAYS** use C# records for immutable DTOs
-9. **ALWAYS** use strict typing (TypeScript and C#)
+8. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
+9. **ALWAYS** use C# records for immutable DTOs
+10. **ALWAYS** use strict typing (TypeScript and C#)
 
 ---
 

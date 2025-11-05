@@ -863,7 +863,22 @@ export class PhaserService {
 
 ## ⚠️ Important Reminders
 
-### 🔴 CRITICAL - Build & Commit Rules (TOP PRIORITY)
+1. **ALWAYS detect the task type** (feature vs technical) before starting
+2. **ALWAYS follow the appropriate 7-step workflow** (Feature or Technical)
+3. **NEVER** continue after step 7 without explicit user confirmation
+4. **ALWAYS** create the GitHub issue before the branch
+5. **ALWAYS** create the Pull Request and link it to the issue
+6. **ALWAYS** use kebab-case in English for branch names
+7. **ALWAYS** use the correct branch prefix:
+   - `feature/` for new features
+   - `tech/` for refactorings
+   - `fix/` for bug fixes
+   - `improve/` for improvements
+8. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
+9. **ALWAYS** use C# records for immutable DTOs
+10. **ALWAYS** use strict typing (TypeScript and C#)
+
+🔴 CRITICAL - Build & Commit Rules (TOP PRIORITY)
 1. **⚠️ BUILD BEFORE EVERY COMMIT - ABSOLUTE MANDATORY RULE**: Run `ng build main-app` and fix ALL errors/warnings BEFORE EVERY SINGLE COMMIT - NO EXCEPTIONS
 2. **COMMIT AFTER EACH MODIFICATION**: Do not accumulate changes - commit incrementally
 3. **NEVER SKIP BUILD VERIFICATION**: Even for "trivial" changes, always build first

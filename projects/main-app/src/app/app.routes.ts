@@ -8,7 +8,7 @@ export const routes: Routes = [
   },
   {
     path: 'trainings',
-    loadComponent: () => 
+    loadComponent: () =>
       import('./features/training/components/training-list.component').then(
         m => m.TrainingListComponent
       )

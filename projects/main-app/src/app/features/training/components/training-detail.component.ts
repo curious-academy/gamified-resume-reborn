@@ -589,7 +589,7 @@ export class TrainingDetailComponent implements OnInit {
   ngOnInit(): void {
     // Component initialization
   }
-  
+
   readonly sortedQuests = computed(() => {
     const training = this.training();
     if (!training) return [];

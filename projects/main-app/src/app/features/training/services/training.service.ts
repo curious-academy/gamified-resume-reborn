@@ -39,7 +39,7 @@ export class TrainingService {
   readonly error$ = this.error.asReadonly();
 
   readonly totalTrainings = computed(() => this.trainings().length);
-  readonly completedTrainings = computed(() => 
+  readonly completedTrainings = computed(() =>
     this.trainings().filter(t => t.isCompleted).length
   );
   readonly totalPoints = computed(() =>
@@ -118,7 +118,7 @@ export class TrainingService {
     if (index === -1) return false;
 
     this.trainings.update(trainings => trainings.filter(t => t.id !== id));
-    
+
     if (this.selectedTraining()?.id === id) {
       this.selectedTraining.set(null);
     }
@@ -236,7 +236,7 @@ export class TrainingService {
    * Create a new objective in a quest
    */
   createObjective(dto: CreateObjectiveDto): Objective | null {
-    const training = this.trainings().find(t => 
+    const training = this.trainings().find(t =>
       t.quests.some(q => q.id === dto.questId)
     );
     if (!training) return null;

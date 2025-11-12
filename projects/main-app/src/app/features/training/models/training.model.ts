@@ -54,7 +54,7 @@ export function calculateTrainingEarnedPoints(training: Training): number {
  * Checks if all quests in a training are completed
  */
 export function isTrainingCompleted(training: Training): boolean {
-  return training.quests.length > 0 && 
+  return training.quests.length > 0 &&
          training.quests.every(quest => quest.isCompleted);
 }
 

@@ -453,7 +453,7 @@ export class VideoInputComponent {
         const newProgress = progress + 10;
         if (newProgress >= 100) {
           clearInterval(interval);
-          
+
           // Emit video data after successful upload
           const video: Video = {
             id: this.generateId(),
@@ -462,7 +462,7 @@ export class VideoInputComponent {
             title: file.name
           };
           this.videoChange.emit(video);
-          
+
           return 100;
         }
         return newProgress;

@@ -84,30 +84,30 @@ import { Training } from '../models';
                 <span class="badge badge-success">✓ Complété</span>
               }
             </div>
-            
+
             <div class="training-description" [innerHTML]="training.description"></div>
-            
+
             <div class="training-stats">
               <span>{{ training.quests.length }} quêtes</span>
               <span>{{ training.earnedPoints }}/{{ training.totalPoints }} points</span>
             </div>
 
             <div class="progress-bar">
-              <div 
-                class="progress-fill" 
+              <div
+                class="progress-fill"
                 [style.width.%]="calculateProgress(training)"
               ></div>
             </div>
 
             <div class="training-actions">
-              <button 
-                class="btn-small btn-primary" 
+              <button
+                class="btn-small btn-primary"
                 (click)="onEditTraining($event, training.id)"
               >
                 Éditer
               </button>
-              <button 
-                class="btn-small btn-danger" 
+              <button
+                class="btn-small btn-danger"
                 (click)="onDeleteTraining($event, training.id)"
               >
                 Supprimer

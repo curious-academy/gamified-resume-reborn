@@ -60,6 +60,6 @@ export function calculateQuestEarnedPoints(quest: Quest): number {
  * Checks if all objectives in a quest are completed
  */
 export function isQuestCompleted(quest: Quest): boolean {
-  return quest.objectives.length > 0 && 
+  return quest.objectives.length > 0 &&
          quest.objectives.every(objective => objective.isCompleted);
 }

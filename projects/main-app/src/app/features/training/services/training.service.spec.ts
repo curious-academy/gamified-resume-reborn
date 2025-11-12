@@ -46,9 +46,9 @@ describe('TrainingService', () => {
         description: '<p>Test</p>'
       };
       const created = service.createTraining(dto);
-      
+
       const found = service.getTrainingById(created.id);
-      
+
       expect(found).toBeDefined();
       expect(found?.id).toBe(created.id);
     });
@@ -59,13 +59,13 @@ describe('TrainingService', () => {
         description: '<p>Original</p>'
       };
       const created = service.createTraining(dto);
-      
+
       const success = service.updateTraining(created.id, {
         title: 'Updated Title'
       });
-      
+
       expect(success).toBe(true);
-      
+
       const updated = service.getTrainingById(created.id);
       expect(updated?.title).toBe('Updated Title');
     });
@@ -76,9 +76,9 @@ describe('TrainingService', () => {
         description: '<p>Delete me</p>'
       };
       const created = service.createTraining(dto);
-      
+
       const success = service.deleteTraining(created.id);
-      
+
       expect(success).toBe(true);
       expect(service.getTrainingById(created.id)).toBeUndefined();
     });
@@ -89,9 +89,9 @@ describe('TrainingService', () => {
         description: '<p>Select me</p>'
       };
       const created = service.createTraining(dto);
-      
+
       service.selectTraining(created.id);
-      
+
       expect(service.selectedTraining$()).toBe(created);
     });
   });
@@ -381,7 +381,7 @@ describe('TrainingService', () => {
   describe('Computed Signals', () => {
     it('should compute total trainings', () => {
       const initial = service.totalTrainings();
-      
+
       service.createTraining({
         title: 'New Training',
         description: '<p>New</p>'

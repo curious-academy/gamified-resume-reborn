@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, computed } from '@angular/core';
+import { Component, signal, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
@@ -561,6 +561,8 @@ import { Quest, CreateQuestDto, CreateObjectiveDto } from '../models';
   `]
 })
 export class TrainingDetailComponent implements OnInit {
+  private readonly trainingService = inject(TrainingService);
+
   private readonly expandedQuests = signal<Set<string>>(new Set());
   readonly showQuestForm = signal<boolean>(false);
   readonly showObjectiveForm = signal<boolean>(false);
@@ -580,15 +582,11 @@ export class TrainingDetailComponent implements OnInit {
     order: 1
   };
 
-  readonly training: any;
-
-  constructor(readonly trainingService: TrainingService) {
-    this.training = this.trainingService.selectedTraining$;
-  }
-
   ngOnInit(): void {
     // Component initialization
   }
+
+  readonly training = this.trainingService.selectedTraining$;
 
   readonly sortedQuests = computed(() => {
     const training = this.training();

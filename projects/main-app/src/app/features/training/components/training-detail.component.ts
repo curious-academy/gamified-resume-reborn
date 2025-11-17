@@ -2,15 +2,15 @@ import { Component, signal, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
-import { Quest, CreateQuestDto, CreateObjectiveDto } from '../models';
+import { Quest, CreateQuestDto, CreateObjectiveDto, Video } from '../models';
+import { VideoInputComponent } from './video-input.component';
 
 /**
  * Component for managing training details with quests and objectives
  */
 @Component({
   selector: 'app-training-detail',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, VideoInputComponent],
   template: `
     <div class="training-detail">
       @if (training(); as training) {
@@ -158,6 +158,13 @@ import { Quest, CreateQuestDto, CreateObjectiveDto } from '../models';
                             required
                             rows="2"
                           ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                          <label>Vidéo (optionnelle)</label>
+                          <app-video-input
+                            (videoChange)="onVideoSelected($event)"
+                          ></app-video-input>
                         </div>
 
                         <div class="form-actions">
@@ -579,7 +586,8 @@ export class TrainingDetailComponent implements OnInit {
     title: '',
     description: '',
     points: 10,
-    order: 1
+    order: 1,
+    video: null as Video | null
   };
 
   ngOnInit(): void {
@@ -675,8 +683,12 @@ export class TrainingDetailComponent implements OnInit {
   // Objective management
   onAddObjective(questId: string): void {
     this.currentQuestId.set(questId);
-    this.objectiveFormData = { title: '', description: '', points: 10, order: 1 };
+    this.objectiveFormData = { title: '', description: '', points: 10, order: 1, video: null };
     this.showObjectiveForm.set(true);
+  }
+
+  onVideoSelected(video: Video | null): void {
+    this.objectiveFormData.video = video;
   }
 
   onCancelObjective(): void {
@@ -689,8 +701,12 @@ export class TrainingDetailComponent implements OnInit {
     if (!questId) return;
 
     const dto: CreateObjectiveDto = {
-      ...this.objectiveFormData,
-      questId
+      title: this.objectiveFormData.title,
+      description: this.objectiveFormData.description,
+      points: this.objectiveFormData.points,
+      order: this.objectiveFormData.order,
+      questId,
+      video: this.objectiveFormData.video || undefined
     };
 
     this.trainingService.createObjective(dto);

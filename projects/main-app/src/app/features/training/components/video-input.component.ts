@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Video, VideoSourceType } from '../models';
@@ -8,7 +8,6 @@ import { Video, VideoSourceType } from '../models';
  */
 @Component({
   selector: 'app-video-input',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="video-input">
@@ -372,8 +371,8 @@ import { Video, VideoSourceType } from '../models';
   `]
 })
 export class VideoInputComponent {
-  @Input() currentVideo: any = signal<Video | null>(null);
-  @Output() videoChange = new EventEmitter<Video | null>();
+  readonly currentVideo = input<Video | null>(null);
+  readonly videoChange = output<Video | null>();
 
   readonly videoType = signal<'youtube' | 'server'>('youtube');
   readonly youtubeUrl = signal<string>('');

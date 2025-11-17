@@ -9,7 +9,6 @@ import { Training } from '../models';
  */
 @Component({
   selector: 'app-training-list',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
     <div class="training-list">

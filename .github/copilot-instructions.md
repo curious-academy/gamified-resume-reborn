@@ -52,19 +52,38 @@ This project is a **gamified** application using:
 
 ### ⚠️ Important Rule: Automatic Task Type Detection
 
-Before starting any work, **ALWAYS** determine the task type:
+Before starting any work, **ALWAYS** determine the task type and context:
 
 1. **New Feature**: Adding new functionality (e.g., "Add inventory system")
-   → Follow the **Feature Workflow** (7 steps)
+   → Check if related to current branch, then follow appropriate workflow
 
 2. **Technical Task**: Refactoring, fixes, improvements, optimizations (e.g., "Refactor code", "Performance improvement", "Bug fix")
-   → Follow the **Technical Workflow** (7 steps)
+   → Check if related to current branch, then follow appropriate workflow
+
+### 🔍 Context Detection (Step 0 for all workflows)
+
+Before following any workflow, **ALWAYS** check:
+
+```
+❓ Question to ask: "Is this task related to the current branch and its feature/issue?"
+
+📝 If YES (task is part of current work):
+   → Skip steps 4, 5, 6 (no issue/branch/PR creation)
+   → Ask user confirmation before implementation
+   → Continue on current branch
+
+📝 If NO (independent task):
+   → Follow complete workflow (all 7 steps)
+   → Create new issue, branch, and PR
+```
 
 ---
 
 ## 📋 Feature Workflow (New Functionality)
 
 ### Mandatory process for each new feature
+
+**⚠️ STEP 0: Check Context (see Context Detection above)**
 
 Follow these steps **rigorously** in order:
 
@@ -97,7 +116,7 @@ Follow these steps **rigorously** in order:
 ✅ Validation: At least 3 clear acceptance criteria
 ```
 
-#### 4️⃣ Create GitHub Issue
+#### 4️⃣ Create GitHub Issue (⚠️ SKIP if task is part of current branch)
 ```
 🔧 Action: Automatically create an issue on the repository with:
    - Title: [same title as step 1, translated to English]
@@ -116,7 +135,7 @@ Follow these steps **rigorously** in order:
 ✅ Confirmation: Display issue number and URL
 ```
 
-#### 5️⃣ Create Local Branch
+#### 5️⃣ Create Local Branch (⚠️ SKIP if task is part of current branch)
 ```
 🔧 Action: Create a local branch with format:
    - Name: feature/[title-in-kebab-case]
@@ -132,7 +151,7 @@ Example: "Add inventory system" → "feature/add-inventory-system"
 ✅ Confirmation: Display created branch name
 ```
 
-#### 6️⃣ Create Pull Request and Link to Issue
+#### 6️⃣ Create Pull Request and Link to Issue (⚠️ SKIP if task is part of current branch)
 ```
 🔧 Action: Automatically create a Pull Request with:
    - Title: Same as the issue title
@@ -158,10 +177,20 @@ Example: "Add inventory system" → "feature/add-inventory-system"
 #### 7️⃣ Pause and Wait for Confirmation
 ```
 ⏸️ Mandatory message (in French):
+
+IF steps 4, 5, 6 were executed (independent task):
 "✅ Feature setup complet !
 📝 Issue #[number] créée: [URL]
 🌿 Branche créée: [branch-name]
 🔗 Pull Request #[number] créée: [URL]
+
+⏳ Attendant votre confirmation pour commencer l'implémentation.
+💬 Tapez 'go' ou 'continue' pour démarrer le développement."
+
+IF steps 4, 5, 6 were skipped (task related to current branch):
+"✅ Préparation terminée !
+🌿 Branche actuelle: [current-branch-name]
+📋 Tâche: [task-title]
 
 ⏳ Attendant votre confirmation pour commencer l'implémentation.
 💬 Tapez 'go' ou 'continue' pour démarrer le développement."
@@ -174,6 +203,8 @@ Example: "Add inventory system" → "feature/add-inventory-system"
 ## 📋 Technical Workflow (Refactoring, Fixes, Improvements)
 
 ### Mandatory process for each technical task
+
+**⚠️ STEP 0: Check Context (see Context Detection above)**
 
 Follow these steps **rigorously** in order:
 
@@ -207,7 +238,7 @@ Follow these steps **rigorously** in order:
 ✅ Validation: At least 3 clear validation criteria
 ```
 
-#### 4️⃣ Create GitHub Issue
+#### 4️⃣ Create GitHub Issue (⚠️ SKIP if task is part of current branch)
 ```
 🔧 Action: Automatically create an issue on the repository with:
    - Title: [same title as step 1, translated to English]
@@ -228,7 +259,7 @@ Follow these steps **rigorously** in order:
 ✅ Confirmation: Display issue number and URL
 ```
 
-#### 5️⃣ Create Local Branch
+#### 5️⃣ Create Local Branch (⚠️ SKIP if task is part of current branch)
 ```
 🔧 Action: Create a local branch with format:
    - Name: [type]/[title-in-kebab-case]

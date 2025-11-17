@@ -198,6 +198,60 @@ IF steps 4, 5, 6 were skipped (task related to current branch):
 ⛔ DO NOT continue without explicit user confirmation
 ```
 
+#### 8️⃣ Build Verification and Commit (After Implementation)
+```
+🔧 After completing the implementation and receiving user approval:
+
+STEP 8.1 - Build Verification:
+   - Run: ng build
+   - Check build output for errors
+   
+STEP 8.2 - Error Handling (if build fails):
+   - Analyze build errors
+   - Fix errors automatically
+   - Run ng build again
+   - Repeat until build succeeds
+   - ⚠️ DO NOT proceed to commit until build is successful
+   
+STEP 8.3 - Conventional Commit (only if build succeeds):
+   - Format: <type>(<scope>): <subject>
+   - Types:
+     * feat: New feature
+     * fix: Bug fix
+     * refactor: Code refactoring
+     * perf: Performance improvement
+     * style: Code style changes
+     * docs: Documentation changes
+     * test: Test changes
+     * chore: Build/tooling changes
+   
+   - Scope: Component or feature name (e.g., training, game, terminal)
+   - Subject: Short description in English (max 72 chars)
+   
+   Examples:
+   * "feat(training): add video input component"
+   * "feat(training): implement training list and detail views"
+   * "refactor(game): simplify player entity logic"
+   * "fix(terminal): resolve command parsing issue"
+
+STEP 8.4 - Commit Execution:
+   - Stage all changes: git add .
+   - Commit with conventional message
+   - Display commit confirmation
+
+📝 Message (in French):
+"🔨 Build en cours...
+✅ Build réussi !
+💾 Commit effectué: [commit-message]"
+
+OR if build failed initially:
+"🔨 Build en cours...
+❌ Erreurs détectées, correction en cours...
+🔄 Tentative [N]...
+✅ Build réussi !
+💾 Commit effectué: [commit-message]"
+```
+
 ---
 
 ## 📋 Technical Workflow (Refactoring, Fixes, Improvements)
@@ -326,6 +380,59 @@ IF steps 4, 5, 6 were skipped (task related to current branch):
 ⛔ DO NOT continue without explicit user confirmation
 ```
 
+#### 8️⃣ Build Verification and Commit (After Implementation)
+```
+🔧 After completing the implementation and receiving user approval:
+
+STEP 8.1 - Build Verification:
+   - Run: ng build
+   - Check build output for errors
+   
+STEP 8.2 - Error Handling (if build fails):
+   - Analyze build errors
+   - Fix errors automatically
+   - Run ng build again
+   - Repeat until build succeeds
+   - ⚠️ DO NOT proceed to commit until build is successful
+   
+STEP 8.3 - Conventional Commit (only if build succeeds):
+   - Format: <type>(<scope>): <subject>
+   - Types:
+     * feat: New feature
+     * fix: Bug fix
+     * refactor: Code refactoring
+     * perf: Performance improvement
+     * style: Code style changes
+     * docs: Documentation changes
+     * test: Test changes
+     * chore: Build/tooling changes
+   
+   - Scope: Component or feature name (e.g., training, game, terminal)
+   - Subject: Short description in English (max 72 chars)
+   
+   Examples:
+   * "fix(game): resolve collision detection bug"
+   * "refactor(terminal): simplify command processing"
+   * "perf(player): optimize entity update loop"
+   * "style(app): apply consistent formatting"
+
+STEP 8.4 - Commit Execution:
+   - Stage all changes: git add .
+   - Commit with conventional message
+   - Display commit confirmation
+
+📝 Message (in French):
+"🔨 Build en cours...
+✅ Build réussi !
+💾 Commit effectué: [commit-message]"
+
+OR if build failed initially:
+"🔨 Build en cours...
+❌ Erreurs détectées, correction en cours...
+🔄 Tentative [N]...
+✅ Build réussi !
+💾 Commit effectué: [commit-message]"
+```
 
 ---
 
@@ -714,7 +821,7 @@ export class PhaserService {
 ## ⚠️ Important Reminders
 
 1. **ALWAYS detect the task type** (feature vs technical) before starting
-2. **ALWAYS follow the appropriate 7-step workflow** (Feature or Technical)
+2. **ALWAYS follow the appropriate 8-step workflow** (Feature or Technical)
 3. **NEVER** continue after step 7 without explicit user confirmation
 4. **ALWAYS** create the GitHub issue before the branch
 5. **ALWAYS** create the Pull Request and link it to the issue
@@ -724,9 +831,11 @@ export class PhaserService {
    - `tech/` for refactorings
    - `fix/` for bug fixes
    - `improve/` for improvements
-8. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
-9. **ALWAYS** use C# records for immutable DTOs
-10. **ALWAYS** use strict typing (TypeScript and C#)
+8. **ALWAYS** run `ng build` after implementation and fix errors until build succeeds
+9. **ALWAYS** use conventional commit format for commit messages
+10. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
+11. **ALWAYS** use C# records for immutable DTOs
+12. **ALWAYS** use strict typing (TypeScript and C#)
 
 ---
 

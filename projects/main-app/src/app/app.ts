@@ -1,6 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { GameContainerComponent } from './features/game/game-container';
 import { TerminalComponent } from './features/terminal/terminal.component';
 import { TerminalPromptComponent } from './features/terminal/terminal-prompt.component';
 import { TerminalService } from './core/services/terminal.service';
@@ -12,7 +11,7 @@ import { KeyboardService } from './core/services/keyboard.service';
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, GameContainerComponent, TerminalComponent, TerminalPromptComponent],
+  imports: [RouterOutlet, TerminalComponent, TerminalPromptComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

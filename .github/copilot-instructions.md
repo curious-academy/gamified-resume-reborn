@@ -52,9 +52,10 @@ This project is a **gamified** application using:
 
 ### ⚠️ Critical Rules
 
-1. **ALWAYS BUILD BEFORE COMMITTING**: Every modification must be validated with `ng build main-app` before commit
+1. **⚠️ ALWAYS BUILD BEFORE COMMITTING - ABSOLUTE PRIORITY**: Every modification must be validated with `ng build main-app` before commit. This is NON-NEGOTIABLE.
 2. **COMMIT IMMEDIATELY AFTER EACH COMPLETED STEP**: Do not accumulate changes - commit after each logical unit of work
 3. **NEVER SKIP THE BUILD STEP**: Even for "small" changes, always verify the build passes
+4. **⚠️ NO EXCEPTIONS TO BUILD RULE**: Whether it's a refactoring, a new feature, a fix, or any code change - ALWAYS build first
 
 ### ⚠️ Important Rule: Automatic Task Type Detection
 
@@ -863,11 +864,12 @@ export class PhaserService {
 ## ⚠️ Important Reminders
 
 ### 🔴 CRITICAL - Build & Commit Rules (TOP PRIORITY)
-1. **BUILD BEFORE EVERY COMMIT**: Run `ng build main-app` and fix ALL errors/warnings
+1. **⚠️ BUILD BEFORE EVERY COMMIT - ABSOLUTE MANDATORY RULE**: Run `ng build main-app` and fix ALL errors/warnings BEFORE EVERY SINGLE COMMIT - NO EXCEPTIONS
 2. **COMMIT AFTER EACH MODIFICATION**: Do not accumulate changes - commit incrementally
 3. **NEVER SKIP BUILD VERIFICATION**: Even for "trivial" changes, always build first
 4. **FIX BUILD WARNINGS**: Clean unused imports, resolve type issues immediately
 5. **SPECIFY PROJECT IN MONOREPO**: Always use `ng build main-app`, not just `ng build`
+6. **⚠️ IF YOU FORGET TO BUILD**: You are violating the most critical rule - this must NEVER happen
 
 ### 📋 Workflow Rules
 6. **ALWAYS detect the task type** (feature vs technical) before starting

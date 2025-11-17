@@ -50,6 +50,12 @@ This project is a **gamified** application using:
 
 ## 📋 Development Workflows
 
+### ⚠️ Critical Rules
+
+1. **ALWAYS BUILD BEFORE COMMITTING**: Every modification must be validated with `ng build main-app` before commit
+2. **COMMIT IMMEDIATELY AFTER EACH COMPLETED STEP**: Do not accumulate changes - commit after each logical unit of work
+3. **NEVER SKIP THE BUILD STEP**: Even for "small" changes, always verify the build passes
+
 ### ⚠️ Important Rule: Automatic Task Type Detection
 
 Before starting any work, **ALWAYS** determine the task type and context:
@@ -71,10 +77,12 @@ Before following any workflow, **ALWAYS** check:
    → Skip steps 4, 5, 6 (no issue/branch/PR creation)
    → Ask user confirmation before implementation
    → Continue on current branch
+   → ⚠️ MANDATORY: Build + Commit after EACH modification
 
 📝 If NO (independent task):
-   → Follow complete workflow (all 7 steps)
+   → Follow complete workflow (all 8 steps)
    → Create new issue, branch, and PR
+   → ⚠️ MANDATORY: Build + Commit after EACH modification
 ```
 
 ---
@@ -198,20 +206,31 @@ IF steps 4, 5, 6 were skipped (task related to current branch):
 ⛔ DO NOT continue without explicit user confirmation
 ```
 
-#### 8️⃣ Build Verification and Commit (After Implementation)
+#### 8️⃣ Build Verification and Commit (⚠️ MANDATORY AFTER EACH MODIFICATION)
 ```
-🔧 After completing the implementation and receiving user approval:
+🔧 CRITICAL: This step is MANDATORY after EVERY code modification, not just at the end!
+
+⚠️ WHEN TO EXECUTE STEP 8:
+   - After creating/modifying a component
+   - After adding/modifying a route
+   - After updating a service
+   - After ANY file change that affects the application
+   - After cleaning up imports
+   - EVEN for "small" changes
+   
+❌ DO NOT ACCUMULATE CHANGES - Commit incrementally!
 
 STEP 8.1 - Build Verification:
-   - Run: ng build
-   - Check build output for errors
+   - ALWAYS run: ng build main-app (specify project in monorepo)
+   - Check build output for errors AND warnings
+   - Pay attention to unused imports warnings
    
 STEP 8.2 - Error Handling (if build fails):
-   - Analyze build errors
-   - Fix errors automatically
-   - Run ng build again
-   - Repeat until build succeeds
-   - ⚠️ DO NOT proceed to commit until build is successful
+   - Analyze build errors carefully
+   - Fix errors automatically (imports, syntax, types)
+   - Run ng build main-app again
+   - Repeat until build succeeds with no critical warnings
+   - ⚠️ ABSOLUTE RULE: DO NOT proceed to commit until build is 100% successful
    
 STEP 8.3 - Conventional Commit (only if build succeeds):
    - Format: <type>(<scope>): <subject>
@@ -225,31 +244,37 @@ STEP 8.3 - Conventional Commit (only if build succeeds):
      * test: Test changes
      * chore: Build/tooling changes
    
-   - Scope: Component or feature name (e.g., training, game, terminal)
+   - Scope: Component or feature name (e.g., training, game, routing, terminal)
    - Subject: Short description in English (max 72 chars)
    
    Examples:
    * "feat(training): add video input component"
    * "feat(training): implement training list and detail views"
-   * "refactor(game): simplify player entity logic"
+   * "refactor(routing): move game container to /game/new route"
+   * "fix(game): clean unused imports from app component"
    * "fix(terminal): resolve command parsing issue"
 
 STEP 8.4 - Commit Execution:
    - Stage all changes: git add .
    - Commit with conventional message
    - Display commit confirmation
+   - ⚠️ THEN READY FOR NEXT MODIFICATION
 
 📝 Message (in French):
 "🔨 Build en cours...
 ✅ Build réussi !
-💾 Commit effectué: [commit-message]"
+💾 Commit effectué: [commit-message]
+
+✨ Prêt pour la prochaine modification !"
 
 OR if build failed initially:
 "🔨 Build en cours...
 ❌ Erreurs détectées, correction en cours...
 🔄 Tentative [N]...
 ✅ Build réussi !
-💾 Commit effectué: [commit-message]"
+💾 Commit effectué: [commit-message]
+
+✨ Prêt pour la prochaine modification !"
 ```
 
 ---
@@ -380,20 +405,31 @@ IF steps 4, 5, 6 were skipped (task related to current branch):
 ⛔ DO NOT continue without explicit user confirmation
 ```
 
-#### 8️⃣ Build Verification and Commit (After Implementation)
+#### 8️⃣ Build Verification and Commit (⚠️ MANDATORY AFTER EACH MODIFICATION)
 ```
-🔧 After completing the implementation and receiving user approval:
+🔧 CRITICAL: This step is MANDATORY after EVERY code modification, not just at the end!
+
+⚠️ WHEN TO EXECUTE STEP 8:
+   - After creating/modifying a component
+   - After adding/modifying a route
+   - After updating a service
+   - After ANY file change that affects the application
+   - After cleaning up imports
+   - EVEN for "small" changes
+   
+❌ DO NOT ACCUMULATE CHANGES - Commit incrementally!
 
 STEP 8.1 - Build Verification:
-   - Run: ng build
-   - Check build output for errors
+   - ALWAYS run: ng build main-app (specify project in monorepo)
+   - Check build output for errors AND warnings
+   - Pay attention to unused imports warnings
    
 STEP 8.2 - Error Handling (if build fails):
-   - Analyze build errors
-   - Fix errors automatically
-   - Run ng build again
-   - Repeat until build succeeds
-   - ⚠️ DO NOT proceed to commit until build is successful
+   - Analyze build errors carefully
+   - Fix errors automatically (imports, syntax, types)
+   - Run ng build main-app again
+   - Repeat until build succeeds with no critical warnings
+   - ⚠️ ABSOLUTE RULE: DO NOT proceed to commit until build is 100% successful
    
 STEP 8.3 - Conventional Commit (only if build succeeds):
    - Format: <type>(<scope>): <subject>
@@ -407,12 +443,13 @@ STEP 8.3 - Conventional Commit (only if build succeeds):
      * test: Test changes
      * chore: Build/tooling changes
    
-   - Scope: Component or feature name (e.g., training, game, terminal)
+   - Scope: Component or feature name (e.g., training, game, routing, terminal)
    - Subject: Short description in English (max 72 chars)
    
    Examples:
    * "fix(game): resolve collision detection bug"
    * "refactor(terminal): simplify command processing"
+   * "refactor(routing): move game container to dedicated route"
    * "perf(player): optimize entity update loop"
    * "style(app): apply consistent formatting"
 
@@ -420,18 +457,23 @@ STEP 8.4 - Commit Execution:
    - Stage all changes: git add .
    - Commit with conventional message
    - Display commit confirmation
+   - ⚠️ THEN READY FOR NEXT MODIFICATION
 
 📝 Message (in French):
 "🔨 Build en cours...
 ✅ Build réussi !
-💾 Commit effectué: [commit-message]"
+💾 Commit effectué: [commit-message]
+
+✨ Prêt pour la prochaine modification !"
 
 OR if build failed initially:
 "🔨 Build en cours...
 ❌ Erreurs détectées, correction en cours...
 🔄 Tentative [N]...
 ✅ Build réussi !
-💾 Commit effectué: [commit-message]"
+💾 Commit effectué: [commit-message]
+
+✨ Prêt pour la prochaine modification !"
 ```
 
 ---
@@ -820,22 +862,34 @@ export class PhaserService {
 
 ## ⚠️ Important Reminders
 
-1. **ALWAYS detect the task type** (feature vs technical) before starting
-2. **ALWAYS follow the appropriate 8-step workflow** (Feature or Technical)
-3. **NEVER** continue after step 7 without explicit user confirmation
-4. **ALWAYS** create the GitHub issue before the branch
-5. **ALWAYS** create the Pull Request and link it to the issue
-6. **ALWAYS** use kebab-case in English for branch names
-7. **ALWAYS** use the correct branch prefix:
-   - `feature/` for new features
-   - `tech/` for refactorings
-   - `fix/` for bug fixes
-   - `improve/` for improvements
-8. **ALWAYS** run `ng build` after implementation and fix errors until build succeeds
-9. **ALWAYS** use conventional commit format for commit messages
-10. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
-11. **ALWAYS** use C# records for immutable DTOs
-12. **ALWAYS** use strict typing (TypeScript and C#)
+### 🔴 CRITICAL - Build & Commit Rules (TOP PRIORITY)
+1. **BUILD BEFORE EVERY COMMIT**: Run `ng build main-app` and fix ALL errors/warnings
+2. **COMMIT AFTER EACH MODIFICATION**: Do not accumulate changes - commit incrementally
+3. **NEVER SKIP BUILD VERIFICATION**: Even for "trivial" changes, always build first
+4. **FIX BUILD WARNINGS**: Clean unused imports, resolve type issues immediately
+5. **SPECIFY PROJECT IN MONOREPO**: Always use `ng build main-app`, not just `ng build`
+
+### 📋 Workflow Rules
+6. **ALWAYS detect the task type** (feature vs technical) before starting
+7. **ALWAYS follow the appropriate 8-step workflow** (Feature or Technical)
+8. **NEVER** continue after step 7 without explicit user confirmation
+9. **ALWAYS** create the GitHub issue before the branch
+10. **ALWAYS** create the Pull Request and link it to the issue
+
+### 🏷️ Naming & Format Rules
+11. **ALWAYS** use kebab-case in English for branch names
+12. **ALWAYS** use the correct branch prefix:
+    - `feature/` for new features
+    - `tech/` for refactorings
+    - `fix/` for bug fixes
+    - `improve/` for improvements
+13. **ALWAYS** use conventional commit format for commit messages
+
+### 💻 Code Quality Rules
+14. **ALWAYS** use Angular 21 signals instead of RxJS Subjects when possible
+15. **ALWAYS** use C# records for immutable DTOs
+16. **ALWAYS** use strict typing (TypeScript and C#)
+17. **ALWAYS** clean unused imports immediately when warned by build
 
 ---
 

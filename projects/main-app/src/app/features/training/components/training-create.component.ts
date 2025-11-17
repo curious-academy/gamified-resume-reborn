@@ -1,29 +1,15 @@
 import { Component, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { VideoInputComponent } from './video-input.component';
 import { Video } from '../models';
-
-interface QuestFormData {
-  title: string;
-  description: string;
-  video: Video | null;
-  objectives: ObjectiveFormData[];
-}
-
-interface ObjectiveFormData {
-  title: string;
-  description: string;
-  points: number;
-  video: Video | null;
-}
 
 /**
  * Component for creating a new training course with quests and objectives
  */
 @Component({
   selector: 'app-training-create',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, VideoInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, VideoInputComponent],
   template: `
     <div class="training-create">
       <div class="form-header">
@@ -71,7 +57,7 @@ interface ObjectiveFormData {
         </div>
 
         <!-- Quests Section -->
-        <div class="section">
+        <div class="section" formArrayName="quests">
           <div class="section-header">
             <h3>Quêtes</h3>
             <button type="button" class="btn-primary btn-small" (click)="addQuest()">
@@ -79,8 +65,8 @@ interface ObjectiveFormData {
             </button>
           </div>
 
-          @for (quest of quests(); track $index) {
-            <div class="quest-card">
+          @for (questControl of questsArray.controls; track $index) {
+            <div class="quest-card" [formGroupName]="$index">
               <div class="quest-header">
                 <h4>Quête {{ $index + 1 }}</h4>
                 <button type="button" class="btn-icon btn-danger" (click)="removeQuest($index)">
@@ -92,34 +78,35 @@ interface ObjectiveFormData {
                 <label>Titre de la quête *</label>
                 <input
                   type="text"
-                  [(ngModel)]="quest.title"
-                  [ngModelOptions]="{standalone: true}"
+                  formControlName="title"
                   placeholder="Ex: Découvrir les composants"
-                  required
                 />
+                @if (questControl.get('title')?.invalid && questControl.get('title')?.touched) {
+                  <span class="field-error">Le titre est obligatoire (min. 3 caractères)</span>
+                }
               </div>
 
               <div class="form-group">
                 <label>Description de la quête *</label>
                 <textarea
-                  [(ngModel)]="quest.description"
-                  [ngModelOptions]="{standalone: true}"
+                  formControlName="description"
                   rows="3"
                   placeholder="Description de la quête..."
-                  required
                 ></textarea>
+                @if (questControl.get('description')?.invalid && questControl.get('description')?.touched) {
+                  <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+                }
               </div>
 
               <div class="form-group">
                 <label>Vidéo de la quête (optionnelle)</label>
                 <app-video-input
-                  [currentVideo]="quest.video"
                   (videoChange)="onQuestVideoSelected($index, $event)"
                 ></app-video-input>
               </div>
 
               <!-- Objectives for this quest -->
-              <div class="objectives-section">
+              <div class="objectives-section" [formArrayName]="'objectives'">
                 <div class="objectives-header">
                   <h5>Objectifs de la quête</h5>
                   <button type="button" class="btn-secondary btn-small" (click)="addObjective($index)">
@@ -127,11 +114,11 @@ interface ObjectiveFormData {
                   </button>
                 </div>
 
-                @for (objective of quest.objectives; track $index) {
-                  <div class="objective-card">
+                @for (objectiveControl of getObjectivesArray($index).controls; track $index) {
+                  <div class="objective-card" [formGroupName]="$index">
                     <div class="objective-header">
                       <span>Objectif {{ $index + 1 }}</span>
-                      <button type="button" class="btn-icon btn-danger-small" (click)="removeObjective(quest, $index)">
+                      <button type="button" class="btn-icon btn-danger-small" (click)="removeObjective(questControl, $index)">
                         ✕
                       </button>
                     </div>
@@ -141,41 +128,43 @@ interface ObjectiveFormData {
                         <label>Titre *</label>
                         <input
                           type="text"
-                          [(ngModel)]="objective.title"
-                          [ngModelOptions]="{standalone: true}"
+                          formControlName="title"
                           placeholder="Ex: Créer un composant"
-                          required
                         />
+                        @if (objectiveControl.get('title')?.invalid && objectiveControl.get('title')?.touched) {
+                          <span class="field-error">Le titre est obligatoire (min. 3 caractères)</span>
+                        }
                       </div>
 
                       <div class="form-group form-group-small">
                         <label>Points *</label>
                         <input
                           type="number"
-                          [(ngModel)]="objective.points"
-                          [ngModelOptions]="{standalone: true}"
+                          formControlName="points"
                           min="1"
-                          required
                         />
+                        @if (objectiveControl.get('points')?.invalid && objectiveControl.get('points')?.touched) {
+                          <span class="field-error">Min. 1 point</span>
+                        }
                       </div>
                     </div>
 
                     <div class="form-group">
                       <label>Description *</label>
                       <textarea
-                        [(ngModel)]="objective.description"
-                        [ngModelOptions]="{standalone: true}"
+                        formControlName="description"
                         rows="2"
                         placeholder="Description de l'objectif..."
-                        required
                       ></textarea>
+                      @if (objectiveControl.get('description')?.invalid && objectiveControl.get('description')?.touched) {
+                        <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+                      }
                     </div>
 
                     <div class="form-group">
                       <label>Vidéo de l'objectif (optionnelle)</label>
                       <app-video-input
-                        [currentVideo]="objective.video"
-                        (videoChange)="onObjectiveVideoSelected(quest, $index, $event)"
+                        (videoChange)="onObjectiveVideoSelected(questControl, $index, $event)"
                       ></app-video-input>
                     </div>
                   </div>
@@ -504,20 +493,49 @@ export class TrainingCreateComponent {
     title: string;
     description: string;
     video?: Video;
-    quests: QuestFormData[];
+    quests: any[];
   }>();
   readonly cancelled = output<void>();
 
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
-  readonly quests = signal<QuestFormData[]>([]);
 
   private trainingVideo: Video | null = null;
+  private questVideos: Map<number, Video | null> = new Map();
+  private objectiveVideos: Map<string, Video | null> = new Map();
 
   readonly trainingForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
-    description: ['', [Validators.required, Validators.minLength(10)]]
+    description: ['', [Validators.required, Validators.minLength(10)]],
+    quests: this.fb.array([])
   });
+
+  // Getters for FormArrays
+  get questsArray(): FormArray {
+    return this.trainingForm.get('quests') as FormArray;
+  }
+
+  getObjectivesArray(questIndex: number): FormArray {
+    return this.questsArray.at(questIndex).get('objectives') as FormArray;
+  }
+
+  // Create FormGroup for Quest
+  private createQuestFormGroup(): FormGroup {
+    return this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      objectives: this.fb.array([])
+    });
+  }
+
+  // Create FormGroup for Objective
+  private createObjectiveFormGroup(): FormGroup {
+    return this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      points: [10, [Validators.required, Validators.min(1)]]
+    });
+  }
 
   // Training video selection
   onTrainingVideoSelected(video: Video | null): void {
@@ -526,115 +544,93 @@ export class TrainingCreateComponent {
 
   // Quest management
   addQuest(): void {
-    const newQuest: QuestFormData = {
-      title: '',
-      description: '',
-      video: null,
-      objectives: []
-    };
-    this.quests.update(quests => [...quests, newQuest]);
+    this.questsArray.push(this.createQuestFormGroup());
   }
 
   removeQuest(index: number): void {
-    this.quests.update(quests => quests.filter((_, i) => i !== index));
+    this.questsArray.removeAt(index);
+    this.questVideos.delete(index);
+
+    // Clean up objective videos for this quest
+    const keysToDelete: string[] = [];
+    this.objectiveVideos.forEach((_, key) => {
+      if (key.startsWith(`${index}-`)) {
+        keysToDelete.push(key);
+      }
+    });
+    keysToDelete.forEach(key => this.objectiveVideos.delete(key));
   }
 
   onQuestVideoSelected(questIndex: number, video: Video | null): void {
-    this.quests.update(quests => {
-      const updated = [...quests];
-      updated[questIndex].video = video;
-      return updated;
-    });
+    this.questVideos.set(questIndex, video);
   }
 
   // Objective management
   addObjective(questIndex: number): void {
-    const newObjective: ObjectiveFormData = {
-      title: '',
-      description: '',
-      points: 10,
-      video: null
-    };
-
-    this.quests.update(quests => {
-      const updated = [...quests];
-      updated[questIndex].objectives.push(newObjective);
-      return updated;
-    });
+    const objectivesArray = this.getObjectivesArray(questIndex);
+    objectivesArray.push(this.createObjectiveFormGroup());
   }
 
-  removeObjective(quest: QuestFormData, objectiveIndex: number): void {
-    const questIndex = this.quests().indexOf(quest);
-    if (questIndex === -1) return;
+  removeObjective(questControl: any, objectiveIndex: number): void {
+    const questIndex = this.questsArray.controls.indexOf(questControl);
+    const objectivesArray = this.getObjectivesArray(questIndex);
+    objectivesArray.removeAt(objectiveIndex);
 
-    this.quests.update(quests => {
-      const updated = [...quests];
-      updated[questIndex].objectives = updated[questIndex].objectives.filter(
-        (_, i) => i !== objectiveIndex
-      );
-      return updated;
-    });
+    // Clean up video reference
+    const videoKey = `${questIndex}-${objectiveIndex}`;
+    this.objectiveVideos.delete(videoKey);
   }
 
-  onObjectiveVideoSelected(quest: QuestFormData, objectiveIndex: number, video: Video | null): void {
-    const questIndex = this.quests().indexOf(quest);
-    if (questIndex === -1) return;
-
-    this.quests.update(quests => {
-      const updated = [...quests];
-      updated[questIndex].objectives[objectiveIndex].video = video;
-      return updated;
-    });
+  onObjectiveVideoSelected(questControl: any, objectiveIndex: number, video: Video | null): void {
+    const questIndex = this.questsArray.controls.indexOf(questControl);
+    const videoKey = `${questIndex}-${objectiveIndex}`;
+    this.objectiveVideos.set(videoKey, video);
   }
 
   // Form validation
-  private validateQuests(): boolean {
-    const quests = this.quests();
-
-    if (quests.length === 0) {
+  private validateForm(): boolean {
+    if (this.questsArray.length === 0) {
       this.errorMessage.set('Ajoutez au moins une quête');
       return false;
     }
 
-    for (let i = 0; i < quests.length; i++) {
-      const quest = quests[i];
+    for (let i = 0; i < this.questsArray.length; i++) {
+      const questGroup = this.questsArray.at(i) as FormGroup;
+      const objectivesArray = this.getObjectivesArray(i);
 
-      if (!quest.title.trim()) {
-        this.errorMessage.set(`La quête ${i + 1} doit avoir un titre`);
-        return false;
-      }
-
-      if (!quest.description.trim()) {
-        this.errorMessage.set(`La quête ${i + 1} doit avoir une description`);
-        return false;
-      }
-
-      if (quest.objectives.length === 0) {
+      if (objectivesArray.length === 0) {
         this.errorMessage.set(`La quête ${i + 1} doit avoir au moins un objectif`);
         return false;
-      }
-
-      for (let j = 0; j < quest.objectives.length; j++) {
-        const objective = quest.objectives[j];
-
-        if (!objective.title.trim()) {
-          this.errorMessage.set(`L'objectif ${j + 1} de la quête ${i + 1} doit avoir un titre`);
-          return false;
-        }
-
-        if (!objective.description.trim()) {
-          this.errorMessage.set(`L'objectif ${j + 1} de la quête ${i + 1} doit avoir une description`);
-          return false;
-        }
-
-        if (objective.points < 1) {
-          this.errorMessage.set(`L'objectif ${j + 1} de la quête ${i + 1} doit avoir au moins 1 point`);
-          return false;
-        }
       }
     }
 
     return true;
+  }
+
+  // Build output data with videos
+  private buildOutputData(): any {
+    const quests = this.questsArray.value.map((quest: any, questIndex: number) => {
+      const objectives = quest.objectives.map((objective: any, objectiveIndex: number) => {
+        const videoKey = `${questIndex}-${objectiveIndex}`;
+        return {
+          ...objective,
+          video: this.objectiveVideos.get(videoKey) || null
+        };
+      });
+
+      return {
+        ...quest,
+        video: this.questVideos.get(questIndex) || null,
+        objectives
+      };
+    });
+
+    return {
+      title: this.trainingForm.value.title.trim(),
+      description: this.trainingForm.value.description.trim(),
+      video: this.trainingVideo || undefined,
+      quests
+    };
   }
 
   // Form submission
@@ -648,7 +644,7 @@ export class TrainingCreateComponent {
     }
 
     // Validate quests and objectives
-    if (!this.validateQuests()) {
+    if (!this.validateForm()) {
       return;
     }
 
@@ -658,13 +654,8 @@ export class TrainingCreateComponent {
     // Set submitting state
     this.isSubmitting.set(true);
 
-    // Emit the training data with quests and objectives
-    this.trainingCreated.emit({
-      title: this.trainingForm.value.title.trim(),
-      description: this.trainingForm.value.description.trim(),
-      video: this.trainingVideo || undefined,
-      quests: this.quests()
-    });
+    // Build and emit the training data with quests and objectives
+    this.trainingCreated.emit(this.buildOutputData());
 
     // Reset form
     this.resetForm();
@@ -678,8 +669,10 @@ export class TrainingCreateComponent {
 
   private resetForm(): void {
     this.trainingForm.reset();
+    this.questsArray.clear();
     this.trainingVideo = null;
-    this.quests.set([]);
+    this.questVideos.clear();
+    this.objectiveVideos.clear();
     this.errorMessage.set(null);
   }
 }

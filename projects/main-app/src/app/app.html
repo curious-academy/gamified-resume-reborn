@@ -4,18 +4,5 @@
     <p>Jeu 2D Style Final Fantasy 6 - Déplacez-vous avec ZQSD (ou WASD)</p>
   </header>
 
-  <!-- Terminal Prompt -->
-  @if (terminalService.showTerminalPrompt()) {
-    <app-terminal-prompt
-      (openTerminal)="openTerminal()"
-      (closePrompt)="closePrompt()">
-    </app-terminal-prompt>
-  }
-
-  <!-- Terminal Component -->
-  @if (terminalService.isTerminalOpen()) {
-    <app-terminal (closeTerminal)="closeTerminal()"></app-terminal>
-  }
-
   <router-outlet />
 </div>

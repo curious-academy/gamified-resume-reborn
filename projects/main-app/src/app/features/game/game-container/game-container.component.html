@@ -16,3 +16,16 @@
     <p><strong>Nouveau :</strong> Approchez-vous du carré violet pour accéder au terminal ! 💻</p>
   </div>
 </div>
+
+<!-- Terminal Prompt -->
+@if (terminalService.showTerminalPrompt()) {
+  <app-terminal-prompt
+    (openTerminal)="openTerminal()"
+    (closePrompt)="closePrompt()">
+  </app-terminal-prompt>
+}
+
+<!-- Terminal Component -->
+@if (terminalService.isTerminalOpen()) {
+  <app-terminal (closeTerminal)="closeTerminal()"></app-terminal>
+}

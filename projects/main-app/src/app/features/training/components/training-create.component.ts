@@ -1,6 +1,6 @@
-import { Component, output, signal } from '@angular/core';
+import { Component, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { VideoInputComponent } from './video-input.component';
 import { Video } from '../models';
 
@@ -9,7 +9,7 @@ import { Video } from '../models';
  */
 @Component({
   selector: 'app-training-create',
-  imports: [CommonModule, FormsModule, VideoInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, VideoInputComponent],
   template: `
     <div class="training-create">
       <div class="form-header">
@@ -17,29 +17,31 @@ import { Video } from '../models';
         <button type="button" class="btn-close" (click)="onCancel()">✕</button>
       </div>
 
-      <form (ngSubmit)="onSubmit()">
+      <form [formGroup]="trainingForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label for="title">Titre *</label>
           <input
             id="title"
             type="text"
-            [(ngModel)]="formData.title"
-            name="title"
-            required
+            formControlName="title"
             placeholder="Ex: Angular Fundamentals"
           />
+          @if (trainingForm.get('title')?.invalid && trainingForm.get('title')?.touched) {
+            <span class="field-error">Le titre est obligatoire (min. 3 caractères)</span>
+          }
         </div>
 
         <div class="form-group">
           <label for="description">Description *</label>
           <textarea
             id="description"
-            [(ngModel)]="formData.description"
-            name="description"
-            required
+            formControlName="description"
             rows="4"
             placeholder="Description de la formation..."
           ></textarea>
+          @if (trainingForm.get('description')?.invalid && trainingForm.get('description')?.touched) {
+            <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+          }
         </div>
 
         <div class="form-group">
@@ -59,7 +61,11 @@ import { Video } from '../models';
           <button type="button" class="btn-secondary" (click)="onCancel()">
             Annuler
           </button>
-          <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="trainingForm.invalid || isSubmitting()"
+          >
             {{ isSubmitting() ? 'Création...' : 'Créer' }}
           </button>
         </div>
@@ -135,6 +141,18 @@ import { Video } from '../models';
       border-color: #667eea;
     }
 
+    .form-group input.ng-invalid.ng-touched,
+    .form-group textarea.ng-invalid.ng-touched {
+      border-color: #ef4444;
+    }
+
+    .field-error {
+      display: block;
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
     .error-message {
       background: #fee;
       color: #c33;
@@ -187,6 +205,8 @@ import { Video } from '../models';
   `]
 })
 export class TrainingCreateComponent {
+  private readonly fb = inject(FormBuilder);
+
   readonly trainingCreated = output<{
     title: string;
     description: string;
@@ -197,39 +217,37 @@ export class TrainingCreateComponent {
   readonly isSubmitting = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
 
-  formData = {
-    title: '',
-    description: '',
-    video: null as Video | null
-  };
+  private selectedVideo: Video | null = null;
+
+  readonly trainingForm: FormGroup = this.fb.group({
+    title: ['', [Validators.required, Validators.minLength(3)]],
+    description: ['', [Validators.required, Validators.minLength(10)]]
+  });
 
   onVideoSelected(video: Video | null): void {
-    this.formData.video = video;
+    this.selectedVideo = video;
   }
 
   onSubmit(): void {
+    // Mark all fields as touched to show validation errors
+    this.trainingForm.markAllAsTouched();
+
+    if (this.trainingForm.invalid) {
+      this.errorMessage.set('Veuillez corriger les erreurs dans le formulaire');
+      return;
+    }
+
     // Reset error
     this.errorMessage.set(null);
-
-    // Validate form
-    if (!this.formData.title.trim()) {
-      this.errorMessage.set('Le titre est obligatoire');
-      return;
-    }
-
-    if (!this.formData.description.trim()) {
-      this.errorMessage.set('La description est obligatoire');
-      return;
-    }
 
     // Set submitting state
     this.isSubmitting.set(true);
 
     // Emit the training data
     this.trainingCreated.emit({
-      title: this.formData.title,
-      description: this.formData.description,
-      video: this.formData.video || undefined
+      title: this.trainingForm.value.title.trim(),
+      description: this.trainingForm.value.description.trim(),
+      video: this.selectedVideo || undefined
     });
 
     // Reset form
@@ -243,11 +261,8 @@ export class TrainingCreateComponent {
   }
 
   private resetForm(): void {
-    this.formData = {
-      title: '',
-      description: '',
-      video: null
-    };
+    this.trainingForm.reset();
+    this.selectedVideo = null;
     this.errorMessage.set(null);
   }
 }

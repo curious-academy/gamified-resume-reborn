@@ -306,12 +306,31 @@ export class TrainingListComponent implements OnInit {
     this.showCreateForm.set(false);
   }
 
-  onTrainingCreated(data: { title: string; description: string; video?: Video }): void {
+  onTrainingCreated(data: {
+    title: string;
+    description: string;
+    video?: Video;
+    quests: Array<{
+      title: string;
+      description: string;
+      video: Video | null;
+      objectives: Array<{
+        title: string;
+        description: string;
+        points: number;
+        video: Video | null;
+      }>;
+    }>;
+  }): void {
+    // TODO: Update service to handle quests and objectives
     this.trainingService.createTraining({
       title: data.title,
       description: data.description,
       video: data.video
     });
+
+    // Log the quests data for now (to be integrated with service)
+    console.log('Training with quests:', data);
 
     this.onCancelCreate();
   }

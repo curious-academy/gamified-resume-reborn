@@ -4,37 +4,5 @@
     <p>Jeu 2D Style Final Fantasy 6 - Déplacez-vous avec ZQSD (ou WASD)</p>
   </header>
 
-  <div class="game-wrapper">
-    <app-game></app-game>
-    <div class="game-info">
-      <h3>🎮 Contrôles</h3>
-      <ul>
-        <li>⬆️ Z/W = Haut (Bleu)</li>
-        <li>⬇️ S = Bas (Vert)</li>
-        <li>⬅️ Q/A = Gauche (Rouge)</li>
-        <li>➡️ D = Droite (Jaune)</li>
-        <li>⚡ Shift + ZQSD = Courir</li>
-        <li>🔑 Échap = Fermer terminal/popup</li>
-        <li>✅ Entrée = Ouvrir terminal (popup)</li>
-      </ul>
-      <p><strong>Objectif :</strong> Explorez la carte et évitez les murs gris !</p>
-      <p><strong>Astuce :</strong> Maintenez Shift pour courir plus vite avec des effets visuels !</p>
-      <p><strong>Nouveau :</strong> Approchez-vous du carré violet pour accéder au terminal ! 💻</p>
-    </div>
-  </div>
-
-  <!-- Terminal Prompt -->
-  @if (terminalService.showTerminalPrompt()) {
-    <app-terminal-prompt
-      (openTerminal)="openTerminal()"
-      (closePrompt)="closePrompt()">
-    </app-terminal-prompt>
-  }
-
-  <!-- Terminal Component -->
-  @if (terminalService.isTerminalOpen()) {
-    <app-terminal (closeTerminal)="closeTerminal()"></app-terminal>
-  }
-
   <router-outlet />
 </div>

@@ -279,7 +279,7 @@ Examples:
 ✅ Confirmation: Display created branch name
 ```
 
-#### 6️⃣ Create Pull Request and Link to Issue
+#### 6️⃣ Create Pull Request and Link to Issue (⚠️ SKIP if task is part of current branch)
 ```
 🔧 Action: Automatically create a Pull Request with:
    - Title: Same as the issue title
@@ -305,10 +305,20 @@ Examples:
 #### 7️⃣ Pause and Wait for Confirmation
 ```
 ⏸️ Mandatory message (in French):
+
+IF steps 4, 5, 6 were executed (independent task):
 "✅ Tâche technique setup complet !
 📝 Issue #[number] créée: [URL]
 🌿 Branche créée: [branch-name]
 🔗 Pull Request #[number] créée: [URL]
+
+⏳ Attendant votre confirmation pour commencer l'implémentation.
+💬 Tapez 'go' ou 'continue' pour démarrer le développement."
+
+IF steps 4, 5, 6 were skipped (task related to current branch):
+"✅ Préparation terminée !
+🌿 Branche actuelle: [current-branch-name]
+📋 Tâche: [task-title]
 
 ⏳ Attendant votre confirmation pour commencer l'implémentation.
 💬 Tapez 'go' ou 'continue' pour démarrer le développement."

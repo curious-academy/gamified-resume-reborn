@@ -1,4 +1,5 @@
 import { Quest } from './quest.model';
+import { Video } from './video.model';
 
 /**
  * Interface representing a training course
@@ -8,6 +9,7 @@ export interface Training {
   id: string;
   title: string;
   description: string; // HTML content support
+  video?: Video; // Optional introduction video
   quests: Quest[];
   totalPoints: number;
   earnedPoints: number;
@@ -23,6 +25,7 @@ export interface Training {
 export interface CreateTrainingDto {
   title: string;
   description: string;
+  video?: Video;
 }
 
 /**
@@ -31,6 +34,7 @@ export interface CreateTrainingDto {
 export interface UpdateTrainingDto {
   title?: string;
   description?: string;
+  video?: Video;
   isCompleted?: boolean;
   totalPoints?: number;
   earnedPoints?: number;

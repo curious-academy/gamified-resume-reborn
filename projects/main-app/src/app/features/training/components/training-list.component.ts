@@ -2,14 +2,15 @@ import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
-import { Training } from '../models';
+import { Training, Video } from '../models';
+import { TrainingCreateComponent } from './training-create.component';
 
 /**
  * Component for listing and managing trainings
  */
 @Component({
   selector: 'app-training-list',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TrainingCreateComponent],
   template: `
     <div class="training-list">
       <div class="header">
@@ -35,43 +36,10 @@ import { Training } from '../models';
       </div>
 
       @if (showCreateForm()) {
-        <div class="create-form">
-          <h2>Créer une nouvelle formation</h2>
-          <form (ngSubmit)="onSubmitCreate()">
-            <div class="form-group">
-              <label for="title">Titre *</label>
-              <input
-                id="title"
-                type="text"
-                [(ngModel)]="newTrainingTitle"
-                name="title"
-                required
-                placeholder="Ex: Angular Fundamentals"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="description">Description *</label>
-              <textarea
-                id="description"
-                [(ngModel)]="newTrainingDescription"
-                name="description"
-                required
-                rows="4"
-                placeholder="Description HTML de la formation..."
-              ></textarea>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" class="btn-secondary" (click)="onCancelCreate()">
-                Annuler
-              </button>
-              <button type="submit" class="btn-primary">
-                Créer
-              </button>
-            </div>
-          </form>
-        </div>
+        <app-training-create
+          (trainingCreated)="onTrainingCreated($event)"
+          (cancelled)="onCancelCreate()"
+        ></app-training-create>
       }
 
       <div class="trainings-grid">
@@ -176,44 +144,6 @@ import { Training } from '../models';
       border-radius: 8px;
       padding: 2rem;
       margin-bottom: 2rem;
-    }
-
-    .create-form h2 {
-      margin-top: 0;
-      color: #667eea;
-    }
-
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .form-group input,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-family: inherit;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
     }
 
     .trainings-grid {
@@ -357,8 +287,6 @@ import { Training } from '../models';
 })
 export class TrainingListComponent implements OnInit {
   readonly showCreateForm = signal<boolean>(false);
-  newTrainingTitle = '';
-  newTrainingDescription = '';
 
   constructor(readonly trainingService: TrainingService) {}
 
@@ -376,19 +304,13 @@ export class TrainingListComponent implements OnInit {
 
   onCancelCreate(): void {
     this.showCreateForm.set(false);
-    this.newTrainingTitle = '';
-    this.newTrainingDescription = '';
   }
 
-  onSubmitCreate(): void {
-    if (!this.newTrainingTitle.trim() || !this.newTrainingDescription.trim()) {
-      alert('Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
+  onTrainingCreated(data: { title: string; description: string; video?: Video }): void {
     this.trainingService.createTraining({
-      title: this.newTrainingTitle,
-      description: this.newTrainingDescription
+      title: data.title,
+      description: data.description,
+      video: data.video
     });
 
     this.onCancelCreate();

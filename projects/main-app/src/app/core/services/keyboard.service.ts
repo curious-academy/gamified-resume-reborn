@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, DestroyRef } from '@angular/core';
 import { TerminalService } from './terminal.service';
 
 /**
@@ -9,13 +9,18 @@ import { TerminalService } from './terminal.service';
 })
 export class KeyboardService {
   private readonly terminalService = inject(TerminalService);
+  private readonly destroyRef = inject(DestroyRef);
 
   /**
    * Initialise les écouteurs de clavier
    */
   initialize(): void {
-    window.addEventListener('keydown', (event: KeyboardEvent) => {
-      this.handleKeyPress(event);
+    const handler = (event: KeyboardEvent) => this.handleKeyPress(event);
+    window.addEventListener('keydown', handler);
+
+    // Auto-cleanup when service is destroyed
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('keydown', handler);
     });
   }
 
@@ -48,13 +53,5 @@ export class KeyboardService {
         return;
       }
     }
-  }
-
-  /**
-   * Nettoie les écouteurs
-   */
-  cleanup(): void {
-    // Note: Dans une vraie application, on devrait stocker la référence
-    // à la fonction d'écoute pour pouvoir la retirer proprement
   }
 }

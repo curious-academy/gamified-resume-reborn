@@ -1,9 +1,10 @@
 import { Pipe, PipeTransform, inject, SecurityContext } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Pipe to sanitize HTML content before rendering
  * This prevents XSS vulnerabilities when using innerHTML binding
+ * Uses Angular's built-in HTML sanitization via SecurityContext.HTML
  *
  * @example
  * <div [innerHTML]="description | safeHtml"></div>
@@ -15,7 +16,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 export class SafeHtmlPipe implements PipeTransform {
   private readonly sanitizer = inject(DomSanitizer);
 
-  transform(value: string | null | undefined): SafeHtml {
+  transform(value: string | null | undefined): string {
     if (!value) {
       return '';
     }

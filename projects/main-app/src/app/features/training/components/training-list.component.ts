@@ -1,5 +1,4 @@
 import { Component, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Training, Video } from '../models';
@@ -10,7 +9,7 @@ import { TrainingCreateComponent } from './training-create.component';
  */
 @Component({
   selector: 'app-training-list',
-  imports: [CommonModule, FormsModule, TrainingCreateComponent],
+  imports: [FormsModule, TrainingCreateComponent],
   template: `
     <div class="training-list">
       <div class="header">

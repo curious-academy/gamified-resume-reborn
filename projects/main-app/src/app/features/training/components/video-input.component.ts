@@ -1,5 +1,4 @@
 import { Component, input, output, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Video, VideoSourceType } from '../models';
 
@@ -8,7 +7,7 @@ import { Video, VideoSourceType } from '../models';
  */
 @Component({
   selector: 'app-video-input',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="video-input">
       <div class="video-type-selector">

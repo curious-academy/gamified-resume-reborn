@@ -1,12 +1,11 @@
 import { Component, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 /**
  * Composant représentant l'interface du terminal
  */
 @Component({
   selector: 'app-terminal',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './terminal.component.html',
   styleUrls: ['./terminal.component.scss']
 })

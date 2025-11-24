@@ -1,5 +1,4 @@
 import { Component, output, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { VideoInputComponent } from './video-input.component';
 import { Video } from '../models';
@@ -9,7 +8,7 @@ import { Video } from '../models';
  */
 @Component({
   selector: 'app-training-create',
-  imports: [CommonModule, ReactiveFormsModule, VideoInputComponent],
+  imports: [ReactiveFormsModule, VideoInputComponent],
   template: `
     <div class="training-create">
       <div class="form-header">

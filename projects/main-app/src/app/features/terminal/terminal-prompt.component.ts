@@ -1,12 +1,11 @@
 import { Component, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 /**
  * Composant représentant la popup de confirmation pour ouvrir le terminal
  */
 @Component({
   selector: 'app-terminal-prompt',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './terminal-prompt.component.html',
   styleUrls: ['./terminal-prompt.component.scss']
 })

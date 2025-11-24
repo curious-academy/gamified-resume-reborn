@@ -1,7 +1,7 @@
 import { Component, output, ChangeDetectionStrategy } from '@angular/core';
 
 /**
- * Composant représentant la popup de confirmation pour ouvrir le terminal
+ * Component representing the confirmation popup to open the terminal
  */
 @Component({
   selector: 'app-terminal-prompt',
@@ -15,14 +15,14 @@ export class TerminalPromptComponent {
   protected readonly closePrompt = output<void>();
 
   /**
-   * Ouvre le terminal
+   * Opens the terminal
    */
   open(): void {
     this.openTerminal.emit();
   }
 
   /**
-   * Ferme la popup
+   * Closes the popup
    */
   close(): void {
     this.closePrompt.emit();

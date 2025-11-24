@@ -1,7 +1,7 @@
 import { Component, output, ChangeDetectionStrategy } from '@angular/core';
 
 /**
- * Composant représentant l'interface du terminal
+ * Component representing the terminal interface
  */
 @Component({
   selector: 'app-terminal',
@@ -14,7 +14,7 @@ export class TerminalComponent {
   protected readonly closeTerminal = output<void>();
 
   /**
-   * Ferme le terminal
+   * Closes the terminal
    */
   close(): void {
     this.closeTerminal.emit();

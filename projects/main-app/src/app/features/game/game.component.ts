@@ -5,7 +5,7 @@ import { TerminalService } from '../../core/services/terminal.service';
 import { GameScene } from './scenes/game.scene';
 
 /**
- * Composant gérant l'affichage et l'initialisation du jeu Phaser
+ * Component managing Phaser game display and initialization
  */
 @Component({
   selector: 'app-game',
@@ -58,7 +58,7 @@ export class GameComponent implements OnDestroy {
   }
 
   /**
-   * Initialise le jeu Phaser avec la configuration
+   * Initializes Phaser game with configuration
    */
   private initializeGame(): void {
     const config: Phaser.Types.Core.GameConfig = {
@@ -87,7 +87,7 @@ export class GameComponent implements OnDestroy {
   }
 
   /**
-   * Récupère la scène de jeu
+   * Gets the game scene
    */
   getGameScene(): GameScene | undefined {
     return this.phaserService.getScene<GameScene>('GameScene');

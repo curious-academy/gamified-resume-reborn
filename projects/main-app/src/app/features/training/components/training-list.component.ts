@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Training, Video } from '../models';
 import { TrainingCreateComponent } from './training-create.component';
+import { SafeHtmlPipe } from '../../../shared/pipes';
 
 /**
  * Component for listing and managing trainings
  */
 @Component({
   selector: 'app-training-list',
-  imports: [FormsModule, TrainingCreateComponent],
+  imports: [FormsModule, TrainingCreateComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="training-list">
@@ -52,7 +53,7 @@ import { TrainingCreateComponent } from './training-create.component';
               }
             </div>
 
-            <div class="training-description" [innerHTML]="training.description"></div>
+            <div class="training-description" [innerHTML]="training.description | safeHtml"></div>
 
             <div class="training-stats">
               <span>{{ training.quests.length }} quêtes</span>

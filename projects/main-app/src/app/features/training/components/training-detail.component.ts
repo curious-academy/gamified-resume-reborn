@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Quest, CreateQuestDto, CreateObjectiveDto, Video } from '../models';
 import { VideoInputComponent } from './video-input.component';
+import { SafeHtmlPipe } from '../../../shared/pipes';
 
 /**
  * Component for managing training details with quests and objectives
  */
 @Component({
   selector: 'app-training-detail',
-  imports: [FormsModule, VideoInputComponent],
+  imports: [FormsModule, VideoInputComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="training-detail">
@@ -19,7 +20,7 @@ import { VideoInputComponent } from './video-input.component';
             <button class="btn-back" (click)="onBack()">← Retour</button>
             <div>
               <h1>{{ training.title }}</h1>
-              <div [innerHTML]="training.description"></div>
+              <div [innerHTML]="training.description | safeHtml"></div>
             </div>
           </div>
           <button class="btn-primary" (click)="onAddQuest()">
@@ -109,7 +110,7 @@ import { VideoInputComponent } from './video-input.component';
                 </div>
               </div>
 
-              <div class="quest-description" [innerHTML]="quest.description"></div>
+              <div class="quest-description" [innerHTML]="quest.description | safeHtml"></div>
 
               <div class="quest-stats">
                 <span>{{ quest.objectives.length }} objectifs</span>
@@ -194,7 +195,7 @@ import { VideoInputComponent } from './video-input.component';
                             <span class="objective-title">{{ objective.title }}</span>
                             <span class="objective-points">{{ objective.points }} pts</span>
                           </div>
-                          <div class="objective-description" [innerHTML]="objective.description"></div>
+                          <div class="objective-description" [innerHTML]="objective.description | safeHtml"></div>
                           @if (objective.video) {
                             <div class="objective-video">
                               🎥 Vidéo disponible: {{ objective.video.title || objective.video.url }}

@@ -11,7 +11,7 @@ import { Component, output, ChangeDetectionStrategy } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TerminalComponent {
-  readonly closeTerminal = output<void>();
+  protected readonly closeTerminal = output<void>();
 
   /**
    * Ferme le terminal

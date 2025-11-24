@@ -287,7 +287,7 @@ import { TrainingCreateComponent } from './training-create.component';
 })
 export class TrainingListComponent implements OnInit {
   protected readonly trainingService = inject(TrainingService);
-  readonly showCreateForm = signal<boolean>(false);
+  protected readonly showCreateForm = signal<boolean>(false);
 
   ngOnInit(): void {
     // Component initialization

@@ -47,7 +47,7 @@ import { GameScene } from './scenes/game.scene';
 export class GameComponent implements OnInit, OnDestroy {
   private readonly phaserService = inject(PhaserService);
   private readonly terminalService = inject(TerminalService);
-  protected readonly isLoading = signal(true);
+  protected readonly isLoading = signal<boolean>(true);
 
   ngOnInit(): void {
     this.initializeGame();

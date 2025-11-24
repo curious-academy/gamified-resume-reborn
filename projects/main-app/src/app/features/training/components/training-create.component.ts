@@ -489,33 +489,33 @@ import { Video } from '../models';
 export class TrainingCreateComponent {
   private readonly fb = inject(FormBuilder);
 
-  readonly trainingCreated = output<{
+  protected readonly trainingCreated = output<{
     title: string;
     description: string;
     video?: Video;
     quests: any[];
   }>();
-  readonly cancelled = output<void>();
+  protected readonly cancelled = output<void>();
 
-  readonly isSubmitting = signal<boolean>(false);
-  readonly errorMessage = signal<string | null>(null);
+  protected readonly isSubmitting = signal<boolean>(false);
+  protected readonly errorMessage = signal<string | null>(null);
 
   private trainingVideo: Video | null = null;
   private questVideos: Map<number, Video | null> = new Map();
   private objectiveVideos: Map<string, Video | null> = new Map();
 
-  readonly trainingForm: FormGroup = this.fb.group({
+  protected readonly trainingForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', [Validators.required, Validators.minLength(10)]],
     quests: this.fb.array([])
   });
 
   // Getters for FormArrays
-  get questsArray(): FormArray {
+  protected get questsArray(): FormArray {
     return this.trainingForm.get('quests') as FormArray;
   }
 
-  getObjectivesArray(questIndex: number): FormArray {
+  protected getObjectivesArray(questIndex: number): FormArray {
     return this.questsArray.at(questIndex).get('objectives') as FormArray;
   }
 

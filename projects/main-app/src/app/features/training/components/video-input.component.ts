@@ -371,18 +371,18 @@ import { Video, VideoSourceType } from '../models';
   `]
 })
 export class VideoInputComponent {
-  readonly currentVideo = input<Video | null>(null);
-  readonly videoChange = output<Video | null>();
+  protected readonly currentVideo = input<Video | null>(null);
+  protected readonly videoChange = output<Video | null>();
 
-  readonly videoType = signal<'youtube' | 'server'>('youtube');
-  readonly youtubeUrl = signal<string>('');
-  readonly youtubeError = signal<string | null>(null);
-  readonly youtubePreview = signal<string | null>(null);
-  readonly selectedFile = signal<File | null>(null);
-  readonly uploadError = signal<string | null>(null);
-  readonly uploadProgress = signal<number>(0);
+  protected readonly videoType = signal<'youtube' | 'server'>('youtube');
+  protected readonly youtubeUrl = signal<string>('');
+  protected readonly youtubeError = signal<string | null>(null);
+  protected readonly youtubePreview = signal<string | null>(null);
+  protected readonly selectedFile = signal<File | null>(null);
+  protected readonly uploadError = signal<string | null>(null);
+  protected readonly uploadProgress = signal<number>(0);
 
-  youtubeUrlInput = '';
+  protected youtubeUrlInput = '';
 
   setVideoType(type: 'youtube' | 'server'): void {
     this.videoType.set(type);

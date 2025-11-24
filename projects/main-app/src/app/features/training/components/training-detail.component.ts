@@ -571,18 +571,18 @@ export class TrainingDetailComponent implements OnInit {
   private readonly trainingService = inject(TrainingService);
 
   private readonly expandedQuests = signal<Set<string>>(new Set());
-  readonly showQuestForm = signal<boolean>(false);
-  readonly showObjectiveForm = signal<boolean>(false);
-  readonly editingQuest = signal<Quest | null>(null);
-  readonly currentQuestId = signal<string | null>(null);
+  protected readonly showQuestForm = signal<boolean>(false);
+  protected readonly showObjectiveForm = signal<boolean>(false);
+  protected readonly editingQuest = signal<Quest | null>(null);
+  protected readonly currentQuestId = signal<string | null>(null);
 
-  questFormData = {
+  protected questFormData = {
     title: '',
     description: '',
     order: 1
   };
 
-  objectiveFormData = {
+  protected objectiveFormData = {
     title: '',
     description: '',
     points: 10,
@@ -594,15 +594,15 @@ export class TrainingDetailComponent implements OnInit {
     // Component initialization
   }
 
-  readonly training = this.trainingService.selectedTraining$;
+  protected readonly training = this.trainingService.selectedTraining$;
 
-  readonly sortedQuests = computed(() => {
+  protected readonly sortedQuests = computed(() => {
     const training = this.training();
     if (!training) return [];
     return [...training.quests].sort((a, b) => a.order - b.order);
   });
 
-  readonly progress = computed(() => {
+  protected readonly progress = computed(() => {
     const training = this.training();
     if (!training || training.totalPoints === 0) return 0;
     return Math.round((training.earnedPoints / training.totalPoints) * 100);

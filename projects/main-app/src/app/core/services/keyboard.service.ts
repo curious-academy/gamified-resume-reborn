@@ -1,29 +1,34 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, DestroyRef } from '@angular/core';
 import { TerminalService } from './terminal.service';
 
 /**
- * Service gérant les raccourcis clavier globaux de l'application
+ * Service managing global keyboard shortcuts for the application
  */
 @Injectable({
   providedIn: 'root'
 })
 export class KeyboardService {
   private readonly terminalService = inject(TerminalService);
+  private readonly destroyRef = inject(DestroyRef);
 
   /**
-   * Initialise les écouteurs de clavier
+   * Initializes keyboard listeners
    */
   initialize(): void {
-    window.addEventListener('keydown', (event: KeyboardEvent) => {
-      this.handleKeyPress(event);
+    const handler = (event: KeyboardEvent) => this.handleKeyPress(event);
+    window.addEventListener('keydown', handler);
+
+    // Auto-cleanup when service is destroyed
+    this.destroyRef.onDestroy(() => {
+      window.removeEventListener('keydown', handler);
     });
   }
 
   /**
-   * Gère les touches pressées
+   * Handles key presses
    */
   private handleKeyPress(event: KeyboardEvent): void {
-    // Touche Entrée - Ouvrir le terminal si la popup est affichée
+    // Enter key - Open terminal if popup is displayed
     if (event.key === 'Enter') {
       if (this.terminalService.showTerminalPrompt()) {
         this.terminalService.openTerminal();
@@ -32,29 +37,21 @@ export class KeyboardService {
       }
     }
 
-    // Touche Échap
+    // Escape key
     if (event.key === 'Escape') {
-      // Priorité 1: Fermer le terminal s'il est ouvert
+      // Priority 1: Close terminal if it's open
       if (this.terminalService.isTerminalOpen()) {
         this.terminalService.closeTerminal();
         event.preventDefault();
         return;
       }
 
-      // Priorité 2: Fermer la popup si elle est affichée
+      // Priority 2: Close popup if it's displayed
       if (this.terminalService.showTerminalPrompt()) {
         this.terminalService.dismissPrompt();
         event.preventDefault();
         return;
       }
     }
-  }
-
-  /**
-   * Nettoie les écouteurs
-   */
-  cleanup(): void {
-    // Note: Dans une vraie application, on devrait stocker la référence
-    // à la fonction d'écoute pour pouvoir la retirer proprement
   }
 }

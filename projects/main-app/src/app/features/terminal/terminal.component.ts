@@ -1,20 +1,20 @@
-import { Component, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, output, ChangeDetectionStrategy } from '@angular/core';
 
 /**
- * Composant représentant l'interface du terminal
+ * Component representing the terminal interface
  */
 @Component({
   selector: 'app-terminal',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './terminal.component.html',
-  styleUrls: ['./terminal.component.scss']
+  styleUrls: ['./terminal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TerminalComponent {
-  readonly closeTerminal = output<void>();
+  protected readonly closeTerminal = output<void>();
 
   /**
-   * Ferme le terminal
+   * Closes the terminal
    */
   close(): void {
     this.closeTerminal.emit();

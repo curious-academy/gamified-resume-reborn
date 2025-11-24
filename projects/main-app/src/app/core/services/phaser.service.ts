@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import Phaser from 'phaser';
 
 /**
- * Service gérant l'instance Phaser et sa configuration
+ * Service managing Phaser instance and its configuration
  */
 @Injectable({
   providedIn: 'root'
@@ -12,8 +12,8 @@ export class PhaserService {
   readonly isGameInitialized = signal<boolean>(false);
 
   /**
-   * Initialise le jeu Phaser avec la configuration fournie
-   * @param config Configuration Phaser
+   * Initializes Phaser game with the provided configuration
+   * @param config Phaser configuration
    */
   initGame(config: Phaser.Types.Core.GameConfig): void {
     if (this.game) {
@@ -26,7 +26,7 @@ export class PhaserService {
   }
 
   /**
-   * Détruit l'instance du jeu et libère les ressources
+   * Destroys the game instance and releases resources
    */
   destroyGame(): void {
     if (this.game) {
@@ -37,17 +37,17 @@ export class PhaserService {
   }
 
   /**
-   * Récupère une scène spécifique par sa clé
-   * @param key Clé de la scène
-   * @returns La scène demandée ou undefined
+   * Gets a specific scene by its key
+   * @param key Scene key
+   * @returns The requested scene or undefined
    */
   getScene<T extends Phaser.Scene>(key: string): T | undefined {
     return this.game?.scene.getScene(key) as T;
   }
 
   /**
-   * Récupère l'instance du jeu
-   * @returns L'instance Phaser.Game ou undefined
+   * Gets the game instance
+   * @returns The Phaser.Game instance or undefined
    */
   getGame(): Phaser.Game | undefined {
     return this.game;

@@ -1,28 +1,28 @@
-import { Component, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, output, ChangeDetectionStrategy } from '@angular/core';
 
 /**
- * Composant représentant la popup de confirmation pour ouvrir le terminal
+ * Component representing the confirmation popup to open the terminal
  */
 @Component({
   selector: 'app-terminal-prompt',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './terminal-prompt.component.html',
-  styleUrls: ['./terminal-prompt.component.scss']
+  styleUrls: ['./terminal-prompt.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TerminalPromptComponent {
-  readonly openTerminal = output<void>();
-  readonly closePrompt = output<void>();
+  protected readonly openTerminal = output<void>();
+  protected readonly closePrompt = output<void>();
 
   /**
-   * Ouvre le terminal
+   * Opens the terminal
    */
   open(): void {
     this.openTerminal.emit();
   }
 
   /**
-   * Ferme la popup
+   * Closes the popup
    */
   close(): void {
     this.closePrompt.emit();

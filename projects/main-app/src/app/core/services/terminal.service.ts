@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 /**
- * Service gérant la communication entre Phaser et Angular pour le terminal
+ * Service managing communication between Phaser and Angular for the terminal
  */
 @Injectable({
   providedIn: 'root'
@@ -12,21 +12,21 @@ export class TerminalService {
   private promptDismissed = false;
 
   /**
-   * Affiche la popup de confirmation pour ouvrir le terminal
+   * Displays the confirmation popup to open the terminal
    */
   showPrompt(): void {
     this.showTerminalPrompt.set(true);
   }
 
   /**
-   * Cache la popup de confirmation
+   * Hides the confirmation popup
    */
   hidePrompt(): void {
     this.showTerminalPrompt.set(false);
   }
 
   /**
-   * Ferme la popup et marque qu'elle a été refusée par l'utilisateur
+   * Closes the popup and marks it as dismissed by the user
    */
   dismissPrompt(): void {
     this.hidePrompt();
@@ -34,7 +34,7 @@ export class TerminalService {
   }
 
   /**
-   * Ouvre le terminal
+   * Opens the terminal
    */
   openTerminal(): void {
     this.isTerminalOpen.set(true);
@@ -43,21 +43,21 @@ export class TerminalService {
   }
 
   /**
-   * Ferme le terminal
+   * Closes the terminal
    */
   closeTerminal(): void {
     this.isTerminalOpen.set(false);
   }
 
   /**
-   * Gère l'interaction du joueur avec le terminal
-   * @param isNearby true si le joueur est à proximité
+   * Handles player interaction with the terminal
+   * @param isNearby true if the player is nearby
    */
   handlePlayerProximity(isNearby: boolean): void {
     if (isNearby && !this.isTerminalOpen() && !this.showTerminalPrompt() && !this.promptDismissed) {
       this.showPrompt();
     } else if (!isNearby) {
-      // Reset le flag quand le joueur s'éloigne
+      // Reset flag when player moves away
       this.hidePrompt();
       this.promptDismissed = false;
     }

@@ -1,14 +1,15 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import Phaser from 'phaser';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
 import { GameScene } from './scenes/game.scene';
 
 /**
- * Composant gérant l'affichage et l'initialisation du jeu Phaser
+ * Component managing Phaser game display and initialization
  */
 @Component({
   selector: 'app-game',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div id="game-container" class="game-container"></div>
     @if (isLoading()) {
@@ -43,12 +44,12 @@ import { GameScene } from './scenes/game.scene';
     }
   `]
 })
-export class GameComponent implements OnInit, OnDestroy {
+export class GameComponent implements OnDestroy {
   private readonly phaserService = inject(PhaserService);
   private readonly terminalService = inject(TerminalService);
-  protected readonly isLoading = signal(true);
+  protected readonly isLoading = signal<boolean>(true);
 
-  ngOnInit(): void {
+  constructor() {
     this.initializeGame();
   }
 
@@ -57,7 +58,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Initialise le jeu Phaser avec la configuration
+   * Initializes Phaser game with configuration
    */
   private initializeGame(): void {
     const config: Phaser.Types.Core.GameConfig = {
@@ -86,7 +87,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Récupère la scène de jeu
+   * Gets the game scene
    */
   getGameScene(): GameScene | undefined {
     return this.phaserService.getScene<GameScene>('GameScene');

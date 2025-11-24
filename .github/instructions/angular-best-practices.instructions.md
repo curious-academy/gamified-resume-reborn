@@ -26,6 +26,10 @@ workspace/
 #### Standalone Components (Angular 21)
 - A standalone component must explicitly declare its imports
 - Aim to minimize imports to optimize bundle size
+- **ALWAYS use Angular CLI to generate components: `ng g c <component-name>`**
+  - Example: `ng g c features/inventory`
+  - This ensures proper structure, imports, and conventions
+
 ```typescript
 // ✅ GOOD - Standalone component with explicit imports
 import { Component, signal } from '@angular/core';

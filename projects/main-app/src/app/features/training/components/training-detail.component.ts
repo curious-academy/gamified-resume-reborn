@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Quest, CreateQuestDto, CreateObjectiveDto, Video } from '../models';
@@ -567,7 +567,7 @@ import { VideoInputComponent } from './video-input.component';
     }
   `]
 })
-export class TrainingDetailComponent implements OnInit {
+export class TrainingDetailComponent {
   private readonly trainingService = inject(TrainingService);
 
   private readonly expandedQuests = signal<Set<string>>(new Set());
@@ -589,10 +589,6 @@ export class TrainingDetailComponent implements OnInit {
     order: 1,
     video: null as Video | null
   };
-
-  ngOnInit(): void {
-    // Component initialization
-  }
 
   protected readonly training = this.trainingService.selectedTraining$;
 

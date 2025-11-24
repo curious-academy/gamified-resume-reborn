@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Training, Video } from '../models';
@@ -285,13 +285,9 @@ import { TrainingCreateComponent } from './training-create.component';
     }
   `]
 })
-export class TrainingListComponent implements OnInit {
+export class TrainingListComponent {
   protected readonly trainingService = inject(TrainingService);
   protected readonly showCreateForm = signal<boolean>(false);
-
-  ngOnInit(): void {
-    // Component initialization
-  }
 
   get trainings() {
     return this.trainingService.trainings$;

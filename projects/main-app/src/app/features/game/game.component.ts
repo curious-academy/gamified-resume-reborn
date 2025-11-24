@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import Phaser from 'phaser';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
@@ -44,12 +44,12 @@ import { GameScene } from './scenes/game.scene';
     }
   `]
 })
-export class GameComponent implements OnInit, OnDestroy {
+export class GameComponent implements OnDestroy {
   private readonly phaserService = inject(PhaserService);
   private readonly terminalService = inject(TerminalService);
   protected readonly isLoading = signal<boolean>(true);
 
-  ngOnInit(): void {
+  constructor() {
     this.initializeGame();
   }
 

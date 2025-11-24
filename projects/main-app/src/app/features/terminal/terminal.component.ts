@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, output, ChangeDetectionStrategy } from '@angular/core';
 
 /**
  * Composant représentant l'interface du terminal
@@ -7,7 +7,8 @@ import { Component, output } from '@angular/core';
   selector: 'app-terminal',
   imports: [],
   templateUrl: './terminal.component.html',
-  styleUrls: ['./terminal.component.scss']
+  styleUrls: ['./terminal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TerminalComponent {
   readonly closeTerminal = output<void>();

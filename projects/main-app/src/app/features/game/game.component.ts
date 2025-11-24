@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import Phaser from 'phaser';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
@@ -9,6 +9,7 @@ import { GameScene } from './scenes/game.scene';
  */
 @Component({
   selector: 'app-game',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div id="game-container" class="game-container"></div>
     @if (isLoading()) {

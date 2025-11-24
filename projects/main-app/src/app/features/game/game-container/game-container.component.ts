@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { GameComponent } from '../game.component';
 import { TerminalComponent } from '../../terminal/terminal.component';
 import { TerminalPromptComponent } from '../../terminal/terminal-prompt.component';
@@ -14,7 +14,8 @@ import { KeyboardService } from '../../../core/services/keyboard.service';
   selector: 'app-game-container',
   templateUrl: './game-container.component.html',
   styleUrl: './game-container.component.scss',
-  imports: [GameComponent, TerminalComponent, TerminalPromptComponent]
+  imports: [GameComponent, TerminalComponent, TerminalPromptComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GameContainerComponent implements OnInit {
   protected readonly terminalService = inject(TerminalService);

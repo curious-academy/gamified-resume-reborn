@@ -1,4 +1,4 @@
-import { Component, signal, OnInit, computed, inject } from '@angular/core';
+import { Component, signal, OnInit, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Quest, CreateQuestDto, CreateObjectiveDto, Video } from '../models';
@@ -10,6 +10,7 @@ import { VideoInputComponent } from './video-input.component';
 @Component({
   selector: 'app-training-detail',
   imports: [FormsModule, VideoInputComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="training-detail">
       @if (training(); as training) {

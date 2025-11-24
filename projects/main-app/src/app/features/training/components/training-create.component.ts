@@ -1,4 +1,4 @@
-import { Component, output, signal, inject } from '@angular/core';
+import { Component, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { VideoInputComponent } from './video-input.component';
 import { Video } from '../models';
@@ -9,6 +9,7 @@ import { Video } from '../models';
 @Component({
   selector: 'app-training-create',
   imports: [ReactiveFormsModule, VideoInputComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="training-create">
       <div class="form-header">

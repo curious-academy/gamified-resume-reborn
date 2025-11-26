@@ -2,6 +2,8 @@ import { Component, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@
 import Phaser from 'phaser';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
+import { DialogService } from '../../core/services/dialog.service';
+import { GameDataLoaderService } from '../../core/services/game-data-loader.service';
 import { GameScene } from './scenes/game.scene';
 
 /**
@@ -47,6 +49,8 @@ import { GameScene } from './scenes/game.scene';
 export class GameComponent implements OnDestroy {
   private readonly phaserService = inject(PhaserService);
   private readonly terminalService = inject(TerminalService);
+  private readonly dialogService = inject(DialogService);
+  private readonly gameDataLoader = inject(GameDataLoaderService);
   protected readonly isLoading = signal<boolean>(true);
 
   constructor() {
@@ -73,7 +77,11 @@ export class GameComponent implements OnDestroy {
           debug: false
         }
       },
-      scene: new GameScene({ terminalService: this.terminalService }),
+      scene: new GameScene({
+        terminalService: this.terminalService,
+        dialogService: this.dialogService,
+        gameDataLoader: this.gameDataLoader
+      }),
       pixelArt: true,
       antialias: false,
       callbacks: {

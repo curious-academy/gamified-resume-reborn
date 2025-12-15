@@ -163,17 +163,21 @@ export class GameScene extends Phaser.Scene {
 
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
-      if (wallObject.rectangle && wallObject.width && wallObject.height) {
+      if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
         // Create a rectangle for collision
         const wall = this.add.rectangle(
-          wallObject.x! + wallObject.width / 2,
-          wallObject.y! + wallObject.height / 2,
+          wallObject.x + wallObject.width / 2,
+          wallObject.y + wallObject.height / 2,
           wallObject.width,
           wallObject.height,
-          0x808080,
-          0.3 // Semi-transparent for debugging
+          0xff0000,
+          0.3 // Semi-transparent for debugging (red to see clearly)
         );
 
+        // Add physics to the rectangle
+        this.physics.add.existing(wall, true); // true = static body
+
+        // Add to walls group
         this.walls?.add(wall);
 
         console.log(`✅ Created wall: ${wallObject.name} at (${wallObject.x}, ${wallObject.y}) size ${wallObject.width}x${wallObject.height}`);

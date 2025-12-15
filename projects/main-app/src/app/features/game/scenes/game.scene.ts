@@ -95,6 +95,9 @@ export class GameScene extends Phaser.Scene {
 
     // Initialize NPC system
     this.dialogBox = new DialogBox(this);
+    this.dialogBox.setOnCloseCallback(() => {
+      this.closeDialog();
+    });
     this.createNpcsFromData();
 
     // Listen for E key to close dialog

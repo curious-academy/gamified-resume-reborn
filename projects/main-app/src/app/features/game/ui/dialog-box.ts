@@ -16,6 +16,7 @@ export class DialogBox extends Phaser.GameObjects.Container {
   private readonly boxHeight: number;
   private readonly padding: number = 20;
   private marginBottom: number = 100;
+  private onCloseCallback?: () => void;
 
   constructor(scene: Phaser.Scene) {
     // Get scene dimensions
@@ -73,6 +74,18 @@ export class DialogBox extends Phaser.GameObjects.Container {
       color: '#888888'
     });
 
+    // Make close hint interactive
+    this.closeHint.setInteractive({ useHandCursor: true });
+    this.closeHint.on('pointerover', () => {
+      this.closeHint.setColor('#ffffff');
+    });
+    this.closeHint.on('pointerout', () => {
+      this.closeHint.setColor('#888888');
+    });
+    this.closeHint.on('pointerdown', () => {
+      this.handleClose();
+    });
+
     // Add all to container
     this.add([
       this.background,
@@ -128,6 +141,23 @@ export class DialogBox extends Phaser.GameObjects.Container {
       duration: 300,
       ease: 'Back.easeOut'
     });
+  }
+
+  /**
+   * Set callback to execute when dialog is closed
+   */
+  setOnCloseCallback(callback: () => void): void {
+    this.onCloseCallback = callback;
+  }
+
+  /**
+   * Handle close action (from click or keyboard)
+   */
+  private handleClose(): void {
+    this.hide();
+    if (this.onCloseCallback) {
+      this.onCloseCallback();
+    }
   }
 
   /**

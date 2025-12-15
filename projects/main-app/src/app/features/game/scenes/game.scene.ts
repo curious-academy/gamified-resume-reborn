@@ -47,6 +47,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload(): void {
+    // Load Tiled map and tileset
+    this.load.tilemapTiledJSON('map', 'assets/maps/poc-01.json');
+    this.load.image('FieldsTileset', 'assets/tilesets/FieldsTileset.png');
+
     this.createTemporaryAssets();
   }
 
@@ -115,19 +119,32 @@ export class GameScene extends Phaser.Scene {
    * Crée la carte du jeu
    */
   private createMap(): void {
-    const { width, height, tileSize } = this.mapConfig;
+    // Create the tilemap from Tiled JSON
+    const map = this.make.tilemap({ key: 'map' });
 
-    // Créer le sol en herbe
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        this.add.image(x * tileSize, y * tileSize, 'grass-temp').setOrigin(0, 0);
-      }
+    // Add the tileset to the map
+    // 'FieldsTileset' must match the name in the Tiled JSON
+    const tileset = map.addTilesetImage('FieldsTileset', 'FieldsTileset');
+
+    if (!tileset) {
+      console.error('Failed to load tileset');
+      return;
     }
 
-    // Créer les murs
+    // Create the layer from Tiled
+    // 'Calque de Tuiles 1' is the layer name from the JSON
+    const groundLayer = map.createLayer('Calque de Tuiles 1', tileset, 0, 0);
+
+    if (!groundLayer) {
+      console.error('Failed to create layer');
+      return;
+    }
+
+    // Optional: Set collision for specific tiles if needed
+    // groundLayer.setCollisionBetween(1, 10);
+
+    // Initialize walls group for additional obstacles if needed
     this.walls = this.physics.add.staticGroup();
-    this.createBorderWalls();
-    this.createObstacles();
   }
 
   /**

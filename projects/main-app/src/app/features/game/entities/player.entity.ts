@@ -150,14 +150,28 @@ export class Player extends Phaser.GameObjects.Rectangle {
 
     const body = this.body as Phaser.Physics.Arcade.Body;
 
-    // Déterminer la vitesse (course si Shift est pressé)
+    // Early return si aucune touche pressée
+    const hasInput = (
+      this.keys['Z']?.isDown || this.keys['W']?.isDown ||
+      this.keys['S']?.isDown ||
+      this.keys['Q']?.isDown || this.keys['A']?.isDown ||
+      this.keys['D']?.isDown
+    );
+
+    if (!hasInput) {
+      if (this.isMoving) {
+        body.setVelocity(0);
+        this.isMoving = false;
+        this.applyMovementEffects(false);
+      }
+      return;
+    }
+
+    // Reste de la logique seulement si input détecté
     const isRunning = this.keys['SHIFT']?.isDown ?? false;
     const currentSpeed = isRunning ? this.runSpeed : this.speed;
 
-    // Réinitialiser la vélocité
     body.setVelocity(0);
-    this.isMoving = false;
-
     let newDirection = this.direction;
 
     // Gestion des mouvements horizontaux

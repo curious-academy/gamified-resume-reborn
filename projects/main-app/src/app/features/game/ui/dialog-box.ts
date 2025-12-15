@@ -15,6 +15,7 @@ export class DialogBox extends Phaser.GameObjects.Container {
   private readonly boxWidth: number;
   private readonly boxHeight: number;
   private readonly padding: number = 20;
+  private marginBottom: number = 100;
 
   constructor(scene: Phaser.Scene) {
     // Get scene dimensions
@@ -27,10 +28,12 @@ export class DialogBox extends Phaser.GameObjects.Container {
 
     // Center horizontally, positioned at bottom with margin
     const centerX = sceneWidth / 2;
-    const posY = sceneHeight - boxHeight / 2 - 500; // 100px from bottom
+    const marginBottom  = 200;
+    const posY = sceneHeight - boxHeight / 2 - marginBottom;
 
     super(scene, centerX, posY);
 
+    this.marginBottom = marginBottom;
     this.boxWidth = maxWidth;
     this.boxHeight = boxHeight;
     this.currentNpcColor = 0xff8c00; // Default orange
@@ -114,7 +117,7 @@ export class DialogBox extends Phaser.GameObjects.Container {
 
     // Calculate positions for animation (stays at bottom with margin)
     const sceneHeight = this.scene.scale.height;
-    const visibleY = sceneHeight - this.boxHeight / 2 - 500;
+    const visibleY = sceneHeight - this.boxHeight / 2 - this.marginBottom;
     const hiddenY = sceneHeight + this.boxHeight / 2 + 10;
 
     // Slide up animation from below

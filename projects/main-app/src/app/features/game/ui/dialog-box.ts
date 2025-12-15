@@ -25,9 +25,9 @@ export class DialogBox extends Phaser.GameObjects.Container {
     const maxWidth = Math.min(sceneWidth * 0.9, 800);
     const boxHeight = 140;
 
-    // Center horizontally at bottom of screen
+    // Center horizontally, positioned at bottom with full visibility
     const centerX = sceneWidth / 2;
-    const posY = sceneHeight - boxHeight / 2 - 30; // 30px margin from bottom
+    const posY = sceneHeight - boxHeight / 2 - 10; // Position ensuring full visibility
 
     super(scene, centerX, posY);
 
@@ -112,12 +112,12 @@ export class DialogBox extends Phaser.GameObjects.Container {
 
     this.setVisible(true);
 
-    // Calculate positions for animation
+    // Calculate positions for animation (stays at bottom)
     const sceneHeight = this.scene.scale.height;
-    const visibleY = sceneHeight - this.boxHeight / 2 - 30;
-    const hiddenY = sceneHeight + this.boxHeight / 2;
+    const visibleY = sceneHeight - this.boxHeight / 2 - 10;
+    const hiddenY = sceneHeight + this.boxHeight / 2 + 10;
 
-    // Slide up animation
+    // Slide up animation from below
     this.y = hiddenY;
     this.scene.tweens.add({
       targets: this,
@@ -132,7 +132,7 @@ export class DialogBox extends Phaser.GameObjects.Container {
    */
   hide(): void {
     const sceneHeight = this.scene.scale.height;
-    const hiddenY = sceneHeight + this.boxHeight / 2;
+    const hiddenY = sceneHeight + this.boxHeight / 2 + 10;
 
     this.scene.tweens.add({
       targets: this,

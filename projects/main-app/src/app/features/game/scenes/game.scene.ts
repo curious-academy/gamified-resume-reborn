@@ -1,23 +1,18 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/player.entity';
 import { Terminal } from '../entities/terminal.entity';
+import { Npc } from '../entities/npc.entity';
+import { DialogBox } from '../ui/dialog-box';
 import { TerminalService } from '../../../core/services/terminal.service';
-
-/**
- * Configuration de la carte
- */
-interface MapConfig {
-  width?: number;
-  height?: number;
-  tileSize?: number;
-}
+import { DialogService } from '../../../core/services/dialog.service';
+import { GameDataLoaderService } from '../../../core/services/game-data-loader.service';
+import { MapConfig } from '../entities/game-config.entity';
+import { GameSceneConfig } from '../config/game-scene.config';
 
 /**
  * Configuration de la scène incluant les services Angular
  */
-export interface GameSceneConfig extends MapConfig {
-  terminalService?: TerminalService;
-}
+
 
 /**
  * Scène principale du jeu
@@ -28,6 +23,14 @@ export class GameScene extends Phaser.Scene {
   private walls?: Phaser.Physics.Arcade.StaticGroup;
   private readonly mapConfig: Required<MapConfig>;
   private readonly terminalService?: TerminalService;
+  private readonly dialogService?: DialogService;
+  private readonly gameDataLoader?: GameDataLoaderService;
+
+  // NPC system
+  private dialogBox!: DialogBox;
+  private npcs: Npc[] = [];
+  private isDialogOpen = false;
+  private nearestNpc?: Npc;
 
   constructor(config: GameSceneConfig = {}) {
     super({ key: 'GameScene' });
@@ -39,6 +42,8 @@ export class GameScene extends Phaser.Scene {
     };
 
     this.terminalService = config.terminalService;
+    this.dialogService = config.dialogService;
+    this.gameDataLoader = config.gameDataLoader;
   }
 
   preload(): void {
@@ -73,6 +78,12 @@ export class GameScene extends Phaser.Scene {
     graphics.fillRect(4, 4, 24, 24);
     graphics.generateTexture('wall-temp', 32, 32);
 
+    // Texture pour NPC (orange square)
+    graphics.clear();
+    graphics.fillStyle(0xff8c00);
+    graphics.fillRect(0, 0, 32, 32);
+    graphics.generateTexture('npc-temp', 32, 32);
+
     graphics.destroy();
   }
 
@@ -82,6 +93,22 @@ export class GameScene extends Phaser.Scene {
     this.createTerminal();
     this.setupCollisions();
     this.setupCamera();
+
+    // Initialize NPC system
+    this.dialogBox = new DialogBox(this);
+    this.dialogBox.setOnCloseCallback(() => {
+      this.closeDialog();
+    });
+    this.createNpcsFromData();
+
+    // Listen for E key to interact with NPC or close dialog
+    this.input.keyboard?.on('keydown-E', () => {
+      if (this.isDialogOpen) {
+        this.closeDialog();
+      } else if (this.nearestNpc) {
+        this.openDialogForNpc(this.nearestNpc);
+      }
+    });
   }
 
   /**
@@ -187,9 +214,33 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setLerp(0.1, 0.1);
   }
 
+  /**
+   * Create NPCs from loaded game data
+   */
+  private createNpcsFromData(): void {
+    if (!this.gameDataLoader) {
+      console.warn('GameDataLoader not available, skipping NPC creation');
+      return;
+    }
+
+    const npcsData = this.gameDataLoader.getAllNpcs();
+
+    npcsData.forEach(npcData => {
+      const spawnX = npcData.spawnX || Phaser.Math.Between(100, 700);
+      const spawnY = npcData.spawnY || Phaser.Math.Between(100, 500);
+      const color = parseInt(npcData.color.replace('#', ''), 16);
+
+      const npc = new Npc(this, spawnX, spawnY, npcData.id, npcData.name, color);
+      this.npcs.push(npc);
+    });
+
+    console.log(`✅ Created ${this.npcs.length} NPCs from data`);
+  }
+
   override update(): void {
     this.player?.update();
     this.updateTerminalInteraction();
+    this.updateNpcInteractions();
   }
 
   /**
@@ -200,6 +251,76 @@ export class GameScene extends Phaser.Scene {
 
     const isNearby = this.terminal.checkProximity(this.player.x, this.player.y);
     this.terminalService.handlePlayerProximity(isNearby);
+  }
+
+  /**
+   * Update NPC interactions - only detect proximity, don't auto-open dialog
+   */
+  private updateNpcInteractions(): void {
+    if (!this.isDialogOpen && this.player) {
+      // Find nearest NPC within interaction range
+      let foundNearby = false;
+
+      for (const npc of this.npcs) {
+        const isPlayerNear = npc.checkPlayerProximity(this.player.x, this.player.y);
+
+        if (isPlayerNear) {
+          this.nearestNpc = npc;
+          npc.showInteractionPrompt();
+          foundNearby = true;
+          break; // Only track one NPC at a time
+        }
+      }
+
+      // Clear nearest NPC if player moved away
+      if (!foundNearby) {
+        if (this.nearestNpc) {
+          this.nearestNpc.hideInteractionPrompt();
+          this.nearestNpc = undefined;
+        }
+      }
+    }
+  }
+
+  /**
+   * Open dialog for specific NPC
+   */
+  private openDialogForNpc(npc: Npc): void {
+    if (!this.dialogService) return;
+
+    // Stop player movement
+    if (this.player && this.player.body) {
+      const body = this.player.body as Phaser.Physics.Arcade.Body;
+      body.setVelocity(0, 0);
+    }
+    npc.pauseMovement();
+
+    // Get dialog data (synchronous from preloaded data)
+    this.dialogService.showDialogForNpc(npc.id);
+    const dialog = this.dialogService.currentDialog();
+
+    if (dialog) {
+      this.dialogBox.show(dialog.npcName, dialog.message, npc.color);
+      this.isDialogOpen = true;
+    }
+  }
+
+  /**
+   * Close dialog
+   */
+  private closeDialog(): void {
+    this.dialogBox.hide();
+    this.isDialogOpen = false;
+    this.dialogService?.closeDialog();
+
+    // Resume movement for all NPCs
+    this.npcs.forEach(npc => npc.resumeMovement());
+
+    // Clear nearest NPC reference
+    if (this.nearestNpc) {
+      this.nearestNpc.hideInteractionPrompt();
+      this.nearestNpc = undefined;
+    }
   }
 
   /**

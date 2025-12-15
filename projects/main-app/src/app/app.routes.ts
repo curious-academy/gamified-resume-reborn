@@ -1,10 +1,23 @@
 import { Routes } from '@angular/router';
+import { gameDataLoadedGuard } from './core/guards/game-data-loaded.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'trainings',
+    redirectTo: 'menu',
     pathMatch: 'full'
+  },
+  {
+    path: 'menu',
+    loadComponent: () =>
+      import('./features/menu/menu.component').then(m => m.MenuComponent)
+  },
+  {
+    path: 'loading',
+    loadComponent: () =>
+      import('./features/loading/loading-screen.component').then(
+        m => m.LoadingScreenComponent
+      )
   },
   {
     path: 'trainings',
@@ -23,14 +36,10 @@ export const routes: Routes = [
   {
     path: 'game',
     loadComponent: () =>
-      import('./features/game/game.component').then(m => m.GameComponent)
-  },
-  {
-    path: 'game/new',
-    loadComponent: () =>
       import('./features/game/game-container/game-container.component').then(
         m => m.GameContainerComponent
-      )
+      ),
+    canActivate: [gameDataLoadedGuard]
   }
 ];
 

@@ -260,7 +260,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.isDialogOpen && this.player) {
       // Find nearest NPC within interaction range
       let foundNearby = false;
-      
+
       for (const npc of this.npcs) {
         const isPlayerNear = npc.checkPlayerProximity(this.player.x, this.player.y);
 
@@ -271,7 +271,7 @@ export class GameScene extends Phaser.Scene {
           break; // Only track one NPC at a time
         }
       }
-      
+
       // Clear nearest NPC if player moved away
       if (!foundNearby) {
         if (this.nearestNpc) {
@@ -315,7 +315,7 @@ export class GameScene extends Phaser.Scene {
 
     // Resume movement for all NPCs
     this.npcs.forEach(npc => npc.resumeMovement());
-    
+
     // Clear nearest NPC reference
     if (this.nearestNpc) {
       this.nearestNpc.hideInteractionPrompt();

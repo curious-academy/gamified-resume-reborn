@@ -47,9 +47,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Load Tiled map and tileset
+    // Load Tiled map and tilesets
     this.load.tilemapTiledJSON('map', 'assets/maps/poc-01.json');
     this.load.image('FieldsTileset', 'assets/tilesets/FieldsTileset.png');
+    this.load.image('walls', 'assets/tilesets/Tileset2.png');
 
     this.createTemporaryAssets();
   }
@@ -122,75 +123,65 @@ export class GameScene extends Phaser.Scene {
     // Create the tilemap from Tiled JSON
     const map = this.make.tilemap({ key: 'map' });
 
-    // Add the tileset to the map
-    // 'FieldsTileset' must match the name in the Tiled JSON
+    // Add the tilesets to the map
     const tileset = map.addTilesetImage('FieldsTileset', 'FieldsTileset');
+    const wallsTileset = map.addTilesetImage('walls', 'walls');
 
-    if (!tileset) {
-      console.error('Failed to load tileset');
+    if (!tileset || !wallsTileset) {
+      console.error('Failed to load tilesets');
       return;
     }
 
-    // Create the layer from Tiled
-    // 'Calque de Tuiles 1' is the layer name from the JSON
-    const groundLayer = map.createLayer('Calque de Tuiles 1', tileset, 0, 0);
+    // Create the ground layer from Tiled
+    const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset], 0, 0);
 
     if (!groundLayer) {
       console.error('Failed to create layer');
       return;
     }
 
-    // Optional: Set collision for specific tiles if needed
-    // groundLayer.setCollisionBetween(1, 10);
-
-    // Initialize walls group for additional obstacles if needed
+    // Initialize walls group for collision objects
     this.walls = this.physics.add.staticGroup();
+
+    // Create collision rectangles from Tiled object layer
+    this.createWallsFromObjects(map);
   }
 
   /**
-   * Crée les murs de bordure
+   * Crée les murs depuis les objets Tiled
    */
-  private createBorderWalls(): void {
+  private createWallsFromObjects(map: Phaser.Tilemaps.Tilemap): void {
     if (!this.walls) return;
 
-    const { width, height, tileSize } = this.mapConfig;
+    // Get the 'walls' object layer from Tiled
+    const wallsLayer = map.getObjectLayer('walls');
 
-    // Murs horizontaux (haut et bas)
-    for (let x = 0; x < width; x++) {
-      const topWall = this.add.image(x * tileSize, 0, 'wall-temp').setOrigin(0, 0);
-      const bottomWall = this.add.image(x * tileSize, (height - 1) * tileSize, 'wall-temp').setOrigin(0, 0);
-      this.walls.add(topWall);
-      this.walls.add(bottomWall);
+    if (!wallsLayer) {
+      console.warn('No walls layer found in Tiled map');
+      return;
     }
 
-    // Murs verticaux (gauche et droite)
-    for (let y = 1; y < height - 1; y++) {
-      const leftWall = this.add.image(0, y * tileSize, 'wall-temp').setOrigin(0, 0);
-      const rightWall = this.add.image((width - 1) * tileSize, y * tileSize, 'wall-temp').setOrigin(0, 0);
-      this.walls.add(leftWall);
-      this.walls.add(rightWall);
-    }
-  }
+    // Create physics rectangles for each wall object
+    wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
+      if (wallObject.rectangle && wallObject.width && wallObject.height) {
+        // Create a rectangle for collision
+        const wall = this.add.rectangle(
+          wallObject.x! + wallObject.width / 2,
+          wallObject.y! + wallObject.height / 2,
+          wallObject.width,
+          wallObject.height,
+          0x808080,
+          0.3 // Semi-transparent for debugging
+        );
 
-  /**
-   * Crée les obstacles dans la carte
-   */
-  private createObstacles(): void {
-    if (!this.walls) return;
+        this.walls?.add(wall);
 
-    const { tileSize } = this.mapConfig;
-
-    const obstacles = [
-      { x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 },
-      { x: 15, y: 8 }, { x: 16, y: 8 },
-      { x: 10, y: 12 }, { x: 11, y: 12 }, { x: 12, y: 12 },
-    ];
-
-    obstacles.forEach(pos => {
-      const obstacle = this.add.image(pos.x * tileSize, pos.y * tileSize, 'wall-temp').setOrigin(0, 0);
-      this.walls?.add(obstacle);
+        console.log(`✅ Created wall: ${wallObject.name} at (${wallObject.x}, ${wallObject.y}) size ${wallObject.width}x${wallObject.height}`);
+      }
     });
   }
+
+
 
   /**
    * Crée le joueur

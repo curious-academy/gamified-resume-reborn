@@ -11,9 +11,28 @@ export class DialogBox extends Phaser.GameObjects.Container {
   private closeHint: Phaser.GameObjects.Text;
   private currentNpcColor: number;
 
-  constructor(scene: Phaser.Scene) {
-    super(scene, 400, 520); // Centered at bottom
+  // Dynamic dimensions based on scene
+  private readonly boxWidth: number;
+  private readonly boxHeight: number;
+  private readonly padding: number = 20;
 
+  constructor(scene: Phaser.Scene) {
+    // Get scene dimensions
+    const sceneWidth = scene.scale.width;
+    const sceneHeight = scene.scale.height;
+
+    // Calculate box dimensions (90% of scene width, max 800px)
+    const maxWidth = Math.min(sceneWidth * 0.9, 800);
+    const boxHeight = 140;
+
+    // Center horizontally at bottom of screen
+    const centerX = sceneWidth / 2;
+    const posY = sceneHeight - boxHeight / 2 - 30; // 30px margin from bottom
+
+    super(scene, centerX, posY);
+
+    this.boxWidth = maxWidth;
+    this.boxHeight = boxHeight;
     this.currentNpcColor = 0xff8c00; // Default orange
 
     // Background with border
@@ -21,27 +40,31 @@ export class DialogBox extends Phaser.GameObjects.Container {
     this.drawBackground();
 
     // Avatar (dynamic color based on NPC)
-    this.avatar = scene.add.rectangle(-340, -40, 64, 64, this.currentNpcColor);
+    const avatarX = -this.boxWidth / 2 + this.padding + 32; // 32 = half avatar size
+    this.avatar = scene.add.rectangle(avatarX, 0, 64, 64, this.currentNpcColor);
 
     // NPC name
-    this.npcNameText = scene.add.text(-260, -80, '', {
+    const textStartX = -this.boxWidth / 2 + this.padding + 80; // Avatar width + padding
+    this.npcNameText = scene.add.text(textStartX, -this.boxHeight / 2 + this.padding, '', {
       fontFamily: 'Courier New',
       fontSize: '20px',
       color: '#ff8c00',
       fontStyle: 'bold'
     });
 
-    // Message text
-    this.messageText = scene.add.text(-260, -50, '', {
+    // Message text (with dynamic word wrap based on box width)
+    const messageWidth = this.boxWidth - 120 - this.padding * 2; // Minus avatar area and padding
+    this.messageText = scene.add.text(textStartX, -this.boxHeight / 2 + this.padding + 30, '', {
       fontFamily: 'Courier New',
       fontSize: '16px',
       color: '#ffffff',
-      wordWrap: { width: 630 },
+      wordWrap: { width: messageWidth },
       lineSpacing: 4
     });
 
-    // Close hint
-    this.closeHint = scene.add.text(300, 70, '[E] Fermer', {
+    // Close hint (aligned to right)
+    const hintX = this.boxWidth / 2 - this.padding - 80; // Aligned right with padding
+    this.closeHint = scene.add.text(hintX, this.boxHeight / 2 - this.padding - 20, '[E] Fermer', {
       fontFamily: 'Courier New',
       fontSize: '14px',
       color: '#888888'
@@ -67,8 +90,11 @@ export class DialogBox extends Phaser.GameObjects.Container {
     this.background.clear();
     this.background.fillStyle(0x1a1a2e, 0.95);
     this.background.lineStyle(3, this.currentNpcColor);
-    this.background.fillRoundedRect(-380, -100, 760, 140, 8);
-    this.background.strokeRoundedRect(-380, -100, 760, 140, 8);
+    // Draw centered box
+    const x = -this.boxWidth / 2;
+    const y = -this.boxHeight / 2;
+    this.background.fillRoundedRect(x, y, this.boxWidth, this.boxHeight, 8);
+    this.background.strokeRoundedRect(x, y, this.boxWidth, this.boxHeight, 8);
   }
 
   /**
@@ -86,11 +112,16 @@ export class DialogBox extends Phaser.GameObjects.Container {
 
     this.setVisible(true);
 
+    // Calculate positions for animation
+    const sceneHeight = this.scene.scale.height;
+    const visibleY = sceneHeight - this.boxHeight / 2 - 30;
+    const hiddenY = sceneHeight + this.boxHeight / 2;
+
     // Slide up animation
-    this.y = 650;
+    this.y = hiddenY;
     this.scene.tweens.add({
       targets: this,
-      y: 520,
+      y: visibleY,
       duration: 300,
       ease: 'Back.easeOut'
     });
@@ -100,9 +131,12 @@ export class DialogBox extends Phaser.GameObjects.Container {
    * Hide dialog with animation
    */
   hide(): void {
+    const sceneHeight = this.scene.scale.height;
+    const hiddenY = sceneHeight + this.boxHeight / 2;
+
     this.scene.tweens.add({
       targets: this,
-      y: 650,
+      y: hiddenY,
       duration: 200,
       ease: 'Power2.easeIn',
       onComplete: () => this.setVisible(false)

@@ -67,8 +67,8 @@ export class GameComponent implements OnDestroy {
   private initializeGame(): void {
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 600,
+      width: 1280,
+      height: 800,
       parent: 'game-container',
       physics: {
         default: 'arcade',
@@ -78,6 +78,9 @@ export class GameComponent implements OnDestroy {
         }
       },
       scene: new GameScene({
+        width: 25,
+        height: 20,
+        tileSize: 32,
         terminalService: this.terminalService,
         dialogService: this.dialogService,
         gameDataLoader: this.gameDataLoader

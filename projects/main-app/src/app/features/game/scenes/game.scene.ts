@@ -6,24 +6,13 @@ import { DialogBox } from '../ui/dialog-box';
 import { TerminalService } from '../../../core/services/terminal.service';
 import { DialogService } from '../../../core/services/dialog.service';
 import { GameDataLoaderService } from '../../../core/services/game-data-loader.service';
-
-/**
- * Configuration de la carte
- */
-interface MapConfig {
-  width?: number;
-  height?: number;
-  tileSize?: number;
-}
+import { MapConfig } from '../entities/game-config.entity';
+import { GameSceneConfig } from '../config/game-scene.config';
 
 /**
  * Configuration de la scène incluant les services Angular
  */
-export interface GameSceneConfig extends MapConfig {
-  terminalService?: TerminalService;
-  dialogService?: DialogService;
-  gameDataLoader?: GameDataLoaderService;
-}
+
 
 /**
  * Scène principale du jeu

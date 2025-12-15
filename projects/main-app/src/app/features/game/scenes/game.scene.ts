@@ -30,6 +30,7 @@ export class GameScene extends Phaser.Scene {
   private dialogBox!: DialogBox;
   private npcs: Npc[] = [];
   private isDialogOpen = false;
+  private nearestNpc?: Npc;
 
   constructor(config: GameSceneConfig = {}) {
     super({ key: 'GameScene' });
@@ -100,10 +101,12 @@ export class GameScene extends Phaser.Scene {
     });
     this.createNpcsFromData();
 
-    // Listen for E key to close dialog
+    // Listen for E key to interact with NPC or close dialog
     this.input.keyboard?.on('keydown-E', () => {
       if (this.isDialogOpen) {
         this.closeDialog();
+      } else if (this.nearestNpc) {
+        this.openDialogForNpc(this.nearestNpc);
       }
     });
   }
@@ -251,17 +254,29 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
-   * Update NPC interactions
+   * Update NPC interactions - only detect proximity, don't auto-open dialog
    */
   private updateNpcInteractions(): void {
     if (!this.isDialogOpen && this.player) {
-      // Check proximity with each NPC
+      // Find nearest NPC within interaction range
+      let foundNearby = false;
+      
       for (const npc of this.npcs) {
         const isPlayerNear = npc.checkPlayerProximity(this.player.x, this.player.y);
 
         if (isPlayerNear) {
-          this.openDialogForNpc(npc);
-          break; // Only one dialog at a time
+          this.nearestNpc = npc;
+          npc.showInteractionPrompt();
+          foundNearby = true;
+          break; // Only track one NPC at a time
+        }
+      }
+      
+      // Clear nearest NPC if player moved away
+      if (!foundNearby) {
+        if (this.nearestNpc) {
+          this.nearestNpc.hideInteractionPrompt();
+          this.nearestNpc = undefined;
         }
       }
     }
@@ -300,6 +315,12 @@ export class GameScene extends Phaser.Scene {
 
     // Resume movement for all NPCs
     this.npcs.forEach(npc => npc.resumeMovement());
+    
+    // Clear nearest NPC reference
+    if (this.nearestNpc) {
+      this.nearestNpc.hideInteractionPrompt();
+      this.nearestNpc = undefined;
+    }
   }
 
   /**

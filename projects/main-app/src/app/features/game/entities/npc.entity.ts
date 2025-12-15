@@ -13,6 +13,7 @@ export class Npc extends Phaser.GameObjects.Rectangle {
   private movementTween?: Phaser.Tweens.Tween;
   private isPaused = false;
   private isMoving = false;
+  private interactionPrompt?: Phaser.GameObjects.Text;
 
   constructor(
     scene: Phaser.Scene,
@@ -32,8 +33,25 @@ export class Npc extends Phaser.GameObjects.Rectangle {
     scene.physics.add.existing(this);
     this.setOrigin(0.5, 1); // Bottom-center anchor (FF6 style)
 
+    this.createInteractionPrompt();
     this.generateRandomPath();
     this.startMovement();
+  }
+
+  /**
+   * Create interaction prompt text (displayed when player is near)
+   */
+  private createInteractionPrompt(): void {
+    this.interactionPrompt = this.scene.add.text(this.x, this.y - 50, '[E] Parler', {
+      fontFamily: 'Courier New',
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#000000',
+      padding: { x: 8, y: 4 }
+    });
+    this.interactionPrompt.setOrigin(0.5);
+    this.interactionPrompt.setVisible(false);
+    this.interactionPrompt.setDepth(100);
   }
 
   /**
@@ -70,6 +88,12 @@ export class Npc extends Phaser.GameObjects.Rectangle {
       y: waypoint.y,
       duration: 2000,
       ease: 'Linear',
+      onUpdate: () => {
+        // Update prompt position during movement
+        if (this.interactionPrompt && this.interactionPrompt.visible) {
+          this.interactionPrompt.setPosition(this.x, this.y - 50);
+        }
+      },
       onComplete: () => {
         this.isMoving = false;
         this.currentWaypointIndex = (this.currentWaypointIndex + 1) % this.waypoints.length;
@@ -124,6 +148,25 @@ export class Npc extends Phaser.GameObjects.Rectangle {
       this.movementTween.resume();
     } else if (!this.isMoving) {
       this.moveToNextWaypoint();
+    }
+  }
+
+  /**
+   * Show interaction prompt above NPC
+   */
+  showInteractionPrompt(): void {
+    if (this.interactionPrompt) {
+      this.interactionPrompt.setPosition(this.x, this.y - 50);
+      this.interactionPrompt.setVisible(true);
+    }
+  }
+
+  /**
+   * Hide interaction prompt
+   */
+  hideInteractionPrompt(): void {
+    if (this.interactionPrompt) {
+      this.interactionPrompt.setVisible(false);
     }
   }
 }

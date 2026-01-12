@@ -176,12 +176,12 @@ export class GameScene extends Phaser.Scene {
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Tiled objects can have negative coordinates in infinite maps
-        // But Phaser's createLayer might shift the layer to positive coordinates
-        // We need to match the layer's actual position
-        const centerX = wallObject.x + wallObject.width / 2 + layer.x;
-        const centerY = wallObject.y + wallObject.height / 2 + layer.y;
-        
+        // Tiled objects have their original coordinates (can be negative)
+        // The tile layer has been shifted by Phaser (layer.x, layer.y are negative)
+        // We need to compensate by subtracting the layer offset (adding the absolute value)
+        const centerX = wallObject.x + wallObject.width / 2 - layer.x;
+        const centerY = wallObject.y + wallObject.height / 2 - layer.y;
+
         const wall = this.add.rectangle(
           centerX,
           centerY,

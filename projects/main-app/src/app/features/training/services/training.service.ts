@@ -3,12 +3,16 @@ import {
   Training,
   Quest,
   Objective,
+  Level,
   CreateTrainingDto,
   UpdateTrainingDto,
   CreateQuestDto,
   UpdateQuestDto,
   CreateObjectiveDto,
   UpdateObjectiveDto,
+  CreateLevelDto,
+  UpdateLevelDto,
+  DEFAULT_LEVELS,
   calculateTrainingTotalPoints,
   calculateTrainingEarnedPoints,
   isTrainingCompleted,
@@ -29,12 +33,14 @@ export class TrainingService {
   // State signals
   private readonly trainings = signal<Training[]>([]);
   private readonly selectedTraining = signal<Training | null>(null);
+  private readonly levels = signal<Level[]>([]);
   private readonly isLoading = signal<boolean>(false);
   private readonly error = signal<string | null>(null);
 
   // Computed signals
   readonly trainings$ = this.trainings.asReadonly();
   readonly selectedTraining$ = this.selectedTraining.asReadonly();
+  readonly levels$ = this.levels.asReadonly();
   readonly isLoading$ = this.isLoading.asReadonly();
   readonly error$ = this.error.asReadonly();
 
@@ -52,6 +58,7 @@ export class TrainingService {
   constructor() {
     // Initialize with mock data for development
     this.loadMockData();
+    this.initializeDefaultLevels();
   }
 
   // ==================== TRAINING CRUD ====================
@@ -409,11 +416,134 @@ export class TrainingService {
     });
   }
 
+  // ==================== LEVEL CRUD ====================
+
+  /**
+   * Get all levels sorted by order
+   */
+  getLevels(): Level[] {
+    return [...this.levels()].sort((a, b) => a.order - b.order);
+  }
+
+  /**
+   * Get a level by ID
+   */
+  getLevelById(id: string): Level | undefined {
+    return this.levels().find(level => level.id === id);
+  }
+
+  /**
+   * Create a new level
+   */
+  createLevel(dto: CreateLevelDto): Level {
+    const newLevel: Level = {
+      id: this.generateId(),
+      name: dto.name,
+      description: dto.description,
+      color: dto.color,
+      order: dto.order,
+      quests: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    this.levels.update(levels => [...levels, newLevel]);
+    return newLevel;
+  }
+
+  /**
+   * Update a level
+   */
+  updateLevel(id: string, dto: UpdateLevelDto): boolean {
+    const levelExists = this.levels().some(l => l.id === id);
+    if (!levelExists) return false;
+
+    this.levels.update(levels =>
+      levels.map(level =>
+        level.id === id
+          ? {
+              ...level,
+              ...dto,
+              updatedAt: new Date()
+            }
+          : level
+      )
+    );
+
+    // If questIds provided, update quests to point to this level
+    if (dto.questIds && dto.questIds.length > 0) {
+      this.trainings.update(trainings =>
+        trainings.map(training => ({
+          ...training,
+          quests: training.quests.map(quest =>
+            dto.questIds!.indexOf(quest.id) !== -1
+              ? { ...quest, levelId: id, updatedAt: new Date() }
+              : quest
+          ),
+          updatedAt: new Date()
+        }))
+      );
+    }
+
+    return true;
+  }
+
+  /**
+   * Delete a level
+   */
+  deleteLevel(id: string): boolean {
+    // Check if any quests are using this level
+    const questsUsingLevel: Quest[] = [];
+    this.trainings().forEach((training: Training) => {
+      training.quests.forEach((quest: Quest) => {
+        if (quest.levelId === id) {
+          questsUsingLevel.push(quest);
+        }
+      });
+    });
+
+    if (questsUsingLevel.length > 0) {
+      console.warn(`Cannot delete level ${id}: ${questsUsingLevel.length} quests are still assigned to this level`);
+      return false;
+    }
+
+    this.levels.update(levels => levels.filter(l => l.id !== id));
+    return true;
+  }
+
+  /**
+   * Get quests filtered by level
+   */
+  getQuestsByLevel(levelId: string): Quest[] {
+    const allQuests: Quest[] = [];
+
+    this.trainings().forEach(training => {
+      const questsInLevel = training.quests.filter(q => q.levelId === levelId);
+      allQuests.push(...questsInLevel);
+    });
+
+    return allQuests;
+  }
+
   /**
    * Generate a unique ID
    */
   private generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Initialize default difficulty levels
+   */
+  private initializeDefaultLevels(): void {
+    const defaultLevels: Level[] = DEFAULT_LEVELS.map(level => ({
+      ...level,
+      id: `level-${level.name.toLowerCase()}`,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }));
+
+    this.levels.set(defaultLevels);
   }
 
   /**

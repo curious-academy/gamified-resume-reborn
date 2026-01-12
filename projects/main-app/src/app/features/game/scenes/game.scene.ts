@@ -164,30 +164,33 @@ export class GameScene extends Phaser.Scene {
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Tiled uses top-left origin, we need to adjust for Phaser's center origin
-        // Also, Phaser.add.rectangle expects center position but we create it at origin first
+        // Tiled uses top-left origin, Phaser rectangles use center by default
+        // We need to position at center for proper physics body alignment
+        const centerX = wallObject.x + wallObject.width / 2;
+        const centerY = wallObject.y + wallObject.height / 2;
+        
         const wall = this.add.rectangle(
-          0,
-          0,
+          centerX,
+          centerY,
           wallObject.width,
           wallObject.height,
           0xff0000,
           0.3 // Semi-transparent for debugging (red to see clearly)
         );
 
-        // Set origin to top-left to match Tiled coordinates
-        wall.setOrigin(0, 0);
-
-        // Position at exact Tiled coordinates
-        wall.setPosition(wallObject.x, wallObject.y);
-
-        // Add physics to the rectangle
+        // Add physics to the rectangle (must be done before adding to group)
         this.physics.add.existing(wall, true); // true = static body
+
+        // Ensure the physics body matches the visual rectangle
+        const body = wall.body as Phaser.Physics.Arcade.StaticBody;
+        if (body) {
+          body.updateFromGameObject();
+        }
 
         // Add to walls group
         this.walls?.add(wall);
 
-        console.log(`✅ Created wall: ${wallObject.name} at (${wallObject.x}, ${wallObject.y}) size ${wallObject.width}x${wallObject.height}`);
+        console.log(`✅ Created wall: ${wallObject.name} at center (${centerX}, ${centerY}) from Tiled pos (${wallObject.x}, ${wallObject.y}) size ${wallObject.width}x${wallObject.height}`);
       }
     });
   }

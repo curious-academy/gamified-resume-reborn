@@ -120,10 +120,8 @@ export class GameScene extends Phaser.Scene {
    * Crée la carte du jeu
    */
   private createMap(): void {
-    // Create the tilemap from Tiled JSON
     const map = this.make.tilemap({ key: 'map' });
 
-    // Add the tilesets to the map
     const tileset = map.addTilesetImage('FieldsTileset', 'FieldsTileset');
     const wallsTileset = map.addTilesetImage('walls', 'walls');
 
@@ -132,7 +130,6 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Create the ground layer - Phaser will position it correctly for infinite maps
     const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset]);
 
     if (!groundLayer) {
@@ -140,39 +137,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Set collision on wall tiles (GID 65-105 from walls tileset)
-    // These tiles represent fences and barriers
-    // Using setCollisionBetween for range of tile IDs
-    // Walls tileset starts at firstgid 65 in the JSON
+    // Set collision on wall tiles
     groundLayer.setCollisionBetween(65, 105, true);
-
-    // Also set specific tiles just to be sure
     const wallTileGIDs = [65, 66, 67, 68, 73, 81, 89, 97, 105];
-    wallTileGIDs.forEach(gid => {
-      groundLayer.setCollision(gid, true);
-    });
+    wallTileGIDs.forEach(gid => groundLayer.setCollision(gid, true));
 
-    // Enable debug rendering for collisions
-    const debugGraphics = this.add.graphics().setAlpha(0.7);
-    groundLayer.renderDebug(debugGraphics, {
-      tileColor: null, // Non-colliding tiles
-      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles in orange
-      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Colliding face edges
-    });
-
-    console.log('Map properties:', {
-      tileWidth: map.tileWidth,
-      tileHeight: map.tileHeight,
-      widthInPixels: map.widthInPixels,
-      heightInPixels: map.heightInPixels,
-      layerX: groundLayer.x,
-      layerY: groundLayer.y,
-      wallTilesSet: wallTileGIDs,
-      layerHasCollision: groundLayer.layer.collideIndexes.length > 0,
-      collideIndexes: Array.from(groundLayer.layer.collideIndexes)
-    });
-
-    // Store the layer for collision setup
     this.walls = groundLayer;
   }
 
@@ -188,7 +157,6 @@ export class GameScene extends Phaser.Scene {
    */
   private createTerminal(): void {
     const { tileSize } = this.mapConfig;
-    // Positionner le terminal à une position visible dans la carte
     this.terminal = new Terminal(this, 12 * tileSize, 10 * tileSize, {
       size: tileSize,
       proximityRadius: tileSize * 2.5
@@ -200,22 +168,7 @@ export class GameScene extends Phaser.Scene {
    */
   private setupCollisions(): void {
     if (this.walls && this.player) {
-      console.log('Setting up collisions:', {
-        walls: this.walls,
-        wallsLayer: !!this.walls,
-        player: this.player,
-        playerBody: this.player.body,
-        playerBodyType: this.player.body?.constructor.name
-      });
-
-      // Add collision between player and wall tiles layer
-      const collider = this.physics.add.collider(this.player, this.walls);
-      console.log('✅ Collisions configured between player and walls layer', collider);
-    } else {
-      console.error('❌ Cannot setup collisions:', {
-        hasWalls: !!this.walls,
-        hasPlayer: !!this.player
-      });
+      this.physics.add.collider(this.player, this.walls);
     }
   }
 

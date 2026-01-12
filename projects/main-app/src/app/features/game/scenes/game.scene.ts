@@ -192,9 +192,22 @@ export class GameScene extends Phaser.Scene {
    */
   private setupCollisions(): void {
     if (this.walls && this.player) {
+      console.log('Setting up collisions:', {
+        walls: this.walls,
+        wallsLayer: !!this.walls,
+        player: this.player,
+        playerBody: this.player.body,
+        playerBodyType: this.player.body?.constructor.name
+      });
+
       // Add collision between player and wall tiles layer
-      this.physics.add.collider(this.player, this.walls);
-      console.log('✅ Collisions configured between player and walls layer');
+      const collider = this.physics.add.collider(this.player, this.walls);
+      console.log('✅ Collisions configured between player and walls layer', collider);
+    } else {
+      console.error('❌ Cannot setup collisions:', {
+        hasWalls: !!this.walls,
+        hasPlayer: !!this.player
+      });
     }
   }
 

@@ -175,53 +175,40 @@ export class GameScene extends Phaser.Scene {
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // In Tiled, object origin is top-left corner
-        // Create a sprite instead of rectangle for better physics control
-        const centerX = wallObject.x + wallObject.width / 2;
-        const centerY = wallObject.y + wallObject.height / 2;
-        
-        // Create an invisible sprite at the center
-        const wall = this.physics.add.sprite(centerX, centerY, 'wall-temp');
-        wall.setVisible(false); // Hide the sprite, we'll draw our own debug visual
-        wall.setImmovable(true);
-        wall.body.setAllowGravity(false);
-        
-        // Set the exact size we want
+        // In Tiled, object coordinates are top-left
+        // Create an image at top-left position with origin (0,0)
+        const wall = this.physics.add.image(wallObject.x, wallObject.y, 'wall-temp');
+        wall.setOrigin(0, 0); // Top-left origin to match Tiled
         wall.setDisplaySize(wallObject.width, wallObject.height);
-        wall.body.setSize(wallObject.width, wallObject.height);
-        wall.setOrigin(0.5, 0.5);
+        wall.setImmovable(true);
+        (wall.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+        wall.setVisible(false); // Make invisible, we'll draw debug visuals
         
-        // Refresh the body to ensure it's positioned correctly
+        // Set exact body size
+        (wall.body as Phaser.Physics.Arcade.Body).setSize(wallObject.width, wallObject.height);
         wall.refreshBody();
         
-        // Create visual debug overlays
-        // Red semi-transparent fill
-        const debugFill = this.add.rectangle(
-          centerX,
-          centerY,
-          wallObject.width,
-          wallObject.height,
-          0xff0000,
-          0.3
-        );
-        debugFill.setOrigin(0.5, 0.5);
+        const body = wall.body as Phaser.Physics.Arcade.Body;
         
-        // Green outline showing actual physics body
+        // Draw red fill for visualization
         const graphics = this.add.graphics();
-        graphics.lineStyle(3, 0x00ff00, 1);
-        graphics.strokeRect(
-          wall.body.x,
-          wall.body.y,
-          wall.body.width,
-          wall.body.height
+        graphics.fillStyle(0xff0000, 0.3);
+        graphics.fillRect(wallObject.x, wallObject.y, wallObject.width, wallObject.height);
+        
+        // Draw green outline for physics body
+        const debugGraphics = this.add.graphics();
+        debugGraphics.lineStyle(3, 0x00ff00, 1);
+        debugGraphics.strokeRect(
+          body.x,
+          body.y,
+          body.width,
+          body.height
         );
         
         console.log(`✅ Wall: ${wallObject.name}`);
-        console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-        console.log(`   Visual center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
-        console.log(`   Sprite body top-left: (${wall.body.x.toFixed(2)}, ${wall.body.y.toFixed(2)})`);
-        console.log(`   Sprite body size: ${wall.body.width}x${wall.body.height}`);
-        console.log(`   Expected body bounds: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)}) to (${(wallObject.x + wallObject.width).toFixed(2)}, ${(wallObject.y + wallObject.height).toFixed(2)})`);
+        console.log(`   Tiled (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
+        console.log(`   Body (top-left): (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
+        console.log(`   Size: ${body.width}x${body.height}`);
 
         // Add to walls group
         this.walls?.add(wall);

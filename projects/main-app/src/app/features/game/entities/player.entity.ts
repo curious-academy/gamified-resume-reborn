@@ -54,8 +54,9 @@ export class Player extends Phaser.GameObjects.Rectangle {
   private setupPhysics(size: number): void {
     if (this.body && this.body instanceof Phaser.Physics.Arcade.Body) {
       const body = this.body;
-      body.setSize(size / 2, size / 2); // Boîte de collision plus petite
-      body.setOffset(size / 4, size / 2); // Ajuster l'offset
+      // Full body collision box covering the entire player
+      body.setSize(size, size);
+      body.setOffset(0, 0);
       body.setCollideWorldBounds(true);
     }
   }

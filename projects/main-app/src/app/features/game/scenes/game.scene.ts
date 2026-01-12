@@ -133,12 +133,20 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Create the ground layer from Tiled
-    const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset], 0, 0);
+    // For infinite maps, Phaser handles chunk positioning automatically
+    const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset]);
 
     if (!groundLayer) {
       console.error('Failed to create layer');
       return;
     }
+
+    console.log('Map properties:', {
+      tileWidth: map.tileWidth,
+      tileHeight: map.tileHeight,
+      widthInPixels: map.widthInPixels,
+      heightInPixels: map.heightInPixels
+    });
 
     // Initialize walls group for collision objects
     this.walls = this.physics.add.staticGroup();

@@ -173,10 +173,12 @@ export class GameScene extends Phaser.Scene {
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Use Tiled coordinates directly - the layer is now at (0,0)
+        // In Tiled, object origin is top-left corner
+        // Calculate the center position for Phaser rectangle
         const centerX = wallObject.x + wallObject.width / 2;
         const centerY = wallObject.y + wallObject.height / 2;
         
+        // Create a rectangle at the center position
         const wall = this.add.rectangle(
           centerX,
           centerY,
@@ -186,13 +188,23 @@ export class GameScene extends Phaser.Scene {
           0.5 // Semi-transparent for debugging
         );
 
+        // Important: set origin to center for proper alignment
+        wall.setOrigin(0.5, 0.5);
+
         // Add physics to the rectangle
         this.physics.add.existing(wall, true); // true = static body
+
+        // Ensure the physics body matches the visual rectangle exactly
+        const body = wall.body as Phaser.Physics.Arcade.StaticBody;
+        if (body) {
+          // Phaser should automatically sync the body, but we can verify
+          body.updateFromGameObject();
+        }
 
         // Add to walls group
         this.walls?.add(wall);
 
-        console.log(`✅ Wall: ${wallObject.name} at center (${centerX.toFixed(2)}, ${centerY.toFixed(2)}) size ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
+        console.log(`✅ Wall: ${wallObject.name} at (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)}) center (${centerX.toFixed(2)}, ${centerY.toFixed(2)}) size ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
       }
     });
 

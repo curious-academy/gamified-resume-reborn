@@ -200,15 +200,28 @@ export class GameScene extends Phaser.Scene {
         const body = wall.body as Phaser.Physics.Arcade.StaticBody;
         if (body) {
           body.updateFromGameObject();
+          
+          // Debug: Draw physics body bounds
+          const graphics = this.add.graphics();
+          graphics.lineStyle(2, 0x00ff00, 1);
+          graphics.strokeRect(
+            body.x,
+            body.y,
+            body.width,
+            body.height
+          );
+          
+          console.log(`✅ Wall: ${wallObject.name}`);
+          console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
+          console.log(`   Visual rect center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
+          console.log(`   Visual rect origin: (${wall.originX}, ${wall.originY})`);
+          console.log(`   Physics body pos: (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
+          console.log(`   Physics body center: (${body.center.x.toFixed(2)}, ${body.center.y.toFixed(2)})`);
+          console.log(`   Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
         }
 
         // Add to walls group
         this.walls?.add(wall);
-
-        console.log(`✅ Wall: ${wallObject.name}`);
-        console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-        console.log(`   World center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
-        console.log(`   Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
       }
     });
 

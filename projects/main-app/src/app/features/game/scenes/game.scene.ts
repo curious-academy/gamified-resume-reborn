@@ -176,32 +176,39 @@ export class GameScene extends Phaser.Scene {
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
         // In Tiled, object origin is top-left corner
-        // For infinite maps, objects use the same coordinate system as the map
+        // Create a static physics body directly at the Tiled position
+        const wall = this.add.zone(
+          wallObject.x,
+          wallObject.y,
+          wallObject.width,
+          wallObject.height
+        );
+        
+        // Set origin to top-left to match Tiled coordinates exactly
+        wall.setOrigin(0, 0);
+        
+        // Add physics with static body
+        this.physics.add.existing(wall, true);
+        
+        const body = wall.body as Phaser.Physics.Arcade.StaticBody;
+        
+        // Create visual debug rectangle (red, semi-transparent)
+        // Position at center for visual clarity
         const centerX = wallObject.x + wallObject.width / 2;
         const centerY = wallObject.y + wallObject.height / 2;
         
-        // Create a rectangle at the center position
-        const wall = this.add.rectangle(
+        const debugRect = this.add.rectangle(
           centerX,
           centerY,
           wallObject.width,
           wallObject.height,
           0xff0000,
-          0.5 // Semi-transparent for debugging
+          0.3
         );
-
-        // Important: set origin to center for proper alignment
-        wall.setOrigin(0.5, 0.5);
-
-        // Add physics to the rectangle
-        this.physics.add.existing(wall, true); // true = static body
-
-        // Ensure the physics body matches the visual rectangle exactly
-        const body = wall.body as Phaser.Physics.Arcade.StaticBody;
+        debugRect.setOrigin(0.5, 0.5);
+        
+        // Draw physics body bounds (green outline)
         if (body) {
-          body.updateFromGameObject();
-          
-          // Debug: Draw physics body bounds
           const graphics = this.add.graphics();
           graphics.lineStyle(2, 0x00ff00, 1);
           graphics.strokeRect(
@@ -213,11 +220,9 @@ export class GameScene extends Phaser.Scene {
           
           console.log(`✅ Wall: ${wallObject.name}`);
           console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-          console.log(`   Visual rect center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
-          console.log(`   Visual rect origin: (${wall.originX}, ${wall.originY})`);
           console.log(`   Physics body pos: (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
-          console.log(`   Physics body center: (${body.center.x.toFixed(2)}, ${body.center.y.toFixed(2)})`);
-          console.log(`   Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
+          console.log(`   Physics body size: ${body.width}x${body.height}`);
+          console.log(`   Visual center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
         }
 
         // Add to walls group

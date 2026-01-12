@@ -145,20 +145,22 @@ export class GameScene extends Phaser.Scene {
       tileWidth: map.tileWidth,
       tileHeight: map.tileHeight,
       widthInPixels: map.widthInPixels,
-      heightInPixels: map.heightInPixels
+      heightInPixels: map.heightInPixels,
+      layerX: groundLayer.x,
+      layerY: groundLayer.y
     });
 
     // Initialize walls group for collision objects
     this.walls = this.physics.add.staticGroup();
 
     // Create collision rectangles from Tiled object layer
-    this.createWallsFromObjects(map);
+    this.createWallsFromObjects(map, groundLayer);
   }
 
   /**
    * Crée les murs depuis les objets Tiled
    */
-  private createWallsFromObjects(map: Phaser.Tilemaps.Tilemap): void {
+  private createWallsFromObjects(map: Phaser.Tilemaps.Tilemap, layer: Phaser.Tilemaps.TilemapLayer): void {
     if (!this.walls) return;
 
     // Get the 'walls' object layer from Tiled
@@ -169,13 +171,19 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    console.log('Layer position offset:', { x: layer.x, y: layer.y });
+
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Tiled uses top-left origin, Phaser rectangles use center by default
-        // We need to position at center for proper physics body alignment
-        const centerX = wallObject.x + wallObject.width / 2;
-        const centerY = wallObject.y + wallObject.height / 2;
+        // Apply layer offset to object coordinates
+        // Tiled objects are relative to the map, but the layer might be offset
+        const adjustedX = wallObject.x + layer.x;
+        const adjustedY = wallObject.y + layer.y;
+        
+        // Calculate center position for Phaser rectangle
+        const centerX = adjustedX + wallObject.width / 2;
+        const centerY = adjustedY + wallObject.height / 2;
         
         const wall = this.add.rectangle(
           centerX,
@@ -198,7 +206,7 @@ export class GameScene extends Phaser.Scene {
         // Add to walls group
         this.walls?.add(wall);
 
-        console.log(`✅ Created wall: ${wallObject.name} at center (${centerX}, ${centerY}) from Tiled pos (${wallObject.x}, ${wallObject.y}) size ${wallObject.width}x${wallObject.height}`);
+        console.log(`✅ Wall: ${wallObject.name} | Tiled: (${wallObject.x}, ${wallObject.y}) | Adjusted: (${adjustedX}, ${adjustedY}) | Center: (${centerX}, ${centerY}) | Size: ${wallObject.width}x${wallObject.height}`);
       }
     });
   }

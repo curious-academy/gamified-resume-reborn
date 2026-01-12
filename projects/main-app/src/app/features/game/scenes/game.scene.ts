@@ -176,41 +176,49 @@ export class GameScene extends Phaser.Scene {
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
         // In Tiled, object origin is top-left corner
-        // Create a static physics body directly at the Tiled position
-        const wall = this.add.zone(
-          wallObject.x,
-          wallObject.y,
+        // Create a rectangle for physics - we'll use it as the collision body
+        const centerX = wallObject.x + wallObject.width / 2;
+        const centerY = wallObject.y + wallObject.height / 2;
+        
+        // Create the physics rectangle at the CENTER position
+        const wall = this.add.rectangle(
+          centerX,
+          centerY,
           wallObject.width,
-          wallObject.height
+          wallObject.height,
+          0xff0000,
+          0 // Invisible for now
         );
         
-        // Set origin to top-left to match Tiled coordinates exactly
-        wall.setOrigin(0, 0);
+        // Keep origin at center (default 0.5, 0.5)
+        wall.setOrigin(0.5, 0.5);
         
         // Add physics with static body
         this.physics.add.existing(wall, true);
         
         const body = wall.body as Phaser.Physics.Arcade.StaticBody;
         
-        // Create visual debug rectangle (red, semi-transparent)
-        // Position at center for visual clarity
-        const centerX = wallObject.x + wallObject.width / 2;
-        const centerY = wallObject.y + wallObject.height / 2;
-        
-        const debugRect = this.add.rectangle(
-          centerX,
-          centerY,
-          wallObject.width,
-          wallObject.height,
-          0xff0000,
-          0.3
-        );
-        debugRect.setOrigin(0.5, 0.5);
-        
-        // Draw physics body bounds (green outline)
         if (body) {
+          // Force the body to match the rectangle exactly
+          // For origin 0.5, 0.5, the body position should be at top-left
+          body.setSize(wallObject.width, wallObject.height);
+          body.updateFromGameObject();
+          
+          // Create visual debug overlays
+          // Red semi-transparent fill
+          const debugFill = this.add.rectangle(
+            centerX,
+            centerY,
+            wallObject.width,
+            wallObject.height,
+            0xff0000,
+            0.3
+          );
+          debugFill.setOrigin(0.5, 0.5);
+          
+          // Green outline showing actual physics body
           const graphics = this.add.graphics();
-          graphics.lineStyle(2, 0x00ff00, 1);
+          graphics.lineStyle(3, 0x00ff00, 1);
           graphics.strokeRect(
             body.x,
             body.y,
@@ -220,9 +228,10 @@ export class GameScene extends Phaser.Scene {
           
           console.log(`✅ Wall: ${wallObject.name}`);
           console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-          console.log(`   Physics body pos: (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
-          console.log(`   Physics body size: ${body.width}x${body.height}`);
           console.log(`   Visual center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
+          console.log(`   Physics body top-left: (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
+          console.log(`   Physics body size: ${body.width}x${body.height}`);
+          console.log(`   Expected top-left: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
         }
 
         // Add to walls group

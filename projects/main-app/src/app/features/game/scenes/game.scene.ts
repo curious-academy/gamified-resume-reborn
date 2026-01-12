@@ -142,9 +142,15 @@ export class GameScene extends Phaser.Scene {
 
     // Set collision on wall tiles (GID 65-105 from walls tileset)
     // These tiles represent fences and barriers
-    // Using setCollision for specific tile IDs
+    // Using setCollisionBetween for range of tile IDs
+    // Walls tileset starts at firstgid 65 in the JSON
+    groundLayer.setCollisionBetween(65, 105, true);
+
+    // Also set specific tiles just to be sure
     const wallTileGIDs = [65, 66, 67, 68, 73, 81, 89, 97, 105];
-    groundLayer.setCollision(wallTileGIDs);
+    wallTileGIDs.forEach(gid => {
+      groundLayer.setCollision(gid, true);
+    });
 
     // Enable debug rendering for collisions
     const debugGraphics = this.add.graphics().setAlpha(0.7);
@@ -161,7 +167,9 @@ export class GameScene extends Phaser.Scene {
       heightInPixels: map.heightInPixels,
       layerX: groundLayer.x,
       layerY: groundLayer.y,
-      wallTilesSet: wallTileGIDs
+      wallTilesSet: wallTileGIDs,
+      layerHasCollision: groundLayer.layer.collideIndexes.length > 0,
+      collideIndexes: Array.from(groundLayer.layer.collideIndexes)
     });
 
     // Store the layer for collision setup

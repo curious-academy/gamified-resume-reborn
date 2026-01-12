@@ -132,8 +132,8 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Create the ground layer from Tiled at position (0, 0)
-    const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset], 0, 0);
+    // Create the ground layer - Phaser will position it correctly for infinite maps
+    const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset]);
 
     if (!groundLayer) {
       console.error('Failed to create layer');
@@ -170,11 +170,13 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    console.log('Creating walls from object layer');
+
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
         // In Tiled, object origin is top-left corner
-        // Calculate the center position for Phaser rectangle
+        // For infinite maps, objects use the same coordinate system as the map
         const centerX = wallObject.x + wallObject.width / 2;
         const centerY = wallObject.y + wallObject.height / 2;
         
@@ -197,14 +199,16 @@ export class GameScene extends Phaser.Scene {
         // Ensure the physics body matches the visual rectangle exactly
         const body = wall.body as Phaser.Physics.Arcade.StaticBody;
         if (body) {
-          // Phaser should automatically sync the body, but we can verify
           body.updateFromGameObject();
         }
 
         // Add to walls group
         this.walls?.add(wall);
 
-        console.log(`✅ Wall: ${wallObject.name} at (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)}) center (${centerX.toFixed(2)}, ${centerY.toFixed(2)}) size ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
+        console.log(`✅ Wall: ${wallObject.name}`);
+        console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
+        console.log(`   World center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
+        console.log(`   Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
       }
     });
 

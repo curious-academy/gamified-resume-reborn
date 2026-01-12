@@ -172,46 +172,34 @@ export class GameScene extends Phaser.Scene {
 
     console.log('Creating walls from object layer');
 
-    // Create physics rectangles for each wall object
+    // Create physics bodies for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // In Tiled, object coordinates are top-left
-        // Create an image at top-left position with origin (0,0)
-        const wall = this.physics.add.image(wallObject.x, wallObject.y, 'wall-temp');
-        wall.setOrigin(0, 0); // Top-left origin to match Tiled
-        wall.setDisplaySize(wallObject.width, wallObject.height);
-        wall.setImmovable(true);
-        (wall.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-        wall.setVisible(false); // Make invisible, we'll draw debug visuals
-        
-        // Set exact body size
-        (wall.body as Phaser.Physics.Arcade.Body).setSize(wallObject.width, wallObject.height);
-        wall.refreshBody();
-        
-        const body = wall.body as Phaser.Physics.Arcade.Body;
-        
-        // Draw red fill for visualization
-        const graphics = this.add.graphics();
-        graphics.fillStyle(0xff0000, 0.3);
-        graphics.fillRect(wallObject.x, wallObject.y, wallObject.width, wallObject.height);
-        
-        // Draw green outline for physics body
-        const debugGraphics = this.add.graphics();
-        debugGraphics.lineStyle(3, 0x00ff00, 1);
-        debugGraphics.strokeRect(
-          body.x,
-          body.y,
-          body.width,
-          body.height
+        // Create a rectangle using Phaser's rectangle with static physics
+        const rect = this.add.rectangle(
+          wallObject.x,
+          wallObject.y,
+          wallObject.width,
+          wallObject.height,
+          0xff0000,
+          0.3
         );
         
+        // Set origin to TOP-LEFT to match Tiled's coordinate system
+        rect.setOrigin(0, 0);
+        
+        // Enable physics on this rectangle
+        this.physics.world.enable(rect, Phaser.Physics.Arcade.STATIC_BODY);
+        
+        // Get the static body and ensure it's properly sized
+        const body = rect.body as Phaser.Physics.Arcade.StaticBody;
+        
         console.log(`✅ Wall: ${wallObject.name}`);
-        console.log(`   Tiled (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-        console.log(`   Body (top-left): (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
-        console.log(`   Size: ${body.width}x${body.height}`);
+        console.log(`   Position: (${rect.x}, ${rect.y}), Size: ${rect.width}x${rect.height}`);
+        console.log(`   Body: (${body.x}, ${body.y}), Size: ${body.width}x${body.height}`);
 
         // Add to walls group
-        this.walls?.add(wall);
+        this.walls?.add(rect);
       }
     });
 

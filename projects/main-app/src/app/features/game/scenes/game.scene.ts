@@ -176,63 +176,52 @@ export class GameScene extends Phaser.Scene {
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
         // In Tiled, object origin is top-left corner
-        // Create a rectangle for physics - we'll use it as the collision body
+        // Create a sprite instead of rectangle for better physics control
         const centerX = wallObject.x + wallObject.width / 2;
         const centerY = wallObject.y + wallObject.height / 2;
         
-        // Create the physics rectangle at the CENTER position
-        const wall = this.add.rectangle(
+        // Create an invisible sprite at the center
+        const wall = this.physics.add.sprite(centerX, centerY, 'wall-temp');
+        wall.setVisible(false); // Hide the sprite, we'll draw our own debug visual
+        wall.setImmovable(true);
+        wall.body.setAllowGravity(false);
+        
+        // Set the exact size we want
+        wall.setDisplaySize(wallObject.width, wallObject.height);
+        wall.body.setSize(wallObject.width, wallObject.height);
+        wall.setOrigin(0.5, 0.5);
+        
+        // Refresh the body to ensure it's positioned correctly
+        wall.refreshBody();
+        
+        // Create visual debug overlays
+        // Red semi-transparent fill
+        const debugFill = this.add.rectangle(
           centerX,
           centerY,
           wallObject.width,
           wallObject.height,
           0xff0000,
-          0 // Invisible for now
+          0.3
+        );
+        debugFill.setOrigin(0.5, 0.5);
+        
+        // Green outline showing actual physics body
+        const graphics = this.add.graphics();
+        graphics.lineStyle(3, 0x00ff00, 1);
+        graphics.strokeRect(
+          wall.body.x,
+          wall.body.y,
+          wall.body.width,
+          wall.body.height
         );
         
-        // Keep origin at center (default 0.5, 0.5)
-        wall.setOrigin(0.5, 0.5);
-        
-        // Add physics with static body
-        this.physics.add.existing(wall, true);
-        
-        const body = wall.body as Phaser.Physics.Arcade.StaticBody;
-        
-        if (body) {
-          // Force the body to match the rectangle exactly
-          // For origin 0.5, 0.5, the body position should be at top-left
-          body.setSize(wallObject.width, wallObject.height);
-          body.updateFromGameObject();
-          
-          // Create visual debug overlays
-          // Red semi-transparent fill
-          const debugFill = this.add.rectangle(
-            centerX,
-            centerY,
-            wallObject.width,
-            wallObject.height,
-            0xff0000,
-            0.3
-          );
-          debugFill.setOrigin(0.5, 0.5);
-          
-          // Green outline showing actual physics body
-          const graphics = this.add.graphics();
-          graphics.lineStyle(3, 0x00ff00, 1);
-          graphics.strokeRect(
-            body.x,
-            body.y,
-            body.width,
-            body.height
-          );
-          
-          console.log(`✅ Wall: ${wallObject.name}`);
-          console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-          console.log(`   Visual center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
-          console.log(`   Physics body top-left: (${body.x.toFixed(2)}, ${body.y.toFixed(2)})`);
-          console.log(`   Physics body size: ${body.width}x${body.height}`);
-          console.log(`   Expected top-left: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
-        }
+        console.log(`✅ Wall: ${wallObject.name}`);
+        console.log(`   Tiled coords (top-left): (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
+        console.log(`   Visual center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
+        console.log(`   Sprite body top-left: (${wall.body.x.toFixed(2)}, ${wall.body.y.toFixed(2)})`);
+        console.log(`   Sprite body size: ${wall.body.width}x${wall.body.height}`);
+        console.log(`   Expected body bounds: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)}) to (${(wallObject.x + wallObject.width).toFixed(2)}, ${(wallObject.y + wallObject.height).toFixed(2)})`);
 
         // Add to walls group
         this.walls?.add(wall);

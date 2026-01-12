@@ -146,6 +146,14 @@ export class GameScene extends Phaser.Scene {
     const wallTileGIDs = [65, 66, 67, 68, 73, 81, 89, 97, 105];
     groundLayer.setCollision(wallTileGIDs);
 
+    // Enable debug rendering for collisions
+    const debugGraphics = this.add.graphics().setAlpha(0.7);
+    groundLayer.renderDebug(debugGraphics, {
+      tileColor: null, // Non-colliding tiles
+      collidingTileColor: new Phaser.Display.Color(243, 134, 48, 200), // Colliding tiles in orange
+      faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Colliding face edges
+    });
+
     console.log('Map properties:', {
       tileWidth: map.tileWidth,
       tileHeight: map.tileHeight,

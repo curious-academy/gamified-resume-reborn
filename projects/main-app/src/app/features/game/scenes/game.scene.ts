@@ -20,7 +20,7 @@ import { GameSceneConfig } from '../config/game-scene.config';
 export class GameScene extends Phaser.Scene {
   private player?: Player;
   private terminal?: Terminal;
-  private walls?: Phaser.Physics.Arcade.StaticGroup;
+  private walls?: Phaser.Tilemaps.TilemapLayer;
   private readonly mapConfig: Required<MapConfig>;
   private readonly terminalService?: TerminalService;
   private readonly dialogService?: DialogService;
@@ -140,54 +140,25 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    // Set collision on wall tiles (GID 65-105 from walls tileset)
+    // These tiles represent fences and barriers
+    // Using setCollision for specific tile IDs
+    const wallTileGIDs = [65, 66, 67, 68, 73, 81, 89, 97, 105];
+    groundLayer.setCollision(wallTileGIDs);
+
     console.log('Map properties:', {
       tileWidth: map.tileWidth,
       tileHeight: map.tileHeight,
       widthInPixels: map.widthInPixels,
       heightInPixels: map.heightInPixels,
       layerX: groundLayer.x,
-      layerY: groundLayer.y
+      layerY: groundLayer.y,
+      wallTilesSet: wallTileGIDs
     });
 
-    // Initialize walls group for collision objects
-    this.walls = this.physics.add.staticGroup();
-
-    // Create collision rectangles from Tiled object layer
-    this.createWallsFromObjects(map);
+    // Store the layer for collision setup
+    this.walls = groundLayer;
   }
-
-  /**
-   * Crée les murs depuis les objets Tiled
-   */
-  private createWallsFromObjects(map: Phaser.Tilemaps.Tilemap): void {
-    if (!this.walls) return;
-
-    const wallsLayer = map.getObjectLayer('walls');
-    if (!wallsLayer) {
-      console.warn('No walls layer found');
-      return;
-    }
-
-    wallsLayer.objects.forEach((obj) => {
-      if (obj.x !== undefined && obj.y !== undefined && obj.width && obj.height) {
-        // Tiled gives us top-left coordinates
-        // For a rectangle with default origin (0.5, 0.5), we need to position at center
-        const centerX = obj.x + obj.width / 2;
-        const centerY = obj.y + obj.height / 2;
-
-        // Create simple rectangle
-        const rect = this.add.rectangle(centerX, centerY, obj.width, obj.height, 0xff0000, 0.5);
-
-        // Add static physics
-        this.physics.add.existing(rect, true);
-
-        // Add to group
-        this.walls?.add(rect);
-      }
-    });
-  }
-
-
 
   /**
    * Crée le joueur
@@ -213,7 +184,9 @@ export class GameScene extends Phaser.Scene {
    */
   private setupCollisions(): void {
     if (this.walls && this.player) {
+      // Add collision between player and wall tiles layer
       this.physics.add.collider(this.player, this.walls);
+      console.log('✅ Collisions configured between player and walls layer');
     }
   }
 

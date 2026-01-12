@@ -579,7 +579,8 @@ export class TrainingDetailComponent {
   protected questFormData = {
     title: '',
     description: '',
-    order: 1
+    order: 1,
+    levelId: '' // Default level to be selected
   };
 
   protected objectiveFormData = {
@@ -612,7 +613,7 @@ export class TrainingDetailComponent {
   // Quest management
   onAddQuest(): void {
     this.editingQuest.set(null);
-    this.questFormData = { title: '', description: '', order: 1 };
+    this.questFormData = { title: '', description: '', order: 1, levelId: '' };
     this.showQuestForm.set(true);
   }
 
@@ -621,7 +622,8 @@ export class TrainingDetailComponent {
     this.questFormData = {
       title: quest.title,
       description: quest.description,
-      order: quest.order
+      order: quest.order,
+      levelId: quest.levelId
     };
     this.showQuestForm.set(true);
   }

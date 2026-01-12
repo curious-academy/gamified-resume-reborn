@@ -153,6 +153,7 @@ export class TrainingService {
       order: dto.order,
       isCompleted: false,
       trainingId: dto.trainingId,
+      levelId: dto.levelId,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -446,6 +447,7 @@ export class TrainingService {
           order: 1,
           isCompleted: false,
           trainingId: 'training-1',
+          levelId: 'level-beginner', // Beginner level
           createdAt: new Date(),
           updatedAt: new Date()
         }

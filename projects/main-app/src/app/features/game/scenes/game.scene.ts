@@ -164,15 +164,22 @@ export class GameScene extends Phaser.Scene {
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Create a rectangle for collision
+        // Tiled uses top-left origin, we need to adjust for Phaser's center origin
+        // Also, Phaser.add.rectangle expects center position but we create it at origin first
         const wall = this.add.rectangle(
-          wallObject.x + wallObject.width / 2,
-          wallObject.y + wallObject.height / 2,
+          0,
+          0,
           wallObject.width,
           wallObject.height,
           0xff0000,
           0.3 // Semi-transparent for debugging (red to see clearly)
         );
+
+        // Set origin to top-left to match Tiled coordinates
+        wall.setOrigin(0, 0);
+
+        // Position at exact Tiled coordinates
+        wall.setPosition(wallObject.x, wallObject.y);
 
         // Add physics to the rectangle
         this.physics.add.existing(wall, true); // true = static body

@@ -171,19 +171,15 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    console.log('Layer position offset:', { x: layer.x, y: layer.y });
+    console.log('Tile layer offset:', { x: layer.x, y: layer.y });
 
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Apply layer offset to object coordinates
-        // Tiled objects are relative to the map, but the layer might be offset
-        const adjustedX = wallObject.x + layer.x;
-        const adjustedY = wallObject.y + layer.y;
-        
-        // Calculate center position for Phaser rectangle
-        const centerX = adjustedX + wallObject.width / 2;
-        const centerY = adjustedY + wallObject.height / 2;
+        // Objects from Tiled are already in world coordinates
+        // No need to add layer offset as objects are independent from tile layers
+        const centerX = wallObject.x + wallObject.width / 2;
+        const centerY = wallObject.y + wallObject.height / 2;
         
         const wall = this.add.rectangle(
           centerX,
@@ -191,24 +187,20 @@ export class GameScene extends Phaser.Scene {
           wallObject.width,
           wallObject.height,
           0xff0000,
-          0.3 // Semi-transparent for debugging (red to see clearly)
+          0.5 // Semi-transparent for debugging
         );
 
-        // Add physics to the rectangle (must be done before adding to group)
+        // Add physics to the rectangle
         this.physics.add.existing(wall, true); // true = static body
-
-        // Ensure the physics body matches the visual rectangle
-        const body = wall.body as Phaser.Physics.Arcade.StaticBody;
-        if (body) {
-          body.updateFromGameObject();
-        }
 
         // Add to walls group
         this.walls?.add(wall);
 
-        console.log(`✅ Wall: ${wallObject.name} | Tiled: (${wallObject.x}, ${wallObject.y}) | Adjusted: (${adjustedX}, ${adjustedY}) | Center: (${centerX}, ${centerY}) | Size: ${wallObject.width}x${wallObject.height}`);
+        console.log(`✅ Wall: ${wallObject.name} | Tiled pos: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)}) | Center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)}) | Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
       }
     });
+
+    console.log(`Total walls created: ${this.walls.getLength()}`);
   }
 
 

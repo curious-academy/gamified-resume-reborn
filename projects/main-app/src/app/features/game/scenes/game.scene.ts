@@ -162,44 +162,28 @@ export class GameScene extends Phaser.Scene {
   private createWallsFromObjects(map: Phaser.Tilemaps.Tilemap): void {
     if (!this.walls) return;
 
-    // Get the 'walls' object layer from Tiled
-    const wallsLayer = map.getObjectLayer('walls');
+    // Use Phaser's built-in method to convert Tiled objects to sprites
+    const wallObjects = map.createFromObjects('walls', {
+      classType: Phaser.Physics.Arcade.Sprite
+    });
 
-    if (!wallsLayer) {
-      console.warn('No walls layer found in Tiled map');
-      return;
-    }
-
-    console.log('Creating walls from object layer');
-
-    // Create physics bodies for each wall object
-    wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
-      if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Create a rectangle using Phaser's rectangle with static physics
-        const rect = this.add.rectangle(
-          wallObject.x,
-          wallObject.y,
-          wallObject.width,
-          wallObject.height,
-          0xff0000,
-          0.3
-        );
+    // Add physics and styling to all created objects
+    wallObjects.forEach((wall) => {
+      const sprite = wall as Phaser.Physics.Arcade.Sprite;
+      if (sprite && sprite.body) {
+        const body = sprite.body as Phaser.Physics.Arcade.Body;
         
-        // Set origin to TOP-LEFT to match Tiled's coordinate system
-        rect.setOrigin(0, 0);
+        // Make it static and immovable
+        body.setImmovable(true);
+        body.setAllowGravity(false);
         
-        // Enable physics on this rectangle
-        this.physics.world.enable(rect, Phaser.Physics.Arcade.STATIC_BODY);
+        // Make it visible with red color for debugging
+        sprite.setTint(0xff0000);
+        sprite.setAlpha(0.5);
         
-        // Get the static body and ensure it's properly sized
-        const body = rect.body as Phaser.Physics.Arcade.StaticBody;
+        this.walls?.add(sprite);
         
-        console.log(`✅ Wall: ${wallObject.name}`);
-        console.log(`   Position: (${rect.x}, ${rect.y}), Size: ${rect.width}x${rect.height}`);
-        console.log(`   Body: (${body.x}, ${body.y}), Size: ${body.width}x${body.height}`);
-
-        // Add to walls group
-        this.walls?.add(rect);
+        console.log(`✅ Wall at (${body.x}, ${body.y}), size: ${body.width}x${body.height}`);
       }
     });
 

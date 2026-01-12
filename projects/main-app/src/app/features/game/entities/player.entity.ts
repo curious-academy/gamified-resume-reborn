@@ -53,9 +53,28 @@ export class Player extends Phaser.GameObjects.Rectangle {
    */
   private setupPhysics(size: number): void {
     if (this.body && this.body instanceof Phaser.Physics.Arcade.Body) {
-      this.body.setSize(size / 2, size / 2); // Boîte de collision plus petite
-      this.body.setOffset(size / 4, size / 2); // Ajuster l'offset
-      this.body.setCollideWorldBounds(true);
+      const body = this.body;
+      body.setSize(size / 2, size / 2); // Boîte de collision plus petite
+      body.setOffset(size / 4, size / 2); // Ajuster l'offset
+      body.setCollideWorldBounds(true);
+      
+      // Debug: visualize physics body
+      const graphics = this.scene.add.graphics();
+      graphics.lineStyle(2, 0xffff00, 1); // Yellow outline
+      
+      // Update visualization every frame
+      this.scene.events.on('update', () => {
+        if (body && this.active) {
+          graphics.clear();
+          graphics.lineStyle(2, 0xffff00, 1);
+          graphics.strokeRect(
+            body.x,
+            body.y,
+            body.width,
+            body.height
+          );
+        }
+      });
     }
   }
 

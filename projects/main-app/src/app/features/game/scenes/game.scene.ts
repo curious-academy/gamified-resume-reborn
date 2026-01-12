@@ -162,32 +162,33 @@ export class GameScene extends Phaser.Scene {
   private createWallsFromObjects(map: Phaser.Tilemaps.Tilemap): void {
     if (!this.walls) return;
 
-    // Use Phaser's built-in method to convert Tiled objects to sprites
-    const wallObjects = map.createFromObjects('walls', {
-      classType: Phaser.Physics.Arcade.Sprite
-    });
+    const wallsLayer = map.getObjectLayer('walls');
+    if (!wallsLayer) {
+      console.warn('No walls layer found');
+      return;
+    }
 
-    // Add physics and styling to all created objects
-    wallObjects.forEach((wall) => {
-      const sprite = wall as Phaser.Physics.Arcade.Sprite;
-      if (sprite && sprite.body) {
-        const body = sprite.body as Phaser.Physics.Arcade.Body;
+    wallsLayer.objects.forEach((obj) => {
+      if (obj.x !== undefined && obj.y !== undefined && obj.width && obj.height) {
+        // Tiled gives us top-left coordinates
+        // For a rectangle with default origin (0.5, 0.5), we need to position at center
+        const centerX = obj.x + obj.width / 2;
+        const centerY = obj.y + obj.height / 2;
         
-        // Make it static and immovable
-        body.setImmovable(true);
-        body.setAllowGravity(false);
+        // Create simple rectangle
+        const rect = this.add.rectangle(centerX, centerY, obj.width, obj.height, 0xff0000, 0.5);
         
-        // Make it visible with red color for debugging
-        sprite.setTint(0xff0000);
-        sprite.setAlpha(0.5);
+        // Add static physics
+        this.physics.add.existing(rect, true);
         
-        this.walls?.add(sprite);
+        // Add to group
+        this.walls?.add(rect);
         
-        console.log(`✅ Wall at (${body.x}, ${body.y}), size: ${body.width}x${body.height}`);
+        console.log(`Wall: ${obj.name} at center (${centerX}, ${centerY}), size ${obj.width}x${obj.height}`);
       }
     });
 
-    console.log(`Total walls created: ${this.walls.getLength()}`);
+    console.log(`Total walls: ${this.walls.getLength()}`);
   }
 
 

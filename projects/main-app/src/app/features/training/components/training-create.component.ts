@@ -1,7 +1,8 @@
-import { Component, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, output, signal, inject, computed, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { VideoInputComponent } from './video-input.component';
 import { Video } from '../models';
+import { TrainingService } from '../services';
 
 /**
  * Component for creating a new training course with quests and objectives
@@ -95,6 +96,24 @@ import { Video } from '../models';
                 ></textarea>
                 @if (questControl.get('description')?.invalid && questControl.get('description')?.touched) {
                   <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label>Niveau de difficulté *</label>
+                <select formControlName="levelId">
+                  <option value="" disabled>Sélectionnez un niveau</option>
+                  @for (level of availableLevels(); track level.id) {
+                    <option [value]="level.id">
+                      {{ level.name }}
+                      @if (level.description) {
+                        - {{ level.description }}
+                      }
+                    </option>
+                  }
+                </select>
+                @if (questControl.get('levelId')?.invalid && questControl.get('levelId')?.touched) {
+                  <span class="field-error">Le niveau de difficulté est obligatoire</span>
                 }
               </div>
 
@@ -286,7 +305,8 @@ import { Video } from '../models';
     }
 
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: 0.75rem;
       border: 2px solid #e0e0e0;
@@ -295,14 +315,21 @@ import { Video } from '../models';
       font-family: inherit;
     }
 
+    .form-group select {
+      cursor: pointer;
+      background-color: white;
+    }
+
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group textarea:focus,
+    .form-group select:focus {
       outline: none;
       border-color: #667eea;
     }
 
     .form-group input.ng-invalid.ng-touched,
-    .form-group textarea.ng-invalid.ng-touched {
+    .form-group textarea.ng-invalid.ng-touched,
+    .form-group select.ng-invalid.ng-touched {
       border-color: #ef4444;
     }
 
@@ -488,6 +515,7 @@ import { Video } from '../models';
 })
 export class TrainingCreateComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly trainingService = inject(TrainingService);
 
   protected readonly trainingCreated = output<{
     title: string;
@@ -499,6 +527,10 @@ export class TrainingCreateComponent {
 
   protected readonly isSubmitting = signal<boolean>(false);
   protected readonly errorMessage = signal<string | null>(null);
+
+  protected readonly availableLevels = computed(() => {
+    return this.trainingService.getLevels();
+  });
 
   private trainingVideo: Video | null = null;
   private questVideos: Map<number, Video | null> = new Map();
@@ -524,6 +556,7 @@ export class TrainingCreateComponent {
     return this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
+      levelId: ['', Validators.required],
       objectives: this.fb.array([])
     });
   }

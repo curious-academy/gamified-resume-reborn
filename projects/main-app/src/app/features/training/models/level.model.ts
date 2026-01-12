@@ -33,6 +33,7 @@ export interface UpdateLevelDto {
   description?: string;
   color?: string;
   order?: number;
+  questIds?: string[]; // Optional: reassign quests to this level
 }
 
 /**

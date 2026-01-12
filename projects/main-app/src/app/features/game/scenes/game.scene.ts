@@ -174,21 +174,17 @@ export class GameScene extends Phaser.Scene {
         // For a rectangle with default origin (0.5, 0.5), we need to position at center
         const centerX = obj.x + obj.width / 2;
         const centerY = obj.y + obj.height / 2;
-        
+
         // Create simple rectangle
         const rect = this.add.rectangle(centerX, centerY, obj.width, obj.height, 0xff0000, 0.5);
-        
+
         // Add static physics
         this.physics.add.existing(rect, true);
-        
+
         // Add to group
         this.walls?.add(rect);
-        
-        console.log(`Wall: ${obj.name} at center (${centerX}, ${centerY}), size ${obj.width}x${obj.height}`);
       }
     });
-
-    console.log(`Total walls: ${this.walls.getLength()}`);
   }
 
 

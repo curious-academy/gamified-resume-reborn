@@ -171,15 +171,16 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    console.log('Tile layer offset:', { x: layer.x, y: layer.y });
+    console.log('Tile layer position:', { x: layer.x, y: layer.y });
 
     // Create physics rectangles for each wall object
     wallsLayer.objects.forEach((wallObject: Phaser.Types.Tilemaps.TiledObject) => {
       if (wallObject.width && wallObject.height && wallObject.x !== undefined && wallObject.y !== undefined) {
-        // Objects from Tiled are already in world coordinates
-        // No need to add layer offset as objects are independent from tile layers
-        const centerX = wallObject.x + wallObject.width / 2;
-        const centerY = wallObject.y + wallObject.height / 2;
+        // Tiled objects can have negative coordinates in infinite maps
+        // But Phaser's createLayer might shift the layer to positive coordinates
+        // We need to match the layer's actual position
+        const centerX = wallObject.x + wallObject.width / 2 + layer.x;
+        const centerY = wallObject.y + wallObject.height / 2 + layer.y;
         
         const wall = this.add.rectangle(
           centerX,
@@ -196,7 +197,11 @@ export class GameScene extends Phaser.Scene {
         // Add to walls group
         this.walls?.add(wall);
 
-        console.log(`✅ Wall: ${wallObject.name} | Tiled pos: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)}) | Center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)}) | Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
+        console.log(`✅ Wall: ${wallObject.name}`);
+        console.log(`   Tiled coord: (${wallObject.x.toFixed(2)}, ${wallObject.y.toFixed(2)})`);
+        console.log(`   Layer offset: (${layer.x}, ${layer.y})`);
+        console.log(`   Final center: (${centerX.toFixed(2)}, ${centerY.toFixed(2)})`);
+        console.log(`   Size: ${wallObject.width.toFixed(2)}x${wallObject.height.toFixed(2)}`);
       }
     });
 

@@ -77,6 +77,26 @@ import { VideoInputComponent } from './video-input.component';
                 />
               </div>
 
+              <div class="form-group">
+                <label for="questLevel">Niveau de difficulté *</label>
+                <select
+                  id="questLevel"
+                  [(ngModel)]="questFormData.levelId"
+                  name="questLevel"
+                  required
+                >
+                  <option value="" disabled>Sélectionnez un niveau</option>
+                  @for (level of availableLevels(); track level.id) {
+                    <option [value]="level.id">
+                      {{ level.name }}
+                      @if (level.description) {
+                        - {{ level.description }}
+                      }
+                    </option>
+                  }
+                </select>
+              </div>
+
               <div class="form-actions">
                 <button type="button" class="btn-secondary" (click)="onCancelQuest()">
                   Annuler
@@ -96,6 +116,11 @@ import { VideoInputComponent } from './video-input.component';
                 <div class="quest-title-section">
                   <span class="quest-order">Quête {{ quest.order }}</span>
                   <h3>{{ quest.title }}</h3>
+                  @if (getLevelByIdHelper(quest.levelId); as level) {
+                    <span class="badge badge-level" [style.background-color]="level.color">
+                      {{ level.name }}
+                    </span>
+                  }
                   @if (quest.isCompleted) {
                     <span class="badge badge-success">✓ Complétée</span>
                   }
@@ -336,13 +361,24 @@ import { VideoInputComponent } from './video-input.component';
     }
 
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
       padding: 0.75rem;
       border: 2px solid #e0e0e0;
       border-radius: 4px;
       font-size: 1rem;
       font-family: inherit;
+    }
+
+    .form-group select {
+      cursor: pointer;
+      background-color: white;
+    }
+
+    .form-group select:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
     }
 
     .form-row {
@@ -526,6 +562,11 @@ import { VideoInputComponent } from './video-input.component';
       font-weight: 600;
     }
 
+    .badge-level {
+      color: white;
+      margin-right: 0.5rem;
+    }
+
     .badge-success {
       background: #10b981;
       color: white;
@@ -599,11 +640,20 @@ export class TrainingDetailComponent {
     return [...training.quests].sort((a, b) => a.order - b.order);
   });
 
+  protected readonly availableLevels = computed(() => {
+    return this.trainingService.getLevels();
+  });
+
   protected readonly progress = computed(() => {
     const training = this.training();
     if (!training || training.totalPoints === 0) return 0;
     return Math.round((training.earnedPoints / training.totalPoints) * 100);
   });
+
+  // Helper method to get level by ID for template
+  protected getLevelByIdHelper(levelId: string) {
+    return this.trainingService.getLevelById(levelId);
+  }
 
   onBack(): void {
     this.trainingService.selectTraining('');

@@ -1,0 +1,220 @@
+<div class="training-detail">
+  @if (training(); as training) {
+    <div class="header">
+      <div class="header-content">
+        <button class="btn-back" (click)="onBack()">← Retour</button>
+        <div>
+          <h1>{{ training.title }}</h1>
+          <div [innerHTML]="training.description"></div>
+        </div>
+      </div>
+      <button class="btn-primary" (click)="onAddQuest()">
+        + Ajouter une Quête
+      </button>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-info">
+        <span class="progress-label">Progression globale</span>
+        <span class="progress-value">{{ progress() }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+      </div>
+      <div class="points-info">
+        {{ training.earnedPoints }} / {{ training.totalPoints }} points
+      </div>
+    </div>
+
+    @if (showQuestForm()) {
+      <div class="quest-form">
+        <h3>{{ editingQuest() ? 'Modifier la quête' : 'Nouvelle quête' }}</h3>
+        <form (ngSubmit)="onSubmitQuest()">
+          <div class="form-group">
+            <label for="questTitle">Titre *</label>
+            <input
+              id="questTitle"
+              type="text"
+              [(ngModel)]="questFormData.title"
+              name="questTitle"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="questDescription">Description *</label>
+            <textarea
+              id="questDescription"
+              [(ngModel)]="questFormData.description"
+              name="questDescription"
+              required
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="questOrder">Ordre</label>
+            <input
+              id="questOrder"
+              type="number"
+              [(ngModel)]="questFormData.order"
+              name="questOrder"
+              min="1"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="onCancelQuest()">
+              Annuler
+            </button>
+            <button type="submit" class="btn-primary">
+              {{ editingQuest() ? 'Modifier' : 'Créer' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+
+    <div class="quests-list">
+      @for (quest of sortedQuests(); track quest.id) {
+        <div class="quest-card" [class.completed]="quest.isCompleted">
+          <div class="quest-header">
+            <div class="quest-title-section">
+              <span class="quest-order">Quête {{ quest.order }}</span>
+              <h3>{{ quest.title }}</h3>
+              @if (quest.isCompleted) {
+                <span class="badge badge-success">✓ Complétée</span>
+              }
+            </div>
+            <div class="quest-actions">
+              <button class="btn-icon" (click)="onEditQuest(quest)">✏️</button>
+              <button class="btn-icon" (click)="onDeleteQuest(quest.id)">🗑️</button>
+              <button class="btn-icon" (click)="toggleQuestExpanded(quest.id)">
+                {{ isQuestExpanded(quest.id) ? '▲' : '▼' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="quest-description" [innerHTML]="quest.description"></div>
+
+          <div class="quest-stats">
+            <span>{{ quest.objectives.length }} objectifs</span>
+            <span>{{ quest.earnedPoints }} / {{ quest.totalPoints }} points</span>
+          </div>
+
+          @if (isQuestExpanded(quest.id)) {
+            <div class="objectives-section">
+              <div class="objectives-header">
+                <h4>Objectifs</h4>
+                <button class="btn-small btn-primary" (click)="onAddObjective(quest.id)">
+                  + Objectif
+                </button>
+              </div>
+
+              @if (showObjectiveForm() && currentQuestId() === quest.id) {
+                <div class="objective-form">
+                  <form (ngSubmit)="onSubmitObjective()">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Titre *</label>
+                        <input
+                          type="text"
+                          [(ngModel)]="objectiveFormData.title"
+                          name="objTitle"
+                          required
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label>Points *</label>
+                        <input
+                          type="number"
+                          [(ngModel)]="objectiveFormData.points"
+                          name="objPoints"
+                          min="1"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label>Description *</label>
+                      <textarea
+                        [(ngModel)]="objectiveFormData.description"
+                        name="objDescription"
+                        required
+                        rows="2"
+                      ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label>Vidéo (optionnelle)</label>
+                      <app-video-input
+                        (videoChange)="onVideoSelected($event)"
+                      ></app-video-input>
+                    </div>
+
+                    <div class="form-actions">
+                      <button type="button" class="btn-secondary" (click)="onCancelObjective()">
+                        Annuler
+                      </button>
+                      <button type="submit" class="btn-primary">
+                        Créer
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              }
+
+              <div class="objectives-list">
+                @for (objective of sortObjectives(quest.objectives); track objective.id) {
+                  <div class="objective-item" [class.completed]="objective.isCompleted">
+                    <div class="objective-checkbox">
+                      <input
+                        type="checkbox"
+                        [checked]="objective.isCompleted"
+                        (change)="onToggleObjective(quest.id, objective.id)"
+                      />
+                    </div>
+                    <div class="objective-content">
+                      <div class="objective-header">
+                        <span class="objective-title">{{ objective.title }}</span>
+                        <span class="objective-points">{{ objective.points }} pts</span>
+                      </div>
+                      <div class="objective-description" [innerHTML]="objective.description"></div>
+                      @if (objective.video) {
+                        <div class="objective-video">
+                          🎥 Vidéo disponible: {{ objective.video.title || objective.video.url }}
+                        </div>
+                      }
+                    </div>
+                    <button class="btn-icon" (click)="onDeleteObjective(quest.id, objective.id)">
+                      🗑️
+                    </button>
+                  </div>
+                } @empty {
+                  <div class="empty-objectives">
+                    Aucun objectif pour cette quête
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <p>Aucune quête disponible</p>
+          <button class="btn-primary" (click)="onAddQuest()">
+            Créer votre première quête
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="no-training">
+      <p>Aucune formation sélectionnée</p>
+      <button class="btn-primary" (click)="onBack()">
+        Retour à la liste
+      </button>
+    </div>
+  }
+</div>

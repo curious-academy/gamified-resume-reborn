@@ -1,0 +1,27 @@
+<div class="loading-screen">
+  <!-- Loading state -->
+  <div class="loading-content" *ngIf="loader.loadingState() === 'loading'">
+    <h1>🎮 Chargement du jeu...</h1>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="loader.loadingProgress()"></div>
+    </div>
+    <p class="progress-text">{{ loader.loadingProgress() }}%</p>
+    <p class="loading-tip">{{ currentTip }}</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="error-content" *ngIf="loader.loadingState() === 'error'">
+    <h1>❌ Erreur de chargement</h1>
+    <p class="error-message">{{ loader.errorMessage() }}</p>
+    <div class="error-actions">
+      <button class="btn-retry" (click)="retry()">🔄 Réessayer</button>
+      <button class="btn-back" (click)="backToMenu()">⬅ Retour au menu</button>
+    </div>
+  </div>
+
+  <!-- Success (auto-redirect, normally invisible) -->
+  <div class="success-content" *ngIf="loader.loadingState() === 'success'">
+    <h1>✅ Chargement terminé !</h1>
+    <p>Lancement du jeu...</p>
+  </div>
+</div>

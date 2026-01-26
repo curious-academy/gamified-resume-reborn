@@ -1,0 +1,192 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "poc-01.json",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "Tous les Fichiers (*)",
+    "fileStates": {
+        "": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "C:/Users/evan/Documents/devtobecurious/test-map.json": {
+            "scale": 0.75,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 463.99999999999994,
+                "y": 1039.3333333333333
+            }
+        },
+        "C:/Users/evan/Documents/devtobecurious/test-map.json#dungeon_tiles_2": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/example_map..tmx": {
+            "scale": 0.18683333333333332,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 2400.5352363960756,
+                "y": 2403.2114183764493
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/example_map..tmx#tilesheet": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/example_map.tmx": {
+            "scale": 0.87578125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 512.114183764496,
+                "y": 512.685102586976
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/example_map.tmx#tilesheet": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/training-course.json": {
+            "scale": 0.8454752604166667,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": -2815.576175258923,
+                "y": -5119.014361067262
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/training-course.json#World map": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test-2.json": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": -502,
+                "y": -512.5
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test-2.json#World Map": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test.json": {
+            "scale": 1.5,
+            "selectedLayer": 5,
+            "viewCenter": {
+                "x": 417,
+                "y": 187.33333333333331
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test.json#World Map": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test.json#World map": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test.tmx": {
+            "scale": 0.27846875,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 1580.069576927393,
+                "y": 1598.0249130288407
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test.tmx#World map": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/world-map.json": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": -3152.5,
+                "y": -5363.5
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/world-map.json#World map": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/world-map.tmx": {
+            "scale": 0.8331054687499999,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 256.270073848318,
+                "y": -676.985113116868
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end/public/assets/map/example_map.tmx": {
+            "scale": 0.5096354166666667,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 212.89729177312222,
+                "y": 800.5723045477772
+            }
+        },
+        "D:/Works/Projects/courses-metavers/front-end/public/assets/map/example_map.tmx#tilesheet": {
+            "scaleInDock": 1
+        },
+        "D:/Works/Projects/courses-metavers/front-end/public/assets/map/world-map.tmx": {
+            "scale": 0.57705078125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 257.34303604670845,
+                "y": -511.22017261804024
+            }
+        },
+        "D:/Works/Projects/curious labs/gamified-resume-reborn/assets/poc-01.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -15.5,
+                "y": 16
+            }
+        },
+        "D:/Works/Projects/curious labs/gamified-resume-reborn/assets/poc-01.json#FieldsTileset": {
+            "scaleInDock": 1
+        },
+        "poc-01.json": {
+            "scale": 0.87578125,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 0.5709188224798254,
+                "y": 0
+            }
+        },
+        "poc-01.json#FieldsTileset": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "poc-01.json#stone": {
+            "dynamicWrapping": true
+        },
+        "poc-01.json#walls": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "D:/Works/Projects/courses-metavers/front-end/public/assets/map",
+    "last.imagePath": "D:/Works/Projects/curious labs/gamified-resume-reborn/assets/craftpix-net-504452-free-village-pixel-tileset-for-top-down-defense/1.1 Tiles",
+    "map.fixedSize": false,
+    "map.lastUsedExportFilter": "Fichiers de carte JSON (*.json)",
+    "map.lastUsedFormat": "json",
+    "map.layerDataFormat": null,
+    "map.renderOrder": null,
+    "openFiles": [
+        "poc-01.json"
+    ],
+    "project": "poc-01.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "poc-01.json",
+        "D:/Works/Projects/curious labs/gamified-resume-reborn/assets/poc-01.json",
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test-2.json",
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/word-map-test.json",
+        "C:/Users/evan/Documents/devtobecurious/test-map.json",
+        "D:/Works/Projects/courses-metavers/front-end-react/the-game/public/assets/map/world-map.json",
+        "D:/Works/Projects/courses-metavers/front-end/public/assets/map/example_map.tmx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    },
+    "tileset.type": 0
+}

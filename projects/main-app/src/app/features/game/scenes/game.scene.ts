@@ -20,7 +20,7 @@ import { GameSceneConfig } from '../config/game-scene.config';
 export class GameScene extends Phaser.Scene {
   private player?: Player;
   private terminal?: Terminal;
-  private walls?: Phaser.Physics.Arcade.StaticGroup;
+  private walls?: Phaser.Tilemaps.TilemapLayer;
   private readonly mapConfig: Required<MapConfig>;
   private readonly terminalService?: TerminalService;
   private readonly dialogService?: DialogService;
@@ -47,6 +47,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload(): void {
+    // Load Tiled map and tilesets
+    this.load.tilemapTiledJSON('map', 'assets/maps/poc-01.json');
+    this.load.image('FieldsTileset', 'assets/tilesets/FieldsTileset.png');
+    this.load.image('walls', 'assets/tilesets/Tileset2.png');
+
     this.createTemporaryAssets();
   }
 
@@ -115,64 +120,29 @@ export class GameScene extends Phaser.Scene {
    * Crée la carte du jeu
    */
   private createMap(): void {
-    const { width, height, tileSize } = this.mapConfig;
+    const map = this.make.tilemap({ key: 'map' });
 
-    // Créer le sol en herbe
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        this.add.image(x * tileSize, y * tileSize, 'grass-temp').setOrigin(0, 0);
-      }
+    const tileset = map.addTilesetImage('FieldsTileset', 'FieldsTileset');
+    const wallsTileset = map.addTilesetImage('walls', 'walls');
+
+    if (!tileset || !wallsTileset) {
+      console.error('Failed to load tilesets');
+      return;
     }
 
-    // Créer les murs
-    this.walls = this.physics.add.staticGroup();
-    this.createBorderWalls();
-    this.createObstacles();
-  }
+    const groundLayer = map.createLayer('Calque de Tuiles 1', [tileset, wallsTileset]);
 
-  /**
-   * Crée les murs de bordure
-   */
-  private createBorderWalls(): void {
-    if (!this.walls) return;
-
-    const { width, height, tileSize } = this.mapConfig;
-
-    // Murs horizontaux (haut et bas)
-    for (let x = 0; x < width; x++) {
-      const topWall = this.add.image(x * tileSize, 0, 'wall-temp').setOrigin(0, 0);
-      const bottomWall = this.add.image(x * tileSize, (height - 1) * tileSize, 'wall-temp').setOrigin(0, 0);
-      this.walls.add(topWall);
-      this.walls.add(bottomWall);
+    if (!groundLayer) {
+      console.error('Failed to create layer');
+      return;
     }
 
-    // Murs verticaux (gauche et droite)
-    for (let y = 1; y < height - 1; y++) {
-      const leftWall = this.add.image(0, y * tileSize, 'wall-temp').setOrigin(0, 0);
-      const rightWall = this.add.image((width - 1) * tileSize, y * tileSize, 'wall-temp').setOrigin(0, 0);
-      this.walls.add(leftWall);
-      this.walls.add(rightWall);
-    }
-  }
+    // Set collision on wall tiles
+    groundLayer.setCollisionBetween(65, 105, true);
+    const wallTileGIDs = [65, 66, 67, 68, 73, 81, 89, 97, 105];
+    wallTileGIDs.forEach(gid => groundLayer.setCollision(gid, true));
 
-  /**
-   * Crée les obstacles dans la carte
-   */
-  private createObstacles(): void {
-    if (!this.walls) return;
-
-    const { tileSize } = this.mapConfig;
-
-    const obstacles = [
-      { x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 },
-      { x: 15, y: 8 }, { x: 16, y: 8 },
-      { x: 10, y: 12 }, { x: 11, y: 12 }, { x: 12, y: 12 },
-    ];
-
-    obstacles.forEach(pos => {
-      const obstacle = this.add.image(pos.x * tileSize, pos.y * tileSize, 'wall-temp').setOrigin(0, 0);
-      this.walls?.add(obstacle);
-    });
+    this.walls = groundLayer;
   }
 
   /**
@@ -187,7 +157,6 @@ export class GameScene extends Phaser.Scene {
    */
   private createTerminal(): void {
     const { tileSize } = this.mapConfig;
-    // Positionner le terminal à une position visible dans la carte
     this.terminal = new Terminal(this, 12 * tileSize, 10 * tileSize, {
       size: tileSize,
       proximityRadius: tileSize * 2.5

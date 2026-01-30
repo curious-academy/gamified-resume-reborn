@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal,inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, catchError, tap } from 'rxjs';
 import { GameData, DialogData, NpcData, ItemData } from '../models/game-data.models';
@@ -9,6 +9,8 @@ export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
   providedIn: 'root'
 })
 export class GameDataLoaderService {
+  //Modern patter:
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5000/api/game-data';
 
   // State management
@@ -24,7 +26,7 @@ export class GameDataLoaderService {
   // Metadata
   private loadedAt: Date | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   /**
    * Load all game data - Called by LoadingScreenComponent

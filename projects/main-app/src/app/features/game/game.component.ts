@@ -25,6 +25,7 @@ export class GameComponent implements OnDestroy {
   protected readonly isLoading = signal<boolean>(true);
 
   constructor() {
+    console.log('🎮 GameComponent constructor - initializing game');
     this.initializeGame();
   }
 
@@ -42,7 +43,12 @@ export class GameComponent implements OnDestroy {
   private initializeGame(): void {
     // Start a new game session
     const gameId = `game-${Date.now()}`;
+    console.log('🚀 Starting session:', gameId);
     this.gameSessionStore.startSession(gameId);
+    console.log('📊 Session started, store state:', {
+      isActive: this.gameSessionStore.isSessionActive(),
+      sessionStatus: this.gameSessionStore.session().status
+    });
 
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
@@ -74,11 +80,13 @@ export class GameComponent implements OnDestroy {
       antialias: false,
       callbacks: {
         postBoot: () => {
+          console.log('✅ Phaser postBoot callback - game ready');
           this.isLoading.set(false);
         }
       }
     };
 
+    console.log('🎲 Initializing Phaser with config');
     this.phaserService.initGame(config);
   }
 

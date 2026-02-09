@@ -1,6 +1,6 @@
 import { Component, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import Phaser from 'phaser';
-import { injectDispatch, provideDispatcher } from '@ngrx/signals/events';
+import { Dispatcher } from '@ngrx/signals/events';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
 import { DialogService } from '../../core/services/dialog.service';
@@ -16,8 +16,7 @@ import { GameScene } from './scenes/game.scene';
   selector: 'app-game',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.scss'],
-  providers: [provideDispatcher()]
+  styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnDestroy {
   private readonly phaserService = inject(PhaserService);
@@ -25,7 +24,7 @@ export class GameComponent implements OnDestroy {
   private readonly dialogService = inject(DialogService);
   private readonly gameDataLoader = inject(GameDataLoaderService);
   private readonly gameSessionStore = inject(GameSessionStore);
-  private readonly dispatch = injectDispatch(gameSessionEvents);
+  private readonly dispatcher = inject(Dispatcher);
   protected readonly isLoading = signal<boolean>(true);
 
   constructor() {
@@ -36,7 +35,7 @@ export class GameComponent implements OnDestroy {
     this.phaserService.destroyGame();
     // Pause session when leaving the game
     if (this.gameSessionStore.isSessionActive()) {
-      this.dispatch.sessionPaused();
+      this.dispatcher.dispatch(gameSessionEvents.sessionPaused());
     }
   }
 
@@ -46,7 +45,7 @@ export class GameComponent implements OnDestroy {
   private initializeGame(): void {
     // Start a new game session
     const gameId = `game-${Date.now()}`;
-    this.dispatch.sessionStarted({ gameId, playerId: 'player-1' });
+    this.dispatcher.dispatch(gameSessionEvents.sessionStarted({ gameId, playerId: 'player-1' }));
 
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,

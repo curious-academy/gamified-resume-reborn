@@ -70,23 +70,76 @@ withEventHandlers(
 )
 ```
 
-3. **State Transitions with withReducer** (optional but recommended)
+3. **State Transitions with withReducer** (REQUIRED for state updates)
 ```typescript
 import { on, withReducer } from '@ngrx/signals/events';
 
+// CRITICAL: Use withReducer with on() for ALL state updates in response to events
 withReducer(
+  // Simple state update
   on(featureEvents.queryChanged, ({ payload: query }) => ({
     filter: { query },
   })),
   
+  // Access current state via second parameter
+  on(featureEvents.itemSelected, ({ payload: id }, state) => ({
+    selectedItem: state.items.find(item => item.id === id) ?? null,
+  })),
+  
+  // Multiple state updates
   on(apiEvents.loadSuccess, ({ payload: items }) => ({
     items,
     isLoading: false,
-  }))
+    error: null,
+  })),
+  
+  // Conditional logic with state access
+  on(featureEvents.experienceGained, ({ payload: amount }, state) => {
+    const newExp = state.experience + amount;
+    if (newExp >= 100) {
+      return {
+        experience: newExp - 100,
+        level: state.level + 1,
+      };
+    }
+    return { experience: newExp };
+  })
 )
 ```
 
-4. **Event Dispatching with Dispatcher** (in methods or hooks)
+4. **Side Effects with withEventHandlers** (ONLY for impure operations)
+```typescript
+import { Events, withEventHandlers } from '@ngrx/signals/events';
+import { switchMap, tap } from 'rxjs';
+import { mapResponse } from '@ngrx/operators';
+
+// CRITICAL: Use withEventHandlers ONLY for side effects (API calls, logging, etc.)
+withEventHandlers(
+  (store, events = inject(Events), service = inject(SomeService)) => ({
+    // API call side effect
+    loadData$: events
+      .on(featureEvents.opened, featureEvents.queryChanged)
+      .pipe(
+        switchMap(() =>
+          service.getData(store.query()).pipe(
+            mapResponse({
+              next: (data) => apiEvents.loadSuccess(data),
+              error: (error: { message: string }) =>
+                apiEvents.loadFailure(error.message),
+            })
+          )
+        )
+      ),
+    
+    // Logging side effect
+    logError$: events
+      .on(apiEvents.loadFailure)
+      .pipe(tap(({ payload }) => console.error(payload))),
+  })
+)
+```
+
+5. **Event Dispatching with Dispatcher** (in methods or hooks)
 ```typescript
 // In withMethods
 withMethods((store, dispatcher = inject(Dispatcher)) => ({
@@ -104,7 +157,7 @@ withHooks({
 })
 ```
 
-5. **Component Integration with injectDispatch**
+6. **Component Integration with injectDispatch**
 ```typescript
 import { injectDispatch } from '@ngrx/signals/events';
 
@@ -131,31 +184,129 @@ export class FeatureComponent {
    ↓ dispatcher.dispatch(event) or dispatch.eventName()
 [Dispatcher] 
    ↓ broadcasts event
+[State Transitions (withReducer)] 
+   ↓ on() catches events and updates state FIRST
+   ↓ pure state updates (no side effects)
 [Event Handlers (withEventHandlers)] 
-   ↓ events.on() listens and reacts
+   ↓ events.on() listens and reacts AFTER state is updated
    ↓ performs side effects (API calls, logging, etc.)
-   ↓ returns new events if needed
-[State Transitions (withReducer)]
-   ↓ on() catches events and updates state
-[State Updated]
+   ↓ can dispatch new events (success/failure)
+[State Updated (if handlers dispatch new events)]
    ↓ signals react
 [Component Re-renders]
 ```
 
+**Key Points:**
+- **withReducer runs BEFORE withEventHandlers** (state updates happen first)
+- **withReducer** = synchronous, pure state transitions
+- **withEventHandlers** = asynchronous, impure side effects
+
 #### Critical Rules for Event-Driven Architecture
 
+**⚠️ MOST IMPORTANT RULE: withReducer vs withEventHandlers**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  withReducer          →  State Transitions (PURE)          │
+│    - Modify state in response to events                    │
+│    - NO side effects                                        │
+│    - NO API calls                                           │
+│    - NO logging                                             │
+│    - Return partial state objects                           │
+│                                                             │
+│  withEventHandlers    →  Side Effects (IMPURE)             │
+│    - API calls via services                                 │
+│    - Logging                                                │
+│    - External communications                                │
+│    - Return observables ($)                                 │
+│    - CAN dispatch new events (e.g., success/failure)       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Decision Tree:**
+```
+Need to update state in response to an event?
+│
+├─ State update ONLY (no API, no logging)
+│  → Use withReducer with on()
+│  → Example: on(userSelected, ({ payload }) => ({ selectedUser: payload }))
+│
+└─ Need side effects (API, logging, etc.)
+   → Use withEventHandlers with events.on()
+   → Example: events.on(pageOpened).pipe(switchMap(() => api.getData()))
+```
+
+**Examples:**
+
+❌ **WRONG - Using withEventHandlers for state transitions:**
+```typescript
+withEventHandlers((store, events = inject(Events)) => ({
+  onUserSelected$: events.on(userSelected).pipe(
+    tap(({ payload }) => {
+      patchState(store, { selectedUser: payload }); // ❌ DON'T DO THIS
+    })
+  ),
+}))
+```
+
+✅ **CORRECT - Using withReducer for state transitions:**
+```typescript
+withReducer(
+  on(userSelected, ({ payload }) => ({
+    selectedUser: payload, // ✅ Pure state update
+  }))
+)
+```
+
+❌ **WRONG - Using withReducer for API calls:**
+```typescript
+withReducer(
+  on(pageOpened, () => {
+    api.getData(); // ❌ Side effect in reducer!
+    return { isLoading: true };
+  })
+)
+```
+
+✅ **CORRECT - Using withEventHandlers for API calls:**
+```typescript
+withEventHandlers((store, events = inject(Events), api = inject(ApiService)) => ({
+  loadData$: events.on(pageOpened).pipe(
+    switchMap(() => api.getData().pipe( // ✅ Side effect in handler
+      mapResponse({
+        next: (data) => apiEvents.loadSuccess(data),
+        error: (error) => apiEvents.loadFailure(error.message),
+      })
+    ))
+  ),
+}))
+
+// Then handle the result in withReducer
+withReducer(
+  on(pageOpened, () => ({ isLoading: true })),
+  on(apiEvents.loadSuccess, ({ payload }) => ({
+    data: payload,
+    isLoading: false,
+  }))
+)
+```
+
+#### General Rules
+
 1. ✅ **ALWAYS** use `eventGroup` with `type<>()` for event definitions
-2. ✅ **ALWAYS** import `Events` from `'@ngrx/signals/events'`
-3. ✅ **ALWAYS** inject `Events` in `withEventHandlers`: `events = inject(Events)`
-4. ✅ **ALWAYS** return observables ending in `$` from event handlers
-5. ✅ **ALWAYS** use `events.on()` to listen to events (NOT `events.eventName`)
-6. ✅ **ALWAYS** inject `Dispatcher` when dispatching events in methods/hooks
-7. ✅ **ALWAYS** use `dispatcher.dispatch(event())` for manual dispatching
-8. ✅ **ALWAYS** use `injectDispatch()` in components for cleaner syntax
-9. ✅ Use `withReducer` with `on()` for state transitions (declarative)
-10. ✅ Use `withEventHandlers` for side effects (API calls, logging, etc.)
-11. ❌ **NEVER** call event creators directly without dispatching
-12. ❌ **NEVER** use `patchState` directly in methods - dispatch events instead
+2. ✅ **ALWAYS** use `withReducer` with `on()` for **state transitions** (pure functions)
+3. ✅ **ALWAYS** use `withEventHandlers` with `events.on()` for **side effects** (API, logging)
+4. ✅ **ALWAYS** import `Events` from `'@ngrx/signals/events'` when using withEventHandlers
+5. ✅ **ALWAYS** inject `Events` in `withEventHandlers`: `events = inject(Events)`
+6. ✅ **ALWAYS** return observables ending in `$` from event handlers
+7. ✅ **ALWAYS** inject `Dispatcher` when dispatching events in methods/hooks
+8. ✅ **ALWAYS** use `dispatcher.dispatch(event())` for manual dispatching
+9. ✅ **ALWAYS** use `injectDispatch()` in components for cleaner syntax
+10. ✅ In `withReducer`, access current state via second parameter: `on(event, ({ payload }, state) => ({ ... }))`
+11. ❌ **NEVER** use `patchState` in `withEventHandlers` - use `withReducer` instead
+12. ❌ **NEVER** perform side effects in `withReducer` - use `withEventHandlers` instead
+13. ❌ **NEVER** call event creators directly without dispatching
+14. ❌ **NEVER** skip the Events plugin - event-driven architecture is mandatory
 13. ❌ **NEVER** skip the Events plugin - it's mandatory
 
 ### 1. Store Creation/Verification
@@ -241,12 +392,12 @@ withComputed(({ items, filter }) => ({
 
 ### 5. Signal Dependencies with withLinkedState
 
-**CRITICAL: Use `withLinkedState` when a signal depends on another signal AND needs to be updatable**
+**CRITICAL: Use `withLinkedState` when a signal depends on another signal AND needs to be updatable by dispatching events**
 
 #### Decision Tree: withComputed vs withLinkedState
 
 ```
-Does the value need to be UPDATED via patchState?
+Does the value need to be UPDATED by dispatching events?
 │
 ├─ YES → Use withLinkedState
 │   │
@@ -276,8 +427,8 @@ withLinkedState(({ options, items }) => ({
   },
 }))
 
-// Later you can update it:
-// patchState(store, { selectedOption: newValue })
+// Later you can update it by dispatching an event:
+// dispatcher.dispatch(featureEvents.optionChanged(newValue))
 ```
 
 #### Explicit Linking (Complex Computation with Previous Value)
@@ -352,7 +503,6 @@ export const featureApiEvents = eventGroup({
 import { computed, inject } from '@angular/core';
 import { linkedSignal } from '@angular/core';
 import {
-  patchState,
   signalStore,
   withState,
   withLinkedState,
@@ -468,13 +618,11 @@ export const FeatureStore = signalStore(
     })
   ),
   
-  // 6. Methods (optional, for imperative control)
-  withMethods((store) => ({
+  // 6. Methods (optional, for dispatching events imperatively)
+  withMethods((store, dispatcher = inject(Dispatcher)) => ({
     selectItemById(id: number): void {
-      const item = store.items().find(i => i.id === id);
-      if (item) {
-        patchState(store, { selectedItem: item });
-      }
+      // Dispatch event instead of using patchState directly
+      dispatcher.dispatch(featureEvents.itemSelected(id));
     },
   })),
   
@@ -590,7 +738,7 @@ feature/
 5. ✅ Use descriptive event names: `queryChanged`, not `change`
 
 ### Linked State vs Computed
-1. ✅ Use `withLinkedState` when the value needs to be updatable via `patchState`
+1. ✅ Use `withLinkedState` when the value needs to be updatable by dispatching events
 2. ✅ Use `withComputed` for read-only derived values
 3. ✅ Use implicit linking for simple derivations
 4. ✅ Use explicit linking (`linkedSignal`) when you need:

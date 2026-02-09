@@ -861,6 +861,70 @@ export class PhaserService {
 
 ---
 
+## 🔧 Special Workflow: Skills, Instructions & Configuration Files
+
+### When to Use This Workflow
+
+Use this workflow when modifying:
+- Skills files (`.github/skills/**/*.md`)
+- Copilot instructions (`.github/copilot-instructions.md`, `.github/instructions/**/*.md`)
+- Configuration files (`angular.json`, `package.json`, `tsconfig.json`, etc.)
+- Documentation files (`README.md`, `GUIDE.md`, etc.)
+
+### Process (MANDATORY)
+
+**⚠️ CRITICAL: These files do NOT require `ng build` but MUST be committed immediately**
+
+#### Step 1: Make the Modification
+- Update the file with the requested changes
+- Ensure the content is clear and well-formatted
+- Verify syntax if applicable (JSON, Markdown, etc.)
+
+#### Step 2: Immediate Commit (MANDATORY)
+```
+🔧 Action: Commit immediately after modification
+
+Commit Types by File:
+- Skills/Instructions: docs(skills) or docs(instructions)
+- Configuration: chore(config)
+- Documentation: docs(readme) or docs(guide)
+
+Example commit messages:
+- "docs(skills): update ngrx store organization with dedicated store folder"
+- "docs(instructions): add automatic commit rule for skills"
+- "chore(config): update tsconfig for strict mode"
+- "docs(readme): add state management documentation"
+
+STEP 2.1 - Stage Files:
+   git add [modified-files]
+   
+STEP 2.2 - Commit with Conventional Message:
+   git commit -m "<type>(<scope>): <description>"
+   
+STEP 2.3 - Verify Commit:
+   git status (should show "working tree clean")
+```
+
+#### Step 3: Confirmation Message
+```
+📝 Message to user (in French):
+"✅ Modification effectuée !
+💾 Commit: [commit-message]
+
+✨ Changements sauvegardés !"
+```
+
+### Key Rules
+
+1. ✅ **ALWAYS commit immediately** after modifying skills/instructions/config
+2. ✅ **NO BUILD REQUIRED** for these files (they are not part of the application code)
+3. ✅ **Use appropriate commit type**: `docs` for documentation, `chore` for config
+4. ✅ **Use descriptive scope**: skills, instructions, config, readme, etc.
+5. ❌ **NEVER accumulate changes** - commit each modification separately
+6. ❌ **NEVER skip the commit** - it's mandatory even for "small" changes
+
+---
+
 ## ⚠️ Important Reminders
 
 1. **ALWAYS detect the task type** (feature vs technical) before starting

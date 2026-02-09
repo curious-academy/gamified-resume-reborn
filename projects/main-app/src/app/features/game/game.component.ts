@@ -77,7 +77,9 @@ export class GameComponent implements OnDestroy {
         terminalService: this.terminalService,
         dialogService: this.dialogService,
         gameDataLoader: this.gameDataLoader,
-        gameSessionStore: this.gameSessionStore
+        gameSessionStore: this.gameSessionStore,
+        dispatcher: this.dispatcher,
+        gameEvents: gameSessionEvents
       }),
       pixelArt: true,
       antialias: false,

@@ -24,11 +24,35 @@ Always follow this sequence when creating a store:
 
 1. **Analyze the model** - Understand data structure, dependencies, and events
 2. **Define types** - Create explicit TypeScript interfaces
-3. **Define events** - Use `eventGroup` with `type<>()`
-4. **Create store** - Use `signalStore()` with proper feature composition
-5. **Integrate** - Provide and inject in components
+3. **Create store folder** - Create `store/` directory inside feature folder
+4. **Define events** - Use `eventGroup` with `type<>()` in `store/feature.events.ts`
+5. **Create store** - Use `signalStore()` in `store/index.ts` with proper feature composition
+6. **Integrate** - Provide and inject in components
 
-### 2. Event Management with eventGroup
+### 2. Folder Structure (MANDATORY)
+
+**Every feature MUST follow this structure:**
+
+```
+feature/
+├── models/                       # Domain models only (entities, DTOs)
+│   └── feature.model.ts
+├── services/                     # API/Business services
+│   └── feature.service.ts
+├── store/                        # ⭐ State management (REQUIRED)
+│   ├── index.ts                  # State interface + initial state + signal store
+│   └── feature.events.ts         # Event groups
+├── feature.component.ts
+└── feature.component.html
+```
+
+**Key Rules:**
+- ✅ State interface lives in `store/index.ts` (NOT in models/)
+- ✅ Events live in `store/feature.events.ts` (separate file)
+- ✅ Store is exported from `store/index.ts`
+- ✅ Import as: `import { FeatureStore } from './store';`
+
+### 3. Event Management with eventGroup
 
 **CRITICAL: Always use `type<>()` syntax, NEVER use `payload<>()` or `emptyProps()`**
 
@@ -50,7 +74,7 @@ export const featureEvents = eventGroup({
 });
 ```
 
-### 3. Computed Signals with withComputed
+### 4. Computed Signals with withComputed
 
 Use `withComputed` for **read-only derived values** that don't need to be updated via `patchState`:
 
@@ -75,7 +99,7 @@ withComputed(({ items, filter }) => ({
 }))
 ```
 
-### 4. Signal Dependencies with withLinkedState
+### 5. Signal Dependencies with withLinkedState
 
 **CRITICAL: Use `withLinkedState` when a signal depends on another signal AND needs to be updatable**
 
@@ -143,7 +167,7 @@ withLinkedState(({ options }) => ({
 
 ### Step-by-Step Process
 
-#### 1. Define Model Types
+#### 1. Define Domain Models (if needed)
 
 ```typescript
 // models/feature.model.ts
@@ -152,22 +176,12 @@ export interface Item {
   name: string;
   status: 'active' | 'inactive';
 }
-
-export type FeatureState = {
-  items: Item[];
-  isLoading: boolean;
-  error: string | null;
-  filter: {
-    query: string;
-    status: 'all' | 'active' | 'inactive';
-  };
-};
 ```
 
 #### 2. Define Events
 
 ```typescript
-// events/feature.events.ts
+// store/feature.events.ts
 import { type } from '@ngrx/signals';
 import { eventGroup } from '@ngrx/signals/events';
 import { Item } from '../models/feature.model';
@@ -191,10 +205,10 @@ export const featureApiEvents = eventGroup({
 });
 ```
 
-#### 3. Create Store with Proper Feature Composition
+#### 3. Create Store in store/index.ts
 
 ```typescript
-// feature.store.ts
+// store/index.ts
 import { computed, inject } from '@angular/core';
 import { linkedSignal } from '@angular/core';
 import {
@@ -215,7 +229,22 @@ import {
 } from '@ngrx/signals/events';
 import { mapResponse } from '@ngrx/operators';
 import { switchMap, tap } from 'rxjs';
+import { Item } from '../models/feature.model';
+import { FeatureService } from '../services/feature.service';
+import { featureEvents, featureApiEvents } from './feature.events';
 
+// State interface
+export type FeatureState = {
+  items: Item[];
+  isLoading: boolean;
+  error: string | null;
+  filter: {
+    query: string;
+    status: 'all' | 'active' | 'inactive';
+  };
+};
+
+// Initial state
 const initialState: FeatureState = {
   items: [],
   isLoading: false,
@@ -223,6 +252,7 @@ const initialState: FeatureState = {
   filter: { query: '', status: 'all' },
 };
 
+// Signal Store
 export const FeatureStore = signalStore(
   // 1. Base state
   withState(initialState),
@@ -327,8 +357,8 @@ export const FeatureStore = signalStore(
 // feature.component.ts
 import { Component, inject } from '@angular/core';
 import { injectDispatch } from '@ngrx/signals/events';
-import { FeatureStore } from './feature.store';
-import { featureEvents } from './events/feature.events';
+import { FeatureStore } from './store'; // Import from store folder
+import { featureEvents } from './store/feature.events';
 
 @Component({
   selector: 'app-feature',
@@ -378,20 +408,39 @@ export class FeatureComponent {
 
 ## File Structure
 
+**CRITICAL: Always organize stores in a dedicated `store/` folder per feature**
+
 ```
 feature/
 ├── models/
-│   ├── feature.model.ts          # Interfaces/types
-│   └── feature-state.model.ts    # State type
-├── events/
-│   └── feature.events.ts         # Event groups
+│   └── feature.model.ts          # Domain models (entities, DTOs)
 ├── services/
 │   └── feature.service.ts        # API services
-├── feature.store.ts              # Signal Store
+├── store/
+│   ├── index.ts                  # State interface, initial state, signal store (exported)
+│   └── feature.events.ts         # Event groups
 └── feature.component.ts          # Component using store
 ```
 
+### Store Organization Rules
+
+1. ✅ **ALWAYS** create a `store/` folder inside the feature folder
+2. ✅ **ALWAYS** export the store from `store/index.ts`
+3. ✅ **State interface** goes in `store/index.ts` (not in models/)
+4. ✅ **Events** go in `store/feature.events.ts` (dedicated file)
+5. ✅ **Domain models** (entities, DTOs) go in `models/` folder
+6. ✅ Import the store as: `import { FeatureStore } from './store';`
+
 ## Critical Rules
+
+### File Organization
+1. ✅ **ALWAYS** create a `store/` folder inside the feature folder
+2. ✅ **ALWAYS** put state interface, initial state, and signal store in `store/index.ts`
+3. ✅ **ALWAYS** put events in `store/feature.events.ts` (separate file)
+4. ✅ **ALWAYS** export the store from `store/index.ts` for clean imports
+5. ✅ Import store as: `import { FeatureStore } from './store';`
+6. ✅ Import events as: `import { featureEvents } from './store/feature.events';`
+7. ❌ **NEVER** put state types in the `models/` folder (only domain models go there)
 
 ### Event Definitions
 1. ✅ **ALWAYS** use `type<>()` for defining event payloads
@@ -439,13 +488,28 @@ signalStore(
 
 Before completing store creation/modification:
 
+**File Structure:**
+- [ ] `store/` folder exists inside feature folder
+- [ ] `store/index.ts` contains state interface, initial state, and signal store
+- [ ] `store/feature.events.ts` contains all event definitions
+- [ ] Store is exported from `store/index.ts`
+- [ ] Component imports from `./store` (not a specific file)
+
+**Type Safety:**
 - [ ] All state properties have explicit types
 - [ ] All events use `type<>()` syntax
+- [ ] No `any` types used
+
+**Store Composition:**
 - [ ] Dependencies between signals use `withLinkedState`
 - [ ] Read-only derived values use `withComputed`
 - [ ] Event handlers perform side effects correctly
+
+**Integration:**
 - [ ] Store is provided at component level
 - [ ] Events are dispatched using `injectDispatch()`
+
+**Code Quality:**
 - [ ] Code builds without errors
 - [ ] No unused imports or variables
 

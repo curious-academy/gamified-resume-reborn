@@ -67,7 +67,6 @@ export const GameSessionStore = signalStore(
   withReducer(
     // Session lifecycle
     on(gameSessionEvents.sessionStarted, ({ payload }) => {
-      console.log('🔄 REDUCER: sessionStarted event received', payload);
       const now = new Date();
       return {
         session: {
@@ -239,9 +238,7 @@ export const GameSessionStore = signalStore(
      * Start a new game session
      */
     startSession(gameId: string, playerId: string = 'player-1'): void {
-      console.log('📤 STORE METHOD: startSession called, dispatching event', { gameId, playerId });
       dispatcher.dispatch(gameSessionEvents.sessionStarted({ gameId, playerId }));
-      console.log('📤 STORE METHOD: event dispatched');
     },
 
     /**

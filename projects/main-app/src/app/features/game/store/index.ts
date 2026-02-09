@@ -1,12 +1,14 @@
-import { computed } from '@angular/core';
+import { computed, inject } from '@angular/core';
 import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals';
+import { Events, Dispatcher, withEventHandlers } from '@ngrx/signals/events';
+import { tap } from 'rxjs';
 import {
   GameSession,
   PlayerState,
   Position,
   InventoryItem,
-  SessionStatus,
 } from '../models/game-session.model';
+import { gameSessionEvents } from './game-session.events';
 
 /**
  * Game session state interface
@@ -40,244 +42,337 @@ const initialState: GameSessionState = {
 
 /**
  * Game Session Store
- * Manages the current game session and player state
+ * Manages the current game session and player state using event-driven architecture
  */
 export const GameSessionStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
   // Computed signals for derived state
-  withComputed((state) => ({
-    isSessionActive: computed(() => state.session().status === 'active'),
-    isSessionPaused: computed(() => state.session().status === 'paused'),
-    isSessionIdle: computed(() => state.session().status === 'idle'),
-    playerLevel: computed(() => state.player().level),
-    playerExperience: computed(() => state.player().experience),
-    playerHealth: computed(() => state.player().health),
-    playerMaxHealth: computed(() => state.player().maxHealth),
-    playerPosition: computed(() => state.player().position),
-    inventoryCount: computed(() => state.player().inventory.length),
-    hasItems: computed(() => state.player().inventory.length > 0),
-    isPlayerMoving: computed(() => state.player().isMoving),
-    playerDirection: computed(() => state.player().direction),
+  withComputed(({ session, player }) => ({
+    isSessionActive: computed(() => session().status === 'active'),
+    isSessionPaused: computed(() => session().status === 'paused'),
+    isSessionIdle: computed(() => session().status === 'idle'),
+    playerLevel: computed(() => player().level),
+    playerExperience: computed(() => player().experience),
+    playerHealth: computed(() => player().health),
+    playerMaxHealth: computed(() => player().maxHealth),
+    playerPosition: computed(() => player().position),
+    inventoryCount: computed(() => player().inventory.length),
+    hasItems: computed(() => player().inventory.length > 0),
+    isPlayerMoving: computed(() => player().isMoving),
+    playerDirection: computed(() => player().direction),
   })),
 
-  // Methods for state management
-  withMethods((store) => ({
+  // Event handlers - React to events using reactive streams
+  withEventHandlers((store, events = inject(Events)) => ({
+    // Session lifecycle handlers
+    onSessionStarted$: events.on(gameSessionEvents.sessionStarted).pipe(
+      tap(({ payload }) => {
+        const now = new Date();
+        patchState(store, {
+          session: {
+            gameId: payload.gameId,
+            playerId: payload.playerId,
+            status: 'active',
+            startedAt: now,
+            lastSaveAt: undefined,
+            pausedAt: undefined,
+            completedAt: undefined,
+          },
+        });
+      })
+    ),
+
+    onSessionPaused$: events.on(gameSessionEvents.sessionPaused).pipe(
+      tap(() => {
+        patchState(store, {
+          session: {
+            ...store.session(),
+            status: 'paused',
+            pausedAt: new Date(),
+          },
+        });
+      })
+    ),
+
+    onSessionResumed$: events.on(gameSessionEvents.sessionResumed).pipe(
+      tap(() => {
+        patchState(store, {
+          session: {
+            ...store.session(),
+            status: 'active',
+            pausedAt: undefined,
+          },
+        });
+      })
+    ),
+
+    onSessionCompleted$: events.on(gameSessionEvents.sessionCompleted).pipe(
+      tap(() => {
+        patchState(store, {
+          session: {
+            ...store.session(),
+            status: 'completed',
+            completedAt: new Date(),
+          },
+        });
+      })
+    ),
+
+    onSessionSaved$: events.on(gameSessionEvents.sessionSaved).pipe(
+      tap(() => {
+        patchState(store, {
+          session: {
+            ...store.session(),
+            lastSaveAt: new Date(),
+          },
+        });
+      })
+    ),
+
+    // Player state handlers
+    onPlayerMoved$: events.on(gameSessionEvents.playerMoved).pipe(
+      tap(({ payload }) => {
+        patchState(store, {
+          player: {
+            ...store.player(),
+            position: payload,
+          },
+        });
+      })
+    ),
+
+    onPlayerDirectionChanged$: events.on(gameSessionEvents.playerDirectionChanged).pipe(
+      tap(({ payload }) => {
+        patchState(store, {
+          player: {
+            ...store.player(),
+            direction: payload,
+          },
+        });
+      })
+    ),
+
+    onPlayerMovementStatusChanged$: events.on(gameSessionEvents.playerMovementStatusChanged).pipe(
+      tap(({ payload }) => {
+        patchState(store, {
+          player: {
+            ...store.player(),
+            isMoving: payload,
+          },
+        });
+      })
+    ),
+
+    // Player stats handlers
+    onExperienceGained$: events.on(gameSessionEvents.experienceGained).pipe(
+      tap(({ payload }) => {
+        const currentExp = store.player().experience;
+        const currentLevel = store.player().level;
+        const newExp = currentExp + payload;
+        const expForNextLevel = currentLevel * 100;
+
+        if (newExp >= expForNextLevel) {
+          patchState(store, {
+            player: {
+              ...store.player(),
+              experience: newExp - expForNextLevel,
+              level: currentLevel + 1,
+              maxHealth: store.player().maxHealth + 10,
+              health: store.player().maxHealth + 10,
+            },
+          });
+        } else {
+          patchState(store, {
+            player: {
+              ...store.player(),
+              experience: newExp,
+            },
+          });
+        }
+      })
+    ),
+
+    onLevelUp$: events.on(gameSessionEvents.levelUp).pipe(
+      tap(({ payload }) => {
+        patchState(store, {
+          player: {
+            ...store.player(),
+            level: payload,
+            maxHealth: store.player().maxHealth + 10,
+            health: store.player().maxHealth + 10,
+          },
+        });
+      })
+    ),
+
+    onHealthChanged$: events.on(gameSessionEvents.healthChanged).pipe(
+      tap(({ payload }) => {
+        patchState(store, {
+          player: {
+            ...store.player(),
+            health: Math.max(0, Math.min(payload.current, payload.max)),
+            maxHealth: payload.max,
+          },
+        });
+      })
+    ),
+
+    // Inventory handlers
+    onItemCollected$: events.on(gameSessionEvents.itemCollected).pipe(
+      tap(({ payload }) => {
+        const inventory = [...store.player().inventory];
+        const existingItem = inventory.find((i) => i.id === payload.id);
+
+        if (existingItem) {
+          existingItem.quantity += payload.quantity;
+        } else {
+          inventory.push(payload);
+        }
+
+        patchState(store, {
+          player: {
+            ...store.player(),
+            inventory,
+          },
+        });
+      })
+    ),
+
+    onItemUsed$: events.on(gameSessionEvents.itemUsed).pipe(
+      tap(({ payload }) => {
+        const inventory = [...store.player().inventory];
+        const itemIndex = inventory.findIndex((i) => i.id === payload);
+
+        if (itemIndex !== -1) {
+          inventory[itemIndex].quantity -= 1;
+          if (inventory[itemIndex].quantity <= 0) {
+            inventory.splice(itemIndex, 1);
+          }
+        }
+
+        patchState(store, {
+          player: {
+            ...store.player(),
+            inventory,
+          },
+        });
+      })
+    ),
+
+    onItemRemoved$: events.on(gameSessionEvents.itemRemoved).pipe(
+      tap(({ payload }) => {
+        const inventory = store.player().inventory.filter((i) => i.id !== payload);
+
+        patchState(store, {
+          player: {
+            ...store.player(),
+            inventory,
+          },
+        });
+      })
+    ),
+  })),
+
+  // Public methods to dispatch events (components call these)
+  withMethods((store, dispatcher = inject(Dispatcher)) => ({
     /**
      * Start a new game session
      */
     startSession(gameId: string, playerId: string = 'player-1'): void {
-      const now = new Date();
-      patchState(store, {
-        session: {
-          gameId,
-          playerId,
-          status: 'active',
-          startedAt: now,
-          lastSaveAt: undefined,
-          pausedAt: undefined,
-          completedAt: undefined,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.sessionStarted({ gameId, playerId }));
     },
 
     /**
      * Pause the current session
      */
     pauseSession(): void {
-      patchState(store, {
-        session: {
-          ...store.session(),
-          status: 'paused',
-          pausedAt: new Date(),
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.sessionPaused());
     },
 
     /**
      * Resume the paused session
      */
     resumeSession(): void {
-      patchState(store, {
-        session: {
-          ...store.session(),
-          status: 'active',
-          pausedAt: undefined,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.sessionResumed());
     },
 
     /**
      * Complete the session
      */
     completeSession(): void {
-      patchState(store, {
-        session: {
-          ...store.session(),
-          status: 'completed',
-          completedAt: new Date(),
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.sessionCompleted());
     },
 
     /**
      * Save the session
      */
     saveSession(): void {
-      patchState(store, {
-        session: {
-          ...store.session(),
-          lastSaveAt: new Date(),
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.sessionSaved());
     },
 
     /**
      * Update player position
      */
     updatePlayerPosition(position: Position): void {
-      patchState(store, {
-        player: {
-          ...store.player(),
-          position,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.playerMoved(position));
     },
 
     /**
      * Update player direction
      */
     updatePlayerDirection(direction: 'up' | 'down' | 'left' | 'right'): void {
-      patchState(store, {
-        player: {
-          ...store.player(),
-          direction,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.playerDirectionChanged(direction));
     },
 
     /**
      * Update player movement status
      */
     updatePlayerMovementStatus(isMoving: boolean): void {
-      patchState(store, {
-        player: {
-          ...store.player(),
-          isMoving,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.playerMovementStatusChanged(isMoving));
     },
 
     /**
-     * Add experience and handle level up
+     * Add experience
      */
     addExperience(amount: number): void {
-      const currentExp = store.player().experience;
-      const currentLevel = store.player().level;
-      const newExp = currentExp + amount;
-      const expForNextLevel = currentLevel * 100; // Simple formula: 100 XP per level
+      dispatcher.dispatch(gameSessionEvents.experienceGained(amount));
+    },
 
-      // Check if level up
-      if (newExp >= expForNextLevel) {
-        patchState(store, {
-          player: {
-            ...store.player(),
-            experience: newExp - expForNextLevel,
-            level: currentLevel + 1,
-            maxHealth: store.player().maxHealth + 10,
-            health: store.player().maxHealth + 10, // Restore full health on level up
-          },
-        });
-      } else {
-        patchState(store, {
-          player: {
-            ...store.player(),
-            experience: newExp,
-          },
-        });
-      }
+    /**
+     * Level up the player
+     */
+    levelUp(newLevel: number): void {
+      dispatcher.dispatch(gameSessionEvents.levelUp(newLevel));
     },
 
     /**
      * Update player health
      */
-    updatePlayerHealth(health: number, maxHealth?: number): void {
-      const currentMaxHealth = maxHealth ?? store.player().maxHealth;
-      patchState(store, {
-        player: {
-          ...store.player(),
-          health: Math.max(0, Math.min(health, currentMaxHealth)),
-          maxHealth: currentMaxHealth,
-        },
-      });
+    updatePlayerHealth(health: number, maxHealth: number): void {
+      dispatcher.dispatch(gameSessionEvents.healthChanged({ current: health, max: maxHealth }));
     },
 
     /**
      * Collect an item
      */
     collectItem(item: InventoryItem): void {
-      const inventory = [...store.player().inventory];
-      const existingItem = inventory.find((i) => i.id === item.id);
-
-      if (existingItem) {
-        // Increase quantity if item already exists
-        existingItem.quantity += item.quantity;
-      } else {
-        // Add new item
-        inventory.push(item);
-      }
-
-      patchState(store, {
-        player: {
-          ...store.player(),
-          inventory,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.itemCollected(item));
     },
 
     /**
      * Use an item (decreases quantity)
      */
     useItem(itemId: string): void {
-      const inventory = [...store.player().inventory];
-      const itemIndex = inventory.findIndex((i) => i.id === itemId);
-
-      if (itemIndex !== -1) {
-        inventory[itemIndex].quantity -= 1;
-        // Remove item if quantity reaches 0
-        if (inventory[itemIndex].quantity <= 0) {
-          inventory.splice(itemIndex, 1);
-        }
-      }
-
-      patchState(store, {
-        player: {
-          ...store.player(),
-          inventory,
-        },
-      });
+      dispatcher.dispatch(gameSessionEvents.itemUsed(itemId));
     },
 
     /**
      * Remove an item completely
      */
     removeItem(itemId: string): void {
-      const inventory = store.player().inventory.filter((i) => i.id !== itemId);
-
-      patchState(store, {
-        player: {
-          ...store.player(),
-          inventory,
-        },
-      });
-    },
-
-    /**
-     * Reset session to initial state
-     */
-    resetSession(): void {
-      patchState(store, initialState);
+      dispatcher.dispatch(gameSessionEvents.itemRemoved(itemId));
     },
   }))
 );

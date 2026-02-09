@@ -1,10 +1,12 @@
 import { Component, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import Phaser from 'phaser';
+import { Dispatcher } from '@ngrx/signals/events';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
 import { DialogService } from '../../core/services/dialog.service';
 import { GameDataLoaderService } from '../../core/services/game-data-loader.service';
 import { GameSessionStore } from './store';
+import { gameSessionEvents } from './store/game-session.events';
 import { GameScene } from './scenes/game.scene';
 
 /**
@@ -22,6 +24,7 @@ export class GameComponent implements OnDestroy {
   private readonly dialogService = inject(DialogService);
   private readonly gameDataLoader = inject(GameDataLoaderService);
   private readonly gameSessionStore = inject(GameSessionStore);
+  private readonly dispatcher = inject(Dispatcher);
   protected readonly isLoading = signal<boolean>(true);
 
   constructor() {
@@ -33,7 +36,7 @@ export class GameComponent implements OnDestroy {
     this.phaserService.destroyGame();
     // Pause session when leaving the game
     if (this.gameSessionStore.isSessionActive()) {
-      this.gameSessionStore.pauseSession();
+      this.dispatcher.dispatch(gameSessionEvents.sessionPaused());
     }
   }
 
@@ -44,7 +47,7 @@ export class GameComponent implements OnDestroy {
     // Start a new game session
     const gameId = `game-${Date.now()}`;
     console.log('🚀 Starting session:', gameId);
-    this.gameSessionStore.startSession(gameId);
+    this.dispatcher.dispatch(gameSessionEvents.sessionStarted({ gameId, playerId: 'player-1' }));
     console.log('📊 Session started, store state:', {
       isActive: this.gameSessionStore.isSessionActive(),
       sessionStatus: this.gameSessionStore.session().status

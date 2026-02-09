@@ -234,6 +234,23 @@ export class GameScene extends Phaser.Scene {
       this.gameSessionStore.updatePlayerPosition({ x: currentX, y: currentY });
       this.lastPlayerPosition = { x: currentX, y: currentY };
     }
+
+    // Update player direction if available
+    const direction = this.player.getDirection();
+    const validDirections = ['up', 'down', 'left', 'right'];
+    if (direction && validDirections.indexOf(direction) !== -1) {
+      const currentDirection = this.gameSessionStore.playerDirection();
+      if (currentDirection !== direction) {
+        this.gameSessionStore.updatePlayerDirection(direction as 'up' | 'down' | 'left' | 'right');
+      }
+    }
+
+    // Update player movement status
+    const isMoving = this.player.getIsMoving();
+    const currentIsMoving = this.gameSessionStore.isPlayerMoving();
+    if (currentIsMoving !== isMoving) {
+      this.gameSessionStore.updatePlayerMovementStatus(isMoving);
+    }
   }
 
   /**

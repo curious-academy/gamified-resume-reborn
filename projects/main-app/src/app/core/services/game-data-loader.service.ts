@@ -36,6 +36,7 @@ export class GameDataLoaderService {
       return of(this.getCurrentGameData());
     }
 
+    console.log('🔄 Starting game data loading...');
     this.loadingState.set('loading');
     this.loadingProgress.set(0);
     this.errorMessage.set(null);
@@ -43,6 +44,7 @@ export class GameDataLoaderService {
     // Load from single endpoint
     return this.http.get<GameData>(`${this.apiUrl}/all`).pipe(
       tap((data) => {
+        console.log('✅ HTTP request successful, caching data...');
         this.cacheAllData(data);
         this.loadingProgress.set(100);
         this.loadingState.set('success');
@@ -55,12 +57,14 @@ export class GameDataLoaderService {
       }),
       catchError((error) => {
         console.error('❌ Failed to load game data:', error);
+        console.log('⚠️ Using mock data fallback...');
         this.loadingState.set('error');
         this.errorMessage.set(error.message || 'Failed to load game data');
         // Fallback to mock data for development
         const mockData = this.getMockGameData();
         this.cacheAllData(mockData);
         this.loadingState.set('success'); // Set success for dev mode
+        console.log('✅ Mock data loaded in cache');
         return of(mockData);
       })
     );

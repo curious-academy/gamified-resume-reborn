@@ -29,17 +29,29 @@ export class LoadingScreenComponent implements OnInit {
   }
 
   private startLoading(): void {
-    // Start the loading process - GameDataLoaderService will manage the state
-    this.loader.loadGameData();
+    console.log('🔄 Starting data loading...');
+
+    // Start the loading process and subscribe to execute the Observable
+    this.loader.loadGameData().subscribe({
+      next: (data) => {
+        console.log('✅ Data loaded in component:', data);
+      },
+      error: (err) => {
+        console.error('❌ Loading error:', err);
+      }
+    });
 
     // Monitor the loading state and redirect when done
     const checkInterval = setInterval(() => {
       const state = this.loader.loadingState();
+      console.log(`⏳ Check loading state: ${state}, progress: ${this.loader.loadingProgress()}%`);
 
       if (state === 'success') {
+        console.log('✅ Loading complete, navigating to game...');
         clearInterval(checkInterval);
         setTimeout(() => this.router.navigate(['/game']), 500);
       } else if (state === 'error') {
+        console.log('❌ Loading failed');
         clearInterval(checkInterval);
       }
     }, 100);

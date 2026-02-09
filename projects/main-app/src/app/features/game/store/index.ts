@@ -1,7 +1,6 @@
 import { computed, inject } from '@angular/core';
-import { patchState, signalStore, withState, withComputed, withMethods } from '@ngrx/signals';
-import { Events, Dispatcher, withEventHandlers } from '@ngrx/signals/events';
-import { tap } from 'rxjs';
+import { signalStore, withState, withComputed, withMethods } from '@ngrx/signals';
+import { Dispatcher, on, withReducer } from '@ngrx/signals/events';
 import {
   GameSession,
   PlayerState,
@@ -64,216 +63,174 @@ export const GameSessionStore = signalStore(
     playerDirection: computed(() => player().direction),
   })),
 
-  // Event handlers - React to events using reactive streams
-  withEventHandlers((store, events = inject(Events)) => ({
-    // Session lifecycle handlers
-    onSessionStarted$: events.on(gameSessionEvents.sessionStarted).pipe(
-      tap(({ payload }) => {
-        const now = new Date();
-        patchState(store, {
-          session: {
-            gameId: payload.gameId,
-            playerId: payload.playerId,
-            status: 'active',
-            startedAt: now,
-            lastSaveAt: undefined,
-            pausedAt: undefined,
-            completedAt: undefined,
-          },
-        });
-      })
-    ),
+  // State transitions - React to events and update state
+  withReducer(
+    // Session lifecycle
+    on(gameSessionEvents.sessionStarted, ({ payload }) => {
+      const now = new Date();
+      return {
+        session: {
+          gameId: payload.gameId,
+          playerId: payload.playerId,
+          status: 'active' as const,
+          startedAt: now,
+          lastSaveAt: undefined,
+          pausedAt: undefined,
+          completedAt: undefined,
+        },
+      };
+    }),
 
-    onSessionPaused$: events.on(gameSessionEvents.sessionPaused).pipe(
-      tap(() => {
-        patchState(store, {
-          session: {
-            ...store.session(),
-            status: 'paused',
-            pausedAt: new Date(),
-          },
-        });
-      })
-    ),
+    on(gameSessionEvents.sessionPaused, (_, state) => ({
+      session: {
+        ...state.session,
+        status: 'paused' as const,
+        pausedAt: new Date(),
+      },
+    })),
 
-    onSessionResumed$: events.on(gameSessionEvents.sessionResumed).pipe(
-      tap(() => {
-        patchState(store, {
-          session: {
-            ...store.session(),
-            status: 'active',
-            pausedAt: undefined,
-          },
-        });
-      })
-    ),
+    on(gameSessionEvents.sessionResumed, (_, state) => ({
+      session: {
+        ...state.session,
+        status: 'active' as const,
+        pausedAt: undefined,
+      },
+    })),
 
-    onSessionCompleted$: events.on(gameSessionEvents.sessionCompleted).pipe(
-      tap(() => {
-        patchState(store, {
-          session: {
-            ...store.session(),
-            status: 'completed',
-            completedAt: new Date(),
-          },
-        });
-      })
-    ),
+    on(gameSessionEvents.sessionCompleted, (_, state) => ({
+      session: {
+        ...state.session,
+        status: 'completed' as const,
+        completedAt: new Date(),
+      },
+    })),
 
-    onSessionSaved$: events.on(gameSessionEvents.sessionSaved).pipe(
-      tap(() => {
-        patchState(store, {
-          session: {
-            ...store.session(),
-            lastSaveAt: new Date(),
-          },
-        });
-      })
-    ),
+    on(gameSessionEvents.sessionSaved, (_, state) => ({
+      session: {
+        ...state.session,
+        lastSaveAt: new Date(),
+      },
+    })),
 
-    // Player state handlers
-    onPlayerMoved$: events.on(gameSessionEvents.playerMoved).pipe(
-      tap(({ payload }) => {
-        patchState(store, {
+    // Player state
+    on(gameSessionEvents.playerMoved, ({ payload }, state) => ({
+      player: {
+        ...state.player,
+        position: payload,
+      },
+    })),
+
+    on(gameSessionEvents.playerDirectionChanged, ({ payload }, state) => ({
+      player: {
+        ...state.player,
+        direction: payload,
+      },
+    })),
+
+    on(gameSessionEvents.playerMovementStatusChanged, ({ payload }, state) => ({
+      player: {
+        ...state.player,
+        isMoving: payload,
+      },
+    })),
+
+    // Player stats
+    on(gameSessionEvents.experienceGained, ({ payload }, state) => {
+      const currentExp = state.player.experience;
+      const currentLevel = state.player.level;
+      const newExp = currentExp + payload;
+      const expForNextLevel = currentLevel * 100;
+
+      if (newExp >= expForNextLevel) {
+        const newMaxHealth = state.player.maxHealth + 10;
+        return {
           player: {
-            ...store.player(),
-            position: payload,
+            ...state.player,
+            experience: newExp - expForNextLevel,
+            level: currentLevel + 1,
+            maxHealth: newMaxHealth,
+            health: newMaxHealth,
           },
-        });
-      })
-    ),
-
-    onPlayerDirectionChanged$: events.on(gameSessionEvents.playerDirectionChanged).pipe(
-      tap(({ payload }) => {
-        patchState(store, {
+        };
+      } else {
+        return {
           player: {
-            ...store.player(),
-            direction: payload,
+            ...state.player,
+            experience: newExp,
           },
-        });
-      })
-    ),
+        };
+      }
+    }),
 
-    onPlayerMovementStatusChanged$: events.on(gameSessionEvents.playerMovementStatusChanged).pipe(
-      tap(({ payload }) => {
-        patchState(store, {
-          player: {
-            ...store.player(),
-            isMoving: payload,
-          },
-        });
-      })
-    ),
+    on(gameSessionEvents.levelUp, ({ payload }, state) => {
+      const newMaxHealth = state.player.maxHealth + 10;
+      return {
+        player: {
+          ...state.player,
+          level: payload,
+          maxHealth: newMaxHealth,
+          health: newMaxHealth,
+        },
+      };
+    }),
 
-    // Player stats handlers
-    onExperienceGained$: events.on(gameSessionEvents.experienceGained).pipe(
-      tap(({ payload }) => {
-        const currentExp = store.player().experience;
-        const currentLevel = store.player().level;
-        const newExp = currentExp + payload;
-        const expForNextLevel = currentLevel * 100;
+    on(gameSessionEvents.healthChanged, ({ payload }, state) => ({
+      player: {
+        ...state.player,
+        health: Math.max(0, Math.min(payload.current, payload.max)),
+        maxHealth: payload.max,
+      },
+    })),
 
-        if (newExp >= expForNextLevel) {
-          patchState(store, {
-            player: {
-              ...store.player(),
-              experience: newExp - expForNextLevel,
-              level: currentLevel + 1,
-              maxHealth: store.player().maxHealth + 10,
-              health: store.player().maxHealth + 10,
-            },
-          });
-        } else {
-          patchState(store, {
-            player: {
-              ...store.player(),
-              experience: newExp,
-            },
-          });
+    // Inventory
+    on(gameSessionEvents.itemCollected, ({ payload }, state) => {
+      const inventory = [...state.player.inventory];
+      const existingItem = inventory.find((i) => i.id === payload.id);
+
+      if (existingItem) {
+        existingItem.quantity += payload.quantity;
+      } else {
+        inventory.push(payload);
+      }
+
+      return {
+        player: {
+          ...state.player,
+          inventory,
+        },
+      };
+    }),
+
+    on(gameSessionEvents.itemUsed, ({ payload }, state) => {
+      const inventory = [...state.player.inventory];
+      const itemIndex = inventory.findIndex((i) => i.id === payload);
+
+      if (itemIndex !== -1) {
+        inventory[itemIndex].quantity -= 1;
+        if (inventory[itemIndex].quantity <= 0) {
+          inventory.splice(itemIndex, 1);
         }
-      })
-    ),
+      }
 
-    onLevelUp$: events.on(gameSessionEvents.levelUp).pipe(
-      tap(({ payload }) => {
-        patchState(store, {
-          player: {
-            ...store.player(),
-            level: payload,
-            maxHealth: store.player().maxHealth + 10,
-            health: store.player().maxHealth + 10,
-          },
-        });
-      })
-    ),
+      return {
+        player: {
+          ...state.player,
+          inventory,
+        },
+      };
+    }),
 
-    onHealthChanged$: events.on(gameSessionEvents.healthChanged).pipe(
-      tap(({ payload }) => {
-        patchState(store, {
-          player: {
-            ...store.player(),
-            health: Math.max(0, Math.min(payload.current, payload.max)),
-            maxHealth: payload.max,
-          },
-        });
-      })
-    ),
+    on(gameSessionEvents.itemRemoved, ({ payload }, state) => {
+      const inventory = state.player.inventory.filter((i) => i.id !== payload);
 
-    // Inventory handlers
-    onItemCollected$: events.on(gameSessionEvents.itemCollected).pipe(
-      tap(({ payload }) => {
-        const inventory = [...store.player().inventory];
-        const existingItem = inventory.find((i) => i.id === payload.id);
-
-        if (existingItem) {
-          existingItem.quantity += payload.quantity;
-        } else {
-          inventory.push(payload);
-        }
-
-        patchState(store, {
-          player: {
-            ...store.player(),
-            inventory,
-          },
-        });
-      })
-    ),
-
-    onItemUsed$: events.on(gameSessionEvents.itemUsed).pipe(
-      tap(({ payload }) => {
-        const inventory = [...store.player().inventory];
-        const itemIndex = inventory.findIndex((i) => i.id === payload);
-
-        if (itemIndex !== -1) {
-          inventory[itemIndex].quantity -= 1;
-          if (inventory[itemIndex].quantity <= 0) {
-            inventory.splice(itemIndex, 1);
-          }
-        }
-
-        patchState(store, {
-          player: {
-            ...store.player(),
-            inventory,
-          },
-        });
-      })
-    ),
-
-    onItemRemoved$: events.on(gameSessionEvents.itemRemoved).pipe(
-      tap(({ payload }) => {
-        const inventory = store.player().inventory.filter((i) => i.id !== payload);
-
-        patchState(store, {
-          player: {
-            ...store.player(),
-            inventory,
-          },
-        });
-      })
-    ),
-  })),
+      return {
+        player: {
+          ...state.player,
+          inventory,
+        },
+      };
+    })
+  ),
 
   // Public methods to dispatch events (components call these)
   withMethods((store, dispatcher = inject(Dispatcher)) => ({

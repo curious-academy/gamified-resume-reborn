@@ -18,6 +18,146 @@ Use this skill when:
 
 ## Core Principles
 
+### 0. Event-Driven Architecture (CRITICAL - MANDATORY)
+
+**⚠️ ABSOLUTE RULE: All stores MUST use event-driven architecture with Events plugin**
+
+This is NON-NEGOTIABLE. Never create a store without this pattern.
+
+#### Required Pattern Components
+
+1. **Events with eventGroup** (`store/feature.events.ts`)
+```typescript
+import { type } from '@ngrx/signals';
+import { eventGroup } from '@ngrx/signals/events';
+
+export const featureEvents = eventGroup({
+  source: 'Feature Name',
+  events: {
+    opened: type<void>(),
+    queryChanged: type<string>(),
+    itemSelected: type<number>(),
+  },
+});
+```
+
+2. **Event Handlers with withEventHandlers** (`store/index.ts`)
+```typescript
+import { Events, Dispatcher, withEventHandlers } from '@ngrx/signals/events';
+
+// CRITICAL: Must inject Events service for event listening
+withEventHandlers(
+  (store, events = inject(Events), service = inject(SomeService)) => ({
+    // Observable ending in $ - reacts to events
+    onFeatureOpened$: events
+      .on(featureEvents.opened, featureEvents.queryChanged)
+      .pipe(
+        switchMap(() =>
+          service.getData().pipe(
+            mapResponse({
+              next: (data) => apiEvents.loadSuccess(data),
+              error: (error) => apiEvents.loadFailure(error.message),
+            })
+          )
+        )
+      ),
+    
+    // Another handler for logging
+    onError$: events
+      .on(apiEvents.loadFailure)
+      .pipe(tap(({ payload }) => console.error(payload))),
+  })
+)
+```
+
+3. **State Transitions with withReducer** (optional but recommended)
+```typescript
+import { on, withReducer } from '@ngrx/signals/events';
+
+withReducer(
+  on(featureEvents.queryChanged, ({ payload: query }) => ({
+    filter: { query },
+  })),
+  
+  on(apiEvents.loadSuccess, ({ payload: items }) => ({
+    items,
+    isLoading: false,
+  }))
+)
+```
+
+4. **Event Dispatching with Dispatcher** (in methods or hooks)
+```typescript
+// In withMethods
+withMethods((store, dispatcher = inject(Dispatcher)) => ({
+  startAction(): void {
+    // Dispatch events using Dispatcher
+    dispatcher.dispatch(featureEvents.opened());
+  },
+}))
+
+// In withHooks
+withHooks({
+  onInit(store, dispatcher = inject(Dispatcher)) {
+    dispatcher.dispatch(featureEvents.pageOpened());
+  },
+})
+```
+
+5. **Component Integration with injectDispatch**
+```typescript
+import { injectDispatch } from '@ngrx/signals/events';
+
+@Component({
+  // ...
+})
+export class FeatureComponent {
+  readonly store = inject(FeatureStore);
+  readonly dispatch = injectDispatch(featureEvents); // Simplified dispatching
+  
+  onUserAction(): void {
+    // Direct event dispatch - cleaner syntax
+    this.dispatch.queryChanged('new query');
+  }
+}
+```
+
+#### Architecture Flow
+
+```
+[Component] 
+   ↓ calls method / uses injectDispatch
+[Store Methods / Component]
+   ↓ dispatcher.dispatch(event) or dispatch.eventName()
+[Dispatcher] 
+   ↓ broadcasts event
+[Event Handlers (withEventHandlers)] 
+   ↓ events.on() listens and reacts
+   ↓ performs side effects (API calls, logging, etc.)
+   ↓ returns new events if needed
+[State Transitions (withReducer)]
+   ↓ on() catches events and updates state
+[State Updated]
+   ↓ signals react
+[Component Re-renders]
+```
+
+#### Critical Rules for Event-Driven Architecture
+
+1. ✅ **ALWAYS** use `eventGroup` with `type<>()` for event definitions
+2. ✅ **ALWAYS** import `Events` from `'@ngrx/signals/events'`
+3. ✅ **ALWAYS** inject `Events` in `withEventHandlers`: `events = inject(Events)`
+4. ✅ **ALWAYS** return observables ending in `$` from event handlers
+5. ✅ **ALWAYS** use `events.on()` to listen to events (NOT `events.eventName`)
+6. ✅ **ALWAYS** inject `Dispatcher` when dispatching events in methods/hooks
+7. ✅ **ALWAYS** use `dispatcher.dispatch(event())` for manual dispatching
+8. ✅ **ALWAYS** use `injectDispatch()` in components for cleaner syntax
+9. ✅ Use `withReducer` with `on()` for state transitions (declarative)
+10. ✅ Use `withEventHandlers` for side effects (API calls, logging, etc.)
+11. ❌ **NEVER** call event creators directly without dispatching
+12. ❌ **NEVER** use `patchState` directly in methods - dispatch events instead
+13. ❌ **NEVER** skip the Events plugin - it's mandatory
+
 ### 1. Store Creation/Verification
 
 Always follow this sequence when creating a store:

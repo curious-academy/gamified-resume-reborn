@@ -1,0 +1,79 @@
+<div class="training-list">
+  <div class="header">
+    <h1>Formations E-Learning</h1>
+    <button class="btn-primary" (click)="onCreateNew()">
+      + Nouvelle Formation
+    </button>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ trainingService.totalTrainings() }}</span>
+      <span class="stat-label">Formations</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ trainingService.completedTrainings() }}</span>
+      <span class="stat-label">Complétées</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ trainingService.earnedPoints() }}/{{ trainingService.totalPoints() }}</span>
+      <span class="stat-label">Points</span>
+    </div>
+  </div>
+
+  @if (showCreateForm()) {
+    <app-training-create
+      (trainingCreated)="onTrainingCreated($event)"
+      (cancelled)="onCancelCreate()"
+    ></app-training-create>
+  }
+
+  <div class="trainings-grid">
+    @for (training of trainings(); track training.id) {
+      <div class="training-card" (click)="onSelectTraining(training.id)">
+        <div class="training-header">
+          <h3>{{ training.title }}</h3>
+          @if (training.isCompleted) {
+            <span class="badge badge-success">✓ Complété</span>
+          }
+        </div>
+
+        <div class="training-description" [innerHTML]="training.description"></div>
+
+        <div class="training-stats">
+          <span>{{ training.quests.length }} quêtes</span>
+          <span>{{ training.earnedPoints }}/{{ training.totalPoints }} points</span>
+        </div>
+
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            [style.width.%]="calculateProgress(training)"
+          ></div>
+        </div>
+
+        <div class="training-actions">
+          <button
+            class="btn-small btn-primary"
+            (click)="onEditTraining($event, training.id)"
+          >
+            Éditer
+          </button>
+          <button
+            class="btn-small btn-danger"
+            (click)="onDeleteTraining($event, training.id)"
+          >
+            Supprimer
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <p>Aucune formation disponible</p>
+        <button class="btn-primary" (click)="onCreateNew()">
+          Créer votre première formation
+        </button>
+      </div>
+    }
+  </div>
+</div>

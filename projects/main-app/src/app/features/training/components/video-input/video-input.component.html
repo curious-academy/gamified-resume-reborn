@@ -1,0 +1,121 @@
+<div class="video-input">
+  <div class="video-type-selector">
+    <button
+      type="button"
+      class="type-btn"
+      [class.active]="videoType() === 'youtube'"
+      (click)="setVideoType('youtube')"
+    >
+      📺 YouTube
+    </button>
+    <button
+      type="button"
+      class="type-btn"
+      [class.active]="videoType() === 'server'"
+      (click)="setVideoType('server')"
+    >
+      📤 Upload Serveur
+    </button>
+  </div>
+
+  @if (videoType() === 'youtube') {
+    <div class="youtube-input">
+      <div class="form-group">
+        <label for="youtubeUrl">URL YouTube *</label>
+        <input
+          id="youtubeUrl"
+          type="url"
+          [(ngModel)]="youtubeUrl"
+          placeholder="https://www.youtube.com/watch?v=..."
+          (blur)="onYouTubeUrlChange()"
+        />
+        @if (youtubeError()) {
+          <span class="error-message">{{ youtubeError() }}</span>
+        }
+      </div>
+
+      @if (youtubePreview()) {
+        <div class="video-preview">
+          <div class="preview-header">
+            <span>Aperçu</span>
+            <button type="button" class="btn-remove" (click)="removeVideo()">
+              ✕
+            </button>
+          </div>
+          <div class="youtube-embed">
+            <iframe
+              [src]="youtubePreview()"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (videoType() === 'server') {
+    <div class="server-upload">
+      <div class="form-group">
+        <label for="videoFile">Fichier vidéo *</label>
+        <input
+          id="videoFile"
+          type="file"
+          accept="video/*"
+          (change)="onFileSelected($event)"
+        />
+        @if (uploadError()) {
+          <span class="error-message">{{ uploadError() }}</span>
+        }
+      </div>
+
+      @if (selectedFile()) {
+        <div class="file-info">
+          <div class="file-details">
+            <span class="file-name">{{ selectedFile()?.name }}</span>
+            <span class="file-size">{{ formatFileSize(selectedFile()?.size || 0) }}</span>
+          </div>
+          <button type="button" class="btn-remove" (click)="removeFile()">
+            ✕
+          </button>
+        </div>
+
+        @if (uploadProgress() > 0 && uploadProgress() < 100) {
+          <div class="upload-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="uploadProgress()"></div>
+            </div>
+            <span class="progress-text">{{ uploadProgress() }}%</span>
+          </div>
+        }
+
+        @if (uploadProgress() === 100) {
+          <div class="upload-success">
+            ✓ Upload terminé avec succès
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (currentVideo()) {
+    <div class="current-video">
+      <div class="current-video-header">
+        <span>Vidéo actuelle</span>
+        <button type="button" class="btn-remove" (click)="removeVideo()">
+          ✕
+        </button>
+      </div>
+      <div class="current-video-info">
+        <span class="video-icon">
+          {{ currentVideo()?.type === 'youtube' ? '📺' : '📹' }}
+        </span>
+        <div class="video-details">
+          <span class="video-title">{{ currentVideo()?.title || 'Sans titre' }}</span>
+          <span class="video-url">{{ currentVideo()?.url }}</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

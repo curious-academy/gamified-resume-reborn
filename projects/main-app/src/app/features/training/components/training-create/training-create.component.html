@@ -1,0 +1,191 @@
+<div class="training-create">
+  <div class="form-header">
+    <h2>Créer une nouvelle formation</h2>
+    <button type="button" class="btn-close" (click)="onCancel()">✕</button>
+  </div>
+
+  <form [formGroup]="trainingForm" (ngSubmit)="onSubmit()">
+    <!-- Training Info -->
+    <div class="section">
+      <h3>Informations générales</h3>
+
+      <div class="form-group">
+        <label for="title">Titre *</label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="Ex: Angular Fundamentals"
+        />
+        @if (trainingForm.get('title')?.invalid && trainingForm.get('title')?.touched) {
+          <span class="field-error">Le titre est obligatoire (min. 3 caractères)</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          placeholder="Description de la formation..."
+        ></textarea>
+        @if (trainingForm.get('description')?.invalid && trainingForm.get('description')?.touched) {
+          <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Vidéo d'introduction (optionnelle)</label>
+        <app-video-input
+          (videoChange)="onTrainingVideoSelected($event)"
+        ></app-video-input>
+      </div>
+    </div>
+
+    <!-- Quests Section -->
+    <div class="section" formArrayName="quests">
+      <div class="section-header">
+        <h3>Quêtes</h3>
+        <button type="button" class="btn-primary btn-small" (click)="addQuest()">
+          + Ajouter une quête
+        </button>
+      </div>
+
+      @for (questControl of questsArray.controls; track $index) {
+        <div class="quest-card" [formGroupName]="$index">
+          <div class="quest-header">
+            <h4>Quête {{ $index + 1 }}</h4>
+            <button type="button" class="btn-icon btn-danger" (click)="removeQuest($index)">
+              🗑️
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label>Titre de la quête *</label>
+            <input
+              type="text"
+              formControlName="title"
+              placeholder="Ex: Découvrir les composants"
+            />
+            @if (questControl.get('title')?.invalid && questControl.get('title')?.touched) {
+              <span class="field-error">Le titre est obligatoire (min. 3 caractères)</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Description de la quête *</label>
+            <textarea
+              formControlName="description"
+              rows="3"
+              placeholder="Description de la quête..."
+            ></textarea>
+            @if (questControl.get('description')?.invalid && questControl.get('description')?.touched) {
+              <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Vidéo de la quête (optionnelle)</label>
+            <app-video-input
+              (videoChange)="onQuestVideoSelected($index, $event)"
+            ></app-video-input>
+          </div>
+
+          <!-- Objectives for this quest -->
+          <div class="objectives-section" [formArrayName]="'objectives'">
+            <div class="objectives-header">
+              <h5>Objectifs de la quête</h5>
+              <button type="button" class="btn-secondary btn-small" (click)="addObjective($index)">
+                + Ajouter un objectif
+              </button>
+            </div>
+
+            @for (objectiveControl of getObjectivesArray($index).controls; track $index) {
+              <div class="objective-card" [formGroupName]="$index">
+                <div class="objective-header">
+                  <span>Objectif {{ $index + 1 }}</span>
+                  <button type="button" class="btn-icon btn-danger-small" (click)="removeObjective(questControl, $index)">
+                    ✕
+                  </button>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Titre *</label>
+                    <input
+                      type="text"
+                      formControlName="title"
+                      placeholder="Ex: Créer un composant"
+                    />
+                    @if (objectiveControl.get('title')?.invalid && objectiveControl.get('title')?.touched) {
+                      <span class="field-error">Le titre est obligatoire (min. 3 caractères)</span>
+                    }
+                  </div>
+
+                  <div class="form-group form-group-small">
+                    <label>Points *</label>
+                    <input
+                      type="number"
+                      formControlName="points"
+                      min="1"
+                    />
+                    @if (objectiveControl.get('points')?.invalid && objectiveControl.get('points')?.touched) {
+                      <span class="field-error">Min. 1 point</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Description *</label>
+                  <textarea
+                    formControlName="description"
+                    rows="2"
+                    placeholder="Description de l'objectif..."
+                  ></textarea>
+                  @if (objectiveControl.get('description')?.invalid && objectiveControl.get('description')?.touched) {
+                    <span class="field-error">La description est obligatoire (min. 10 caractères)</span>
+                  }
+                </div>
+
+                <div class="form-group">
+                  <label>Vidéo de l'objectif (optionnelle)</label>
+                  <app-video-input
+                    (videoChange)="onObjectiveVideoSelected(questControl, $index, $event)"
+                  ></app-video-input>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-objectives">
+                Aucun objectif. Cliquez sur "Ajouter un objectif" pour commencer.
+              </div>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-quests">
+          Aucune quête. Cliquez sur "Ajouter une quête" pour commencer.
+        </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="error-message">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="onCancel()">
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="trainingForm.invalid || isSubmitting()"
+      >
+        {{ isSubmitting() ? 'Création...' : 'Créer la formation' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { GameComponent } from '../game.component';
-import { TerminalComponent } from '../../terminal/terminal.component';
-import { TerminalPromptComponent } from '../../terminal/terminal-prompt.component';
+import { TerminalComponent } from '../../terminal/terminal/terminal.component';
+import { TerminalPromptComponent } from '../../terminal/terminal-prompt/terminal-prompt.component';
 import { TerminalService } from '../../../core/services/terminal.service';
 import { KeyboardService } from '../../../core/services/keyboard.service';
 

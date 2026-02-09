@@ -1,0 +1,23 @@
+<div class="menu-container">
+  <div class="menu-content">
+    <h1 class="game-title">🎮 Gamified Resume</h1>
+
+    <div class="menu-buttons">
+      <button class="menu-btn primary" (click)="startNewGame()">
+        ▶ Nouvelle Partie
+      </button>
+
+      <button class="menu-btn" (click)="continueGame()" [disabled]="!hasSavedGame">
+        ↻ Continuer
+      </button>
+
+      <button class="menu-btn" (click)="showSettings()">
+        ⚙ Paramètres
+      </button>
+
+      <button class="menu-btn" (click)="showCredits()">
+        ℹ Crédits
+      </button>
+    </div>
+  </div>
+</div>

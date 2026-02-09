@@ -12,39 +12,8 @@ import { GameScene } from './scenes/game.scene';
 @Component({
   selector: 'app-game',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div id="game-container" class="game-container"></div>
-    @if (isLoading()) {
-      <div class="loading">Chargement du jeu...</div>
-    }
-  `,
-  styles: [`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-
-    .game-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 1.5rem;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 1rem 2rem;
-      border-radius: 8px;
-    }
-  `]
+  templateUrl: './game.component.html',
+  styleUrls: ['./game.component.scss']
 })
 export class GameComponent implements OnDestroy {
   private readonly phaserService = inject(PhaserService);

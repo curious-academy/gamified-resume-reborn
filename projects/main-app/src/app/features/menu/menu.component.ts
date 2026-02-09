@@ -6,105 +6,12 @@ import { CommonModule } from '@angular/common';
   selector: 'app-menu',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="menu-container">
-      <div class="menu-content">
-        <h1 class="game-title">🎮 Gamified Resume</h1>
-        
-        <div class="menu-buttons">
-          <button class="menu-btn primary" (click)="startNewGame()">
-            ▶ Nouvelle Partie
-          </button>
-          
-          <button class="menu-btn" (click)="continueGame()" [disabled]="!hasSavedGame">
-            ↻ Continuer
-          </button>
-          
-          <button class="menu-btn" (click)="showSettings()">
-            ⚙ Paramètres
-          </button>
-          
-          <button class="menu-btn" (click)="showCredits()">
-            ℹ Crédits
-          </button>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .menu-container {
-      width: 100%;
-      height: 100vh;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Courier New', monospace;
-    }
-
-    .menu-content {
-      text-align: center;
-      color: white;
-    }
-
-    .game-title {
-      font-size: 3rem;
-      margin-bottom: 3rem;
-      text-shadow: 0 0 20px rgba(255, 140, 0, 0.8);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .menu-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .menu-btn {
-      width: 300px;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      font-family: 'Courier New', monospace;
-      background: rgba(255, 255, 255, 0.1);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-radius: 8px;
-    }
-
-    .menu-btn:hover:not(:disabled) {
-      background: rgba(255, 140, 0, 0.3);
-      border-color: #ff8c00;
-      transform: translateY(-2px);
-    }
-
-    .menu-btn.primary {
-      background: linear-gradient(135deg, #ff8c00, #ffa500);
-      border-color: #ff8c00;
-      font-weight: bold;
-    }
-
-    .menu-btn.primary:hover {
-      background: linear-gradient(135deg, #ffa500, #ffb733);
-      transform: scale(1.05);
-    }
-
-    .menu-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  `]
+  templateUrl: './menu.component.html',
+  styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent {
   private router = inject(Router);
-  
+
   hasSavedGame = false; // TODO: Connect to SaveGameService later
 
   startNewGame(): void {

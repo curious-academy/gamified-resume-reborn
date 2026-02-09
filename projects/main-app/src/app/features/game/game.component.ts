@@ -1,6 +1,6 @@
 import { Component, OnDestroy, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import Phaser from 'phaser';
-import { injectDispatch } from '@ngrx/signals/events';
+import { injectDispatch, provideDispatcher } from '@ngrx/signals/events';
 import { PhaserService } from '../../core/services/phaser.service';
 import { TerminalService } from '../../core/services/terminal.service';
 import { DialogService } from '../../core/services/dialog.service';
@@ -16,7 +16,8 @@ import { GameScene } from './scenes/game.scene';
   selector: 'app-game',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.scss']
+  styleUrls: ['./game.component.scss'],
+  providers: [provideDispatcher()]
 })
 export class GameComponent implements OnDestroy {
   private readonly phaserService = inject(PhaserService);

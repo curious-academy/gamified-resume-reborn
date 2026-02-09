@@ -1,8 +1,8 @@
 import { Component, signal, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TrainingService } from '../services';
-import { Training, Video } from '../models';
-import { TrainingCreateComponent } from './training-create.component';
+import { TrainingService } from '../../services';
+import { Training, Video } from '../../models';
+import { TrainingCreateComponent } from '../training-create/training-create.component';
 
 /**
  * Component for listing and managing trainings

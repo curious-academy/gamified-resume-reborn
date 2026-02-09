@@ -1,6 +1,6 @@
 import { Component, input, output, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Video, VideoSourceType } from '../models';
+import { Video, VideoSourceType } from '../../models';
 
 /**
  * Component for managing video input (YouTube links or server uploads)

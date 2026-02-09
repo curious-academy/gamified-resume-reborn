@@ -22,14 +22,14 @@ export const routes: Routes = [
   {
     path: 'trainings',
     loadComponent: () =>
-      import('./features/training/components/training-list.component').then(
+      import('./features/training/components/training-list/training-list.component').then(
         m => m.TrainingListComponent
       )
   },
   {
     path: 'trainings/:id',
     loadComponent: () =>
-      import('./features/training/components/training-detail.component').then(
+      import('./features/training/components/training-detail/training-detail.component').then(
         m => m.TrainingDetailComponent
       )
   },

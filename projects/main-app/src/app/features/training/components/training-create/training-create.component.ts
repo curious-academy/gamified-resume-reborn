@@ -1,7 +1,7 @@
 import { Component, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { VideoInputComponent } from './video-input.component';
-import { Video } from '../models';
+import { VideoInputComponent } from '../video-input/video-input.component';
+import { Video } from '../../models';
 
 /**
  * Component for creating a new training course with quests and objectives

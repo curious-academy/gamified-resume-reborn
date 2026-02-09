@@ -25,6 +25,8 @@ export class GameScene extends Phaser.Scene {
   private readonly terminalService?: TerminalService;
   private readonly dialogService?: DialogService;
   private readonly gameDataLoader?: GameDataLoaderService;
+  private readonly gameSessionStore?: InstanceType<typeof import('../store').GameSessionStore>;
+  private lastPlayerPosition?: { x: number; y: number };
 
   // NPC system
   private dialogBox!: DialogBox;
@@ -44,6 +46,7 @@ export class GameScene extends Phaser.Scene {
     this.terminalService = config.terminalService;
     this.dialogService = config.dialogService;
     this.gameDataLoader = config.gameDataLoader;
+    this.gameSessionStore = config.gameSessionStore;
   }
 
   preload(): void {
@@ -210,6 +213,27 @@ export class GameScene extends Phaser.Scene {
     this.player?.update();
     this.updateTerminalInteraction();
     this.updateNpcInteractions();
+    this.syncPlayerStateToStore();
+  }
+
+  /**
+   * Synchronize player state with the game session store
+   */
+  private syncPlayerStateToStore(): void {
+    if (!this.player || !this.gameSessionStore) return;
+
+    // Only update position if it changed (to avoid unnecessary updates)
+    const currentX = Math.round(this.player.x);
+    const currentY = Math.round(this.player.y);
+
+    if (
+      !this.lastPlayerPosition ||
+      this.lastPlayerPosition.x !== currentX ||
+      this.lastPlayerPosition.y !== currentY
+    ) {
+      this.gameSessionStore.updatePlayerPosition({ x: currentX, y: currentY });
+      this.lastPlayerPosition = { x: currentX, y: currentY };
+    }
   }
 
   /**

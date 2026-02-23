@@ -1,4 +1,5 @@
 import { Objective } from './objective.model';
+import { Level } from './level.model';
 
 /**
  * Interface representing a training quest
@@ -14,6 +15,8 @@ export interface Quest {
   order: number;
   isCompleted: boolean;
   trainingId: string;
+  levelId: string; // Foreign key to level (required)
+  level?: Level; // Populated level data (optional)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,6 +29,7 @@ export interface CreateQuestDto {
   description: string;
   order: number;
   trainingId: string;
+  levelId: string; // Required difficulty level
 }
 
 /**
@@ -38,6 +42,7 @@ export interface UpdateQuestDto {
   isCompleted?: boolean;
   totalPoints?: number;
   earnedPoints?: number;
+  levelId?: string; // Update difficulty level
 }
 
 /**

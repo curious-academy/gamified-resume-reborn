@@ -91,6 +91,17 @@ Branch prefixes: `feature/` | `tech/` | `fix/` | `improve/`
 4. **Wait for user confirmation** before starting implementation on new features/tasks
 5. **Context detection**: check if current task relates to the active branch before creating new issues/branches/PRs
 
+### New Branch Workflow (independent tasks)
+
+When a task is NOT related to the current branch, execute these steps **before** any implementation:
+
+1. **Create branch** from `main`: `git checkout -b <prefix>/<kebab-case-name> main`
+2. **Push branch** immediately: `git push -u origin <branch-name>`
+3. **Create draft PR** immediately via `gh pr create --draft --title "..." --body "..."`
+4. **Then** start implementation (with build + commit after each modification)
+
+This ensures the PR exists from the start and tracks all commits automatically.
+
 ## Code Conventions
 
 - Angular 21 standalone components with `inject()` (not constructor DI)

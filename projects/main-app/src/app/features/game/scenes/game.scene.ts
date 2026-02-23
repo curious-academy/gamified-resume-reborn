@@ -8,6 +8,8 @@ import { DialogService } from '../../../core/services/dialog.service';
 import { GameDataLoaderService } from '../../../core/services/game-data-loader.service';
 import { MapConfig } from '../entities/game-config.entity';
 import { GameSceneConfig } from '../config/game-scene.config';
+import { Dispatcher } from '@ngrx/signals/events';
+import { gameSessionEvents } from '../store/game-session.events';
 
 /**
  * Configuration de la scène incluant les services Angular
@@ -25,6 +27,10 @@ export class GameScene extends Phaser.Scene {
   private readonly terminalService?: TerminalService;
   private readonly dialogService?: DialogService;
   private readonly gameDataLoader?: GameDataLoaderService;
+  private readonly gameSessionStore?: InstanceType<typeof import('../store').GameSessionStore>;
+  private readonly dispatcher?: Dispatcher;
+  private readonly gameEvents?: typeof gameSessionEvents;
+  private lastPlayerPosition?: { x: number; y: number };
 
   // NPC system
   private dialogBox!: DialogBox;
@@ -44,6 +50,9 @@ export class GameScene extends Phaser.Scene {
     this.terminalService = config.terminalService;
     this.dialogService = config.dialogService;
     this.gameDataLoader = config.gameDataLoader;
+    this.gameSessionStore = config.gameSessionStore;
+    this.dispatcher = config.dispatcher;
+    this.gameEvents = config.gameEvents;
   }
 
   preload(): void {
@@ -210,6 +219,44 @@ export class GameScene extends Phaser.Scene {
     this.player?.update();
     this.updateTerminalInteraction();
     this.updateNpcInteractions();
+    this.syncPlayerStateToStore();
+  }
+
+  /**
+   * Synchronize player state with the game session store
+   */
+  private syncPlayerStateToStore(): void {
+    if (!this.player || !this.dispatcher || !this.gameEvents) return;
+
+    // Only update position if it changed (to avoid unnecessary updates)
+    const currentX = Math.round(this.player.x);
+    const currentY = Math.round(this.player.y);
+
+    if (
+      !this.lastPlayerPosition ||
+      this.lastPlayerPosition.x !== currentX ||
+      this.lastPlayerPosition.y !== currentY
+    ) {
+      this.dispatcher.dispatch(this.gameEvents.playerMoved({ x: currentX, y: currentY }));
+      this.lastPlayerPosition = { x: currentX, y: currentY };
+    }
+
+    // Update player direction if available
+    const direction = this.player.getDirection();
+    const validDirections = ['up', 'down', 'left', 'right'];
+    if (direction && validDirections.indexOf(direction) !== -1) {
+      const currentDirection = this.gameSessionStore?.playerDirection();
+      if (currentDirection !== direction) {
+        this.dispatcher.dispatch(this.gameEvents.playerDirectionChanged(direction as 'up' | 'down' | 'left' | 'right'));
+      }
+    }
+
+    // Update player movement status
+    const isMoving = this.player.getIsMoving();
+    const currentIsMoving = this.gameSessionStore?.isPlayerMoving();
+    if (currentIsMoving !== isMoving) {
+      this.dispatcher.dispatch(this.gameEvents.playerMovementStatusChanged(isMoving));
+    }
   }
 
   /**

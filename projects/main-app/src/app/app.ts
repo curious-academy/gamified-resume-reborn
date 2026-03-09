@@ -14,4 +14,9 @@ import { RouterOutlet } from '@angular/router';
 })
 export class App {
   protected readonly title = signal('Gamified Resume Reborn');
+
+  // private readonly sig1 = signal('Hello');
+  // private readonly sig2 = signal('World');
+
+  // protected readonly result = computed(() => `${this.sig1()} ${this.sig2()}`);
 }

@@ -1,6 +1,6 @@
 import { Component, output, signal, inject, computed, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { VideoInputComponent } from './video-input.component';
+import { VideoInputComponent } from './video-input/video-input.component';
 import { Video } from '../models';
 import { TrainingService } from '../services';
 

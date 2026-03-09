@@ -446,7 +446,7 @@ git add -A && git commit -m "feat(<feature>): add NgRx Signal Store with event-d
 - Move HTTP side effects to withEventHandlers in store
 - Update unit tests for new store-based architecture
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>"
 ```
 
 ## Testing Pitfalls — Must Avoid

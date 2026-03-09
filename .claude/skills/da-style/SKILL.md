@@ -821,7 +821,7 @@ style(<component>): apply design system styles
 - Ensured accessibility standards
 - Followed Tailwind CSS v4 conventions
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```

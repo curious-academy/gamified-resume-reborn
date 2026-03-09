@@ -18,6 +18,18 @@ Transform a feature specification into working, tested, quality code following:
 3. **Code quality** review and fixes
 4. **Professional PR** workflow
 
+## ⚠️ MANDATORY AUTO-COMMIT RULE
+
+**Every single unit of logical modification MUST be committed automatically after the build succeeds.**
+- After generating a component → auto-commit
+- After generating a service → auto-commit
+- After GREEN phase (tests pass) → auto-commit
+- After REFACTOR phase (tests still pass) → auto-commit
+- After styling changes → auto-commit
+- After fixing any issue → auto-commit
+- Use the `commit` skill in auto-commit mode (NON-INTERACTIVE)
+- **NEVER accumulate multiple logical changes without committing**
+
 ## ⚠️ CRITICAL ANGULAR RULES
 
 **NEVER create Angular files manually:**

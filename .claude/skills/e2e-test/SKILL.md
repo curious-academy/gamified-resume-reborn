@@ -189,7 +189,7 @@ chore(e2e): configure Cypress for E2E testing
 - Add npm scripts for running Cypress tests
 - Configure gitignore for Cypress output
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```
@@ -453,7 +453,7 @@ test(e2e): add E2E tests for <feature> workflow
 - ⚠️ Edge cases: <number> scenarios covered
 - Added data-cy attributes for test selectors
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
 )"
 ```

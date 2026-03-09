@@ -208,7 +208,18 @@ readonly positionMap = computed(() =>
 @if (positionMap().get(node.objective.id); as pos) { ... }
 ```
 
-### 3. Checklist before committing a component
+### 3. MANDATORY Auto-Commit
+
+After the component is generated, styled (via da-style), and the build succeeds:
+- **Auto-commit immediately** — do NOT ask the user
+- Use the `commit` skill in auto-commit mode
+- If da-style already committed, verify with `git status` — if clean, skip
+
+**If da-style is NOT invoked** (e.g., headless component with no template):
+- Verify the build: `ng build main-app`
+- Auto-commit: `git add -A && git commit -m "feat(<feature>): generate <component-name> component"`
+
+### 4. Checklist before committing a component
 
 - [ ] `ChangeDetectionStrategy.OnPush` is set in the decorator
 - [ ] No method calls in the template that derive from `input()` signals

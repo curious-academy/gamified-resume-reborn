@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, ChangeDetectionStrategy } from '@a
 import { FormsModule } from '@angular/forms';
 import { TrainingService } from '../services';
 import { Quest, CreateQuestDto, CreateObjectiveDto, Video } from '../models';
-import { VideoInputComponent } from './video-input.component';
+import { VideoInputComponent } from './video-input/video-input.component';
 
 /**
  * Component for managing training details with quests and objectives
